@@ -1,0 +1,282 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0109 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <FL/Fl_File_Chooser.H>} {public
+} 
+
+decl {\#include <FL/Fl_Pixmap.H>} {public
+} 
+
+decl {\#include <FL/Fl_Bitmap.H>} {public
+} 
+
+decl {\#include <FL/Fl_GIF_Image.H>} {public
+} 
+
+decl {\#include "Cartesian.h"} {public
+} 
+
+decl {void userAction(Fl_Widget* target);} {public
+} 
+
+decl {void userAction(selection sel, Ca_Canvas* sender);} {public
+} 
+
+decl {void reduce_all();} {public
+} 
+
+class UserInterface {open
+} {
+  decl {Fl_Repeat_Button* ChnButton[53];} {public
+  }
+  decl {Fl_Input* Delays[52];} {public
+  }
+  Function {make_window()} {open
+  } {
+    Fl_Window main_window {
+      label viewer open
+      xywh {264 51 1005 690} type Double align 0 size_range {800 700 0 0} visible
+    } {
+      Fl_Group plotLH_group {open selected
+        xywh {5 15 850 465}
+      } {
+        Fl_Box plotH {
+          callback {userAction(selection(plotH->sel_rect.xmin,plotH->sel_rect.ymin,plotH->sel_rect.xmax,plotH->sel_rect.ymax), plotH);}
+          image {logo.jpg} xywh {70 69 625 239} box DOWN_BOX color 55
+          class Ca_Canvas
+        }
+        Fl_Box ampH {
+          label {Amplitude (mV)}
+          xywh {5 55 68 265} align 5
+          code0 {ampH->minimum(-1);}
+          code1 {ampH->maximum(1);}
+          code2 {ampH->axis_color(FL_BLACK);}
+          code3 {ampH->axis_align(CA_LEFT);}
+          class Ca_Y_Axis
+        }
+        Fl_Box timeH {
+          label {Time (ns)}
+          xywh {55 308 640 37} align 10
+          code0 {timeH->minimum(-500);}
+          code1 {timeH->maximum(600);}
+          code2 {timeH->axis_color(FL_BLACK);}
+          code3 {timeH->axis_align(CA_BOTTOM);}
+          class Ca_X_Axis
+        }
+        Fl_Output HSlabel {
+          xywh {310 45 130 25} box NO_BOX textsize 12 textcolor 1
+          code0 {HSlabel->value("  Veiwer Output ");}
+        }
+      }
+      Fl_Group plot_group {open
+        xywh {730 300 265 385} box PLASTIC_THIN_DOWN_BOX
+      } {
+        Fl_Button open_btn {
+          label {Open File}
+          callback {userAction(open_btn);}
+          xywh {805 312 115 36}
+        }
+        Fl_Repeat_Button Chn0 {
+          label 1
+          callback {channel->value(1);
+userAction(channel);}
+          xywh {815 500 110 105} box ROUNDED_BOX
+        }
+        Fl_Group {} {open
+          xywh {765 440 100 25}
+        } {
+          Fl_Value_Input event {
+            label event
+            callback {userAction(event);}
+            xywh {785 440 60 25} align 1 minimum 1 maximum 3000 step 10 value 1
+          }
+          Fl_Button {} {
+            label {<}
+            callback {event->value(event->value()-1);
+event->do_callback();
+
+if(event->value()<1){
+
+event->value(1);
+
+}}
+            xywh {765 440 20 25} box FLAT_BOX
+          }
+          Fl_Button {} {
+            label {>}
+            callback {event->value(event->value()+1);
+event->do_callback();}
+            xywh {845 440 20 25} box FLAT_BOX
+          }
+        }
+        Fl_Group {} {open
+          xywh {885 415 100 50} align 5
+        } {
+          Fl_Value_Input channel {
+            label channel
+            callback {userAction(channel);}
+            xywh {913 440 45 25} align 1 minimum 1 maximum 32 step 1 value 1
+          }
+          Fl_Button {} {
+            label {<}
+            callback {channel->value(channel->value()-1);
+channel->do_callback();
+if(channel->value()<1 || channel->value()>60){
+
+channel->value(52);
+
+}}
+            xywh {893 440 20 25} box FLAT_BOX
+          }
+          Fl_Button {} {
+            label {>}
+            callback {channel->value(channel->value()+1);
+channel->do_callback();
+if(channel->value()>52){
+
+channel->value(1);
+
+}}
+            xywh {958 440 20 25} box FLAT_BOX
+          }
+        }
+        Fl_Button reduce_btn {
+          label {Reduce File}
+          callback {userAction(reduce_btn);}
+          xywh {795 355 135 20} down_box THIN_UP_BOX
+        }
+        Fl_Input filename {
+          label {file name}
+          callback {userAction(filename);}
+          xywh {745 378 240 17} labeltype NO_LABEL align 0
+        }
+      }
+      Fl_Button quit_btn {
+        label Quit
+        callback {userAction(quit_btn);}
+        xywh {1003 810 75 30}
+      }
+      Fl_Text_Display TimelineComment {
+        label {Time Line Analysis}
+        xywh {25 390 345 290}
+        code0 {TimelineComment->color(FL_BACKGROUND_COLOR);}
+        code1 {TimelineComment->scrollbar_align(FL_ALIGN_RIGHT);}
+      }
+      Fl_Text_Display RootfileComment {
+        label {Input File Information}
+        xywh {730 95 260 195}
+        code0 {RootfileComment->color(FL_BACKGROUND_COLOR);}
+        code1 {RootfileComment->scrollbar_align(FL_ALIGN_RIGHT);}
+      }
+      Fl_Group {} {open
+        xywh {395 380 320 300} box THIN_UP_BOX
+      } {
+        Fl_Tabs Config_group {
+          label {Plot Tabs} open
+          xywh {410 380 295 265} box PLASTIC_THIN_DOWN_BOX
+        } {
+          Fl_Group CONFtools {
+            label Tools open
+            xywh {410 405 285 235} hide
+          } {
+            Fl_Text_Display {} {
+              label {Threshold units }
+              xywh {535 415 150 25} box THIN_UP_FRAME color 47 labeltype ENGRAVED_LABEL labelsize 12 labelcolor 216 align 4
+            }
+            Fl_Check_Button toolsBox_rms {
+              label RMS
+              callback {toolsBox_adc->value(false);}
+              xywh {535 415 25 25} down_box DOWN_BOX labelsize 10
+              code0 {toolsBox_rms->value(false);}
+            }
+            Fl_Check_Button toolsBox_adc {
+              label ADC_channels
+              callback {toolsBox_rms->value(false);}
+              xywh {585 415 25 25} down_box DOWN_BOX labelsize 10
+              code0 {toolsBox_adc->value(true);}
+            }
+            Fl_Value_Input Threshold {
+              label Threshold
+              callback {userAction(Threshold);}
+              xywh {470 460 60 25} box BORDER_BOX labelsize 10 align 5 minimum 1 maximum 3000 step 10 value 50
+            }
+            Fl_Value_Input noise {
+              label noise
+              callback {userAction(noise);}
+              xywh {585 460 60 25} box BORDER_BOX labelsize 10 align 5 minimum 1 maximum 3000 step 10 value 5
+            }
+            Fl_Text_Display {} {
+              label {Base line}
+              xywh {495 500 185 25} box THIN_UP_FRAME color 47 labeltype ENGRAVED_LABEL labelsize 12 labelcolor 216 align 4
+            }
+            Fl_Check_Button toolsBox_pretrig {
+              label {Pre-trigger}
+              xywh {500 500 25 25} down_box DOWN_BOX labelsize 10
+              code0 {toolsBox_pretrig->value(false);}
+            }
+            Fl_Check_Button toolsBox_base {
+              label user
+              xywh {575 500 25 25} down_box DOWN_BOX labelsize 10
+              code0 {toolsBox_base->value(false);}
+            }
+            Fl_Value_Input baseline {
+              callback {userAction(baseline);}
+              xywh {630 500 50 25} box BORDER_BOX labelsize 10 align 9 minimum 1 maximum 3000 step 10 value 1000
+            }
+          }
+          Fl_Group Graph_tool {
+            label Graph open
+            xywh {410 405 295 235}
+          } {
+            Fl_Text_Display {} {
+              label {Time axis}
+              xywh {495 420 200 55} box THIN_UP_FRAME color 47 labeltype ENGRAVED_LABEL labelsize 12 labelcolor 216 align 4
+            }
+            Fl_Value_Input time_mult {
+              label {Time multiplier}
+              callback {userAction(time_mult);}
+              xywh {610 442 70 23} value 1e+09
+            }
+            Fl_Check_Button time_auto {
+              label {Auto scale}
+              xywh {505 420 90 15} down_box DOWN_BOX
+              code0 {time_auto->value(false);}
+            }
+            Fl_Text_Display {} {
+              label {Voltage axis}
+              xywh {495 485 200 55} box THIN_UP_FRAME color 47 labeltype ENGRAVED_LABEL labelsize 12 labelcolor 216 align 4
+            }
+            Fl_Check_Button amp_auto {
+              label {Auto scale}
+              xywh {505 485 90 15} down_box DOWN_BOX
+              code0 {amp_auto->value(false);}
+            }
+            Fl_Value_Input amp_mult {
+              label {Time multiplier}
+              callback {userAction(amp_mult);}
+              xywh {610 507 70 23} value 1000
+            }
+          }
+        }
+        Fl_Button set_btn {
+          label Set
+          callback {userAction(set_btn);}
+          xywh {535 645 75 30}
+        }
+      }
+      Fl_Text_Display RootfileName {
+        label {Current File  Name}
+        xywh {575 20 415 40}
+        code0 {RootfileComment->color(FL_BACKGROUND_COLOR);}
+        code1 {RootfileComment->scrollbar_align(FL_ALIGN_RIGHT);}
+      }
+    }
+  }
+  Function {show()} {open
+  } {
+    code {make_window();
+ChnButton[0]=Chn0;
+main_window->show();} {}
+  }
+} 
