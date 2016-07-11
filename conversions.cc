@@ -33,6 +33,9 @@ void conversion::initialise() {
 		case DIM_DENSITY:
 			density_units_[_unit] = _value;
 			break;
+		case DIM_DIFFUSION_CONSTANT:
+			diffusion_constant_units_[_unit] = _value;
+			break;
 		default:
 			std::cerr << "Unhandled dimension was read from unit file (" << _dimension << ") for the unit '" << _unit << "'" << std::endl;
 		}

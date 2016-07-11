@@ -307,15 +307,11 @@ void tds_run::make_analysis(int event_num, float thresh_u, float thresh_l, bool 
 	std::cout<<"analyse timeline"<<endl;
 }
 
-void tds_run::basename(std::string _basename) {
-	basename_ = _basename;
-}
-
 void tds_run::initialise() {
 
 	// Before we can read in any data, we should look for
 	// any settings about units we can find
-	conversion _conversion((basename() + ".units").c_str());
+	conversion _conversion((configname() + ".units").c_str());
 	units(&_conversion);
 	cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
 	

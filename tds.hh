@@ -270,6 +270,7 @@ private:
 	ifstream simparamsfile_;
 	ofstream contaminationsfile_;
 	std::string basename_;
+	std::string configname_;
 protected:
 public:
 	tds_run();
@@ -278,9 +279,11 @@ public:
 	void make_analysis(int event_num, float thresh_u, float thresh_l, bool rms, float noise, float m_baseline, bool man_base, bool pretrig);
 	void initialise();
 	//setters
-	void basename(std::string _basename);
+	inline void basename(std::string _basename) { basename_ = _basename; };
+	inline void configname(std::string _configname) { configname_ = _configname; };
 	//getters
 	inline std::string basename() { return basename_; };
+	inline std::string configname() { return configname_; };
 };
 
 class tds_display: public tds_run {

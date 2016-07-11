@@ -28,8 +28,10 @@ int main(int nArg, char** vArg){
 	if (t>=0) {
 		// looks like we're testing functionality rather than using the display or batch processing
 		string basename = "simple";
+		string configname = "simple";
 		tds_t = new tds_run();
 		tds_t->basename(basename);
+		tds_t->configname(configname);
 		tds_t->initialise();
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
