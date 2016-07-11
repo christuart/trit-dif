@@ -1,5 +1,6 @@
 #include "tds.hh"
 
+/******************** VECTOR METHODS ********************/
 void operator+=(vector<float>& u, const vector<float>& v) { u = u+v; }
 void operator-=(vector<float>& u, const vector<float>& v) { u = u-v; }
 void operator*=(vector<float>& u, const vector<float>& v) { u = u*v; }
@@ -71,6 +72,17 @@ void normalise(vector<float>& u) {
 	u *= (1/m);
 }
 
+/******************** TDS_ELEMENT METHODS ********************/
+tds_node::tds_node(float _x, float _y, float _z) {
+	position_.reserve(3);
+	position_.push_back(_x);
+	position_.push_back(_y);
+	position_.push_back(_z);
+}
+tds_node::~tds_node() {
+}
+
+/******************** TDS_ELEMENT METHODS ********************/
 tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
 	// e.g. triangular element r_COM = r_A + (2/3) * (r_AB + 0.5 * r_BC)
@@ -133,8 +145,15 @@ void tds_element::update(float delta_T) {//method to update parameters
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 	}
 }
- 
 
+/******************** TDS_MATERIAL METHODS ********************/
+tds_material::tds_material(std::string _name, float _density, float _diffusion_constant):material_name_(_name),material_density_(_density),material_diffusion_constant_(_diffusion_constant) {
+}
+
+tds_material::~tds_material() {
+}
+
+/******************** TDS_SECTION METHODS ********************/
 tds_section::tds_section():elements_(){	
 }
 
@@ -152,6 +171,7 @@ void tds_section::clean_elements(){
 	elements_.resize(0);
 }
 
+/******************** TDS_ELEMENT_LINK METHODS ********************/
 tds_element_link::tds_element_link(tds_element* _M, tds_element* _N):elementM_(_M),elementN_(_N) {
 	this->initialise();
 }
@@ -220,6 +240,7 @@ float tds_element_link::flow_rate(bool _AB) {
 	return flow_rate_;
 }
 	
+/******************** TDS METHODS ********************/
 tds::tds():sections_(){
 }
 
@@ -232,12 +253,29 @@ void tds::add_section(tds_section* new_section){
 	std::cout<<"adding a new section"<<endl;
 	sections_.push_back(new_section);
 }
+void tds::add_material(tds_material* new_material){
+	std::cout<<"adding a new material"<<endl;
+	materials_.push_back(new_material);
+}
+void tds::add_node(tds_node* new_node){
+	std::cout<<"adding a new node"<<endl;
+	nodes_.push_back(new_node);
+}
 
 void tds::clean_sections(){
 	for (int i=0; i<sections_.size(); ++i) delete sections_[i];
 	sections_.resize(0);
 }
+void tds::clean_materials(){
+	for (int i=0; i<materials_.size(); ++i) delete materials_[i];
+	materials_.resize(0);
+}
+void tds::clean_nodes(){
+	for (int i=0; i<nodes_.size(); ++i) delete nodes_[i];
+	nodes_.resize(0);
+}
 
+/******************** TDS_RUN METHODS ********************/
 tds_run::tds_run():tds(){
 }
 
@@ -291,22 +329,26 @@ void tds_run::initialise() {
 	nodesfile_.open((basename() + ".nodes").c_str());
 	
 	cout << "gonna read me some files" << endl;
-	
-	std::string line;	
+	std::string line;
+		
 	//Let's start off by populating tds with some materials
 	while (std::getline(materialsfile_, line)) {
 		std::istringstream iss(line);
-		std::string _name, _density_unit, _diffusion_unit;
+		std::string _name, _density_unit, _diffusion_constant_unit;
 		double _density, _diffusion_constant;
 		
-		if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_unit)) {
+		if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
 			std::cerr << "Invalid line, skipping.\n";
 			continue;
 		}
 
-		std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_unit << "].\n";
-
-		//tds_material _m(_name, _density, _diffusion_constant);
+		std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
+		
+		// the name string comes in from Gmsh inside double quotes e.g. "Example" so we strip them out
+		_name.erase(_name.end()-1); _name.erase(_name.begin());
+		
+		tds_material _m(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
+		add_material(&_m);
 	}
 	//Now we've got materials, let's get the physical sections which use them
 	while (std::getline(sectionsfile_, line)) {
@@ -321,12 +363,32 @@ void tds_run::initialise() {
 
 		std::cout << "We obtained three values [" << dim << ", " << id << ", " << name << "].\n";
 	}
+	//Next we'll get some nodes in
+	while (std::getline(nodesfile_, line)) {
+		std::istringstream iss(line);
+		int id;
+		float _x, _y, _z;
+		
+		if (!(iss >> id >> _x >> _y >> _z)) {
+			std::cerr << "Invalid line, skipping.\n";
+			continue;
+		}
+
+		std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
+
+		if (id != n_nodes()+1) {
+			std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
+			continue;
+		}
+		add_node(new tds_node(_x,_y,_z));
+	}
 	cout << "gonna close me some files" << endl;
 	sectionsfile_.close();
 	elementsfile_.close();
 	nodesfile_.close();
 }
 
+/******************** TDS_DISPLAY METHODS ********************/
 tds_display::tds_display(UserInterface *gui):GUI_(gui){
 	GUI_->RootfileComment->buffer(FRootfileComments);
 	GUI_->TimelineComment->buffer(TimelineComment);
@@ -384,6 +446,7 @@ void tds_display::action(Fl_Widget *sender){
 	std::cout<<"display action"<<endl;
 }
 
+/******************** TDS_BATCH METHODS ********************/
 tds_batch::tds_batch(string filename, string rootout):infile_(filename.c_str()),rootfile_name_(rootout.c_str()),tds_run(){
 }
 

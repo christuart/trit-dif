@@ -219,13 +219,21 @@ protected:
 public:
 	tds();
 	virtual ~tds();
-	inline int nsections() { return sections_.size(); }
+	inline int n_sections() { return sections_.size(); }
 	inline tds_section& section(int i) { return *sections_[i]; }
+	inline int n_materials() { return materials_.size(); }
+	inline tds_material& material(int i) { return *materials_[i]; }
+	inline int n_nodes() { return nodes_.size(); }
+	inline tds_node& node(int i) { return *nodes_[i]; }
 	
-	//adder
+	//adders
 	void add_section(tds_section* new_section);
-	//cleaner
+	void add_material(tds_material* new_material);
+	void add_node(tds_node* new_node);
+	//cleaners
 	void clean_sections();
+	void clean_materials();
+	void clean_nodes();
 	
 	//setters
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }

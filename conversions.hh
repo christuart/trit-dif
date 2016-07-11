@@ -7,6 +7,15 @@
 #include <iostream>
 #include <sstream>
 
+typedef enum {
+    DIM_LENGTH,
+    DIM_TIME, // cannot reuse name time
+    DIM_DENSITY,
+    DIM_DIFFUSION_CONSTANT,
+    DIM_VOLUME,
+    DIM_AREA
+} enum_dimensions;
+
 class conversion {
 	public:
 	private:
@@ -17,6 +26,7 @@ class conversion {
 	std::map<std::string,float> diffusion_constant_units_;
 	std::map<std::string,float> volume_units_;
 	std::map<std::string,float> area_units_;
+	std::map<std::string,int> dimensions_;
 	protected:
 	public:
 	conversion(std::string _units_file);
