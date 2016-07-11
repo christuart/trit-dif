@@ -28,4 +28,12 @@
 *.out
 *.app
 
+# Project specifics
 viewer
+*.nodes
+*.elements
+*.sections
+*.msh
+
+# Emacs
+*.*~
