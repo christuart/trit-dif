@@ -70,6 +70,7 @@ void normalise(vector<float>& u) {
 	float m = magnitude(u);
 	u *= (1/m);
 }
+	
 
 tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
@@ -267,63 +268,6 @@ tds_run::~tds_run(){
 
 void tds_run::make_analysis(int event_num, float thresh_u, float thresh_l, bool rms, float noise, float m_baseline, bool man_base, bool pretrig){
 	std::cout<<"analyse timeline"<<endl;
-}
-
-void tds_run::basename(std::string _basename) {
-	basename_ = _basename;
-}
-
-void tds_run::initialise() {
-
-	// Before we can read in any data, we should look for
-	// any settings about units we can find
-	conversion _conversion((basename() + ".units").c_str());
-	units(&_conversion);
-	
-	// Now read in data
-	// First open all the necessary files (no point in getting half way through
-	// processing only to find a file we need is missing)
-	cout << "gonna open me some files" << endl;
-	materialsfile_.open((basename() + ".materials").c_str());
-	sectionsfile_.open((basename() + ".sections").c_str());
-	elementsfile_.open((basename() + ".elements").c_str());
-	nodesfile_.open((basename() + ".nodes").c_str());
-	
-	cout << "gonna read me some files" << endl;
-	
-	std::string line;	
-	//Let's start off by populating tds with some materials
-	while (std::getline(materialsfile_, line)) {
-		std::istringstream iss(line);
-		std::string _name, _density_unit, _diffusion_unit;
-		double _density, _diffusion_constant;
-		
-		if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_unit)) {
-			std::cerr << "Invalid line, skipping.\n";
-			continue;
-		}
-
-		std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_unit << "].\n";
-
-		//tds_material _m(_name, _density, _diffusion_constant);
-	}
-	//Now we've got materials, let's get the physical sections which use them
-	while (std::getline(sectionsfile_, line)) {
-		std::istringstream iss(line);
-		int dim, id;
-		std::string name;
-		
-		if (!(iss >> dim >> id >> name)) {
-			std::cerr << "Invalid line, skipping.\n";
-			continue;
-		}
-
-		std::cout << "We obtained three values [" << dim << ", " << id << ", " << name << "].\n";
-	}
-	cout << "gonna close me some files" << endl;
-	sectionsfile_.close();
-	elementsfile_.close();
-	nodesfile_.close();
 }
 
 tds_display::tds_display(UserInterface *gui):GUI_(gui){

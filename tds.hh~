@@ -16,8 +16,6 @@
 #include "TTree.h"
 #include "TBranch.h"
 
-#include "conversions.hh"
-
 class tds_node;
 class tds_element;
 class tds_material;
@@ -48,6 +46,7 @@ float dot(const vector<float>& u, const vector<float>& v);
 vector<float> cross(const vector<float>& u, const vector<float>& v);
 float magnitude(vector<float>& u);
 void normalise(vector<float>& u);
+
 
 class tds_node {
 public:
@@ -209,7 +208,6 @@ private:
 	tds_sections sections_;
 	tds_materials materials_;
 	tds_nodes nodes_;
-	conversion* units_;
 	
 	std::string tds_name_,size_unit_,size_x_unit_,size_y_unit_,size_z_unit_;
 	float size_,size_x_,size_y_,size_z_;
@@ -227,7 +225,7 @@ public:
 	//cleaner
 	void clean_sections();
 	
-	//setters
+	//setter
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }
 	inline void size_unit(std::string sz_unit){ size_unit_=sz_unit; }
 	inline void size(float sz){ size_=sz; }
@@ -237,8 +235,7 @@ public:
 	inline void size_y(float sz_y){ size_y_=sz_y; }
 	inline void size_z_unit(std::string sz_z_unit){ size_z_unit_=sz_z_unit; }
 	inline void size_z(float sz_z){ size_z_=sz_z; }
-	inline void units(conversion* _units) { units_ = _units; }
-	//getters
+	//getter
 	inline std::string tds_name() { return tds_name_; }
 	inline std::string size_unit() { return size_unit_; }
 	inline float size() { return size_; }
@@ -248,13 +245,11 @@ public:
 	inline std::string size_x_unit() { return size_x_unit_; }
 	inline std::string size_y_unit() { return size_y_unit_; }
 	inline std::string size_z_unit() { return size_z_unit_; }
-	inline conversion& units() { return *units_; }
 };
 
 class tds_run: public tds {
 public:
 private:
-	ifstream materialsfile_;
 	ifstream sectionsfile_;
 	ifstream nodesfile_;
 	ifstream elementsfile_;
@@ -271,8 +266,6 @@ public:
 	void initialise();
 	//setters
 	void basename(std::string _basename);
-	//getters
-	inline std::string basename() { return basename_; };
 };
 
 class tds_display: public tds_run {
