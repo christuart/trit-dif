@@ -279,6 +279,7 @@ void tds_run::initialise() {
 	// any settings about units we can find
 	conversion _conversion((basename() + ".units").c_str());
 	units(&_conversion);
+	cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
 	
 	// Now read in data
 	// First open all the necessary files (no point in getting half way through

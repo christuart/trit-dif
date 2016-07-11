@@ -20,3 +20,11 @@ void conversion::initialise() {
 	}
 	units_file_stream.close();
 }
+
+float conversion::convert_density_from(std::string _unit, float _density) {
+	if (density_units_.count(_unit) == 0) {
+		std::cerr << "No density unit '" << _unit << "' was found." << std::endl;
+		return 0.0;
+	}
+	return _density * density_units_[_unit];
+}
