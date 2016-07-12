@@ -2,6 +2,7 @@
 #define TDS_HH
 
 #include <vector>
+#include <list>
 #include <iostream>
 #include "utilities.hh"
 #include "gui.h"
@@ -15,6 +16,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TBranch.h"
+#include <forward_list>
 
 #include "conversions.hh"
 
@@ -31,6 +33,7 @@ class tds_batch;
 typedef vector<tds_material*> tds_materials;
 typedef vector<tds_section*> tds_sections;
 typedef vector<tds_element*> tds_elements;
+typedef forward_list<tds_element*> tds_quick_elements;
 typedef vector<tds_node*> tds_nodes;
 typedef vector<tds_element_link*> tds_links;
 
@@ -53,21 +56,27 @@ class tds_node {
 public:
 private:
 	vector<float> position_;
+	tds_quick_elements elements_;
+	// used during construction only, because links can't be made
+	// until both elements exist, so the node needs to gradually
+	// learn which elements it is linked to.
 protected:
 public:
 	tds_node(float _x, float _y, float _z);
 	tds_node(vector<float> _position);
 	~tds_node();
+	//adders
+	void add_element(tds_element* new_element);
 	//setters
 	inline void position(vector<float> _position) { position_ = _position; }
 	inline void position(int i, float _p) { position_[i] = _p; }
 	//getters
 	inline vector<float> position() { return position_; }
 	inline float position(int i) { return position_[i]; }
+	inline bool elements_empty() { return elements_.empty(); }
+	
+	void clean_elements();
 };
-
-
-
 
 class tds_element {
 public:
@@ -93,7 +102,7 @@ public:
 	//getters
 	inline bool flagAB() { return flagAB_; }
 	inline float size() { return size_; }
-	inline float contamination() { if (flagAB()) return contaminationB_; else return contaminationA_; }
+	virtual inline float contamination() { if (flagAB()) return contaminationB_; else return contaminationA_; }
 	inline float origin(int i) { return origin_[i]; }
 	inline vector<float> origin() { return origin_; }
 	inline tds_material& material() { return *material_; }
@@ -108,6 +117,8 @@ public:
 	void set_origin_from_nodes();
 	// will calculate and apply the total amounts to be transferred to the element
 	void update(float delta_T);
+	// gives each node in the element a reference to it, so that element links may later be built
+	void propogate_into_nodes();
 };
 
 class tds_material {
@@ -129,6 +140,7 @@ public:
 	inline float diffusion_constant() { return material_diffusion_constant_; }
 	inline std::string material_density_unit() { return material_density_unit_; }
 	inline std::string material_diffusion_constant_unit() { return material_diffusion_constant_unit_; }
+	inline std::string name() { return material_name_; }
 };
 
 
@@ -140,7 +152,7 @@ private:
 	tds_material* material_;
 protected:
 public:
-	tds_section();
+	tds_section(tds_material* _material);
 	virtual ~tds_section();
 	//adders
 	void add_element(tds_element* new_element);
@@ -209,7 +221,10 @@ private:
 	tds_sections sections_;
 	tds_materials materials_;
 	tds_nodes nodes_;
+	tds_elements elements_;
 	conversion* units_;
+
+	std::map<std::string,tds_material*> material_map_;
 	
 	std::string tds_name_,size_unit_,size_x_unit_,size_y_unit_,size_z_unit_;
 	float size_,size_x_,size_y_,size_z_;
@@ -223,17 +238,22 @@ public:
 	inline tds_section& section(int i) { return *sections_[i]; }
 	inline int n_materials() { return materials_.size(); }
 	inline tds_material& material(int i) { return *materials_[i]; }
+	inline tds_material& material(std::string s) { return *material_map_[s]; }
 	inline int n_nodes() { return nodes_.size(); }
 	inline tds_node& node(int i) { return *nodes_[i]; }
+	inline int n_elements() { return elements_.size(); }
+	inline tds_element& element(int i) { return *elements_[i]; }
 	
 	//adders
 	void add_section(tds_section* new_section);
 	void add_material(tds_material* new_material);
 	void add_node(tds_node* new_node);
+	void add_element(tds_element* new_element);
 	//cleaners
 	void clean_sections();
 	void clean_materials();
 	void clean_nodes();
+	void clean_elements();
 	
 	//setters
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }

@@ -72,7 +72,7 @@ void normalise(vector<float>& u) {
 	u *= (1/m);
 }
 
-/******************** TDS_ELEMENT METHODS ********************/
+/******************** TDS_NODE METHODS ********************/
 tds_node::tds_node(float _x, float _y, float _z) {
 	position_.reserve(3);
 	position_.push_back(_x);
@@ -80,6 +80,14 @@ tds_node::tds_node(float _x, float _y, float _z) {
 	position_.push_back(_z);
 }
 tds_node::~tds_node() {
+}
+
+void tds_node::add_element(tds_element* new_element){
+	std::cout<<"adding new element for node"<<endl;
+	elements_.push_front(new_element);
+}
+void tds_node::clean_elements(){
+	while (!elements_empty()) elements_.pop_front();
 }
 
 /******************** TDS_ELEMENT METHODS ********************/
@@ -145,6 +153,11 @@ void tds_element::update(float delta_T) {//method to update parameters
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 	}
 }
+void tds_element::propogate_into_nodes() {
+	for (int i=0; i < n_nodes(); i++) {
+		node(i).add_element(this);
+	}
+}
 
 /******************** TDS_MATERIAL METHODS ********************/
 tds_material::tds_material(std::string _name, float _density, float _diffusion_constant):material_name_(_name),material_density_(_density),material_diffusion_constant_(_diffusion_constant) {
@@ -154,19 +167,19 @@ tds_material::~tds_material() {
 }
 
 /******************** TDS_SECTION METHODS ********************/
-tds_section::tds_section():elements_(){	
+tds_section::tds_section(tds_material* _material):elements_(),material_(_material) {	
 }
 
-tds_section::~tds_section(){
+tds_section::~tds_section() {
 	clean_elements();
 }
 
-void tds_section::add_element(tds_element* new_element){
+void tds_section::add_element(tds_element* new_element) {
 	std::cout<<"adding new element"<<endl;
 	elements_.push_back(new_element);
 }
 
-void tds_section::clean_elements(){
+void tds_section::clean_elements() {
 	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
 	elements_.resize(0);
 }
@@ -255,11 +268,16 @@ void tds::add_section(tds_section* new_section){
 }
 void tds::add_material(tds_material* new_material){
 	std::cout<<"adding a new material"<<endl;
+	material_map_[(*new_material).name()];
 	materials_.push_back(new_material);
 }
 void tds::add_node(tds_node* new_node){
 	std::cout<<"adding a new node"<<endl;
 	nodes_.push_back(new_node);
+}
+void tds::add_element(tds_element* new_element){
+	std::cout<<"adding a new element"<<endl;
+	elements_.push_back(new_element);
 }
 
 void tds::clean_sections(){
@@ -273,6 +291,10 @@ void tds::clean_materials(){
 void tds::clean_nodes(){
 	for (int i=0; i<nodes_.size(); ++i) delete nodes_[i];
 	nodes_.resize(0);
+}
+void tds::clean_elements(){
+	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
+	elements_.resize(0);
 }
 
 /******************** TDS_RUN METHODS ********************/
@@ -310,7 +332,7 @@ void tds_run::make_analysis(int event_num, float thresh_u, float thresh_l, bool 
 void tds_run::initialise() {
 
 	// Before we can read in any data, we should look for
-	// any settings about units we can find
+	// any settings about (measurement) units we can find
 	conversion _conversion((configname() + ".units").c_str());
 	units(&_conversion);
 	cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
@@ -349,15 +371,25 @@ void tds_run::initialise() {
 	//Now we've got materials, let's get the physical sections which use them
 	while (std::getline(sectionsfile_, line)) {
 		std::istringstream iss(line);
-		int dim, id;
-		std::string name;
+		int _dim, _id;
+		std::string _name;
 		
-		if (!(iss >> dim >> id >> name)) {
+		if (!(iss >> _dim >> _id >> _name)) {
 			std::cerr << "Invalid line, skipping.\n";
 			continue;
 		}
 
-		std::cout << "We obtained three values [" << dim << ", " << id << ", " << name << "].\n";
+		std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
+		
+		// the name string comes in from Gmsh inside double quotes e.g. "Example" so we strip them out
+		_name.erase(_name.end()-1); _name.erase(_name.begin());
+
+		if (_id != n_sections()+1) {
+			std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
+			continue;
+		}
+		
+		add_section(new tds_section(&material(_name)));
 	}
 	//Next we'll get some nodes in
 	while (std::getline(nodesfile_, line)) {
@@ -378,10 +410,58 @@ void tds_run::initialise() {
 		}
 		add_node(new tds_node(_x,_y,_z));
 	}
-	cout << "gonna close me some files" << endl;
+	//Now finally we'll read the elements
+	while (std::getline(elementsfile_, line)) {
+		std::istringstream iss(line);
+		int id, type, n_tags, section_id, entity_id;
+		std::ostringstream extra_tags;
+		
+		if (!(iss >> id >> type >> n_tags)) {
+			std::cerr << "Invalid line, skipping.\n";
+			continue;
+		}
+		if (id != n_elements()+1) {
+			std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
+			continue;
+		}
+		int tags_processed = 0;
+		iss >> section_id >> entity_id;
+		for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
+			extra_tags << iss << " ";
+		}
+		if (extra_tags.str().length() > 0)
+			std::cout << "Unprocessed tags: " << extra_tags.str() << std::endl;
+		tds_nodes _element_nodes;
+		int this_node;
+		while (iss >> this_node) {
+			std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
+			_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
+		}
+		std::cout << "all nodes ready to place into the element" << std::endl;
+		tds_element new_element(_element_nodes,&(section(section_id-1).material()),0.0);
+		std::cout << "element created, with nodes" << std::endl;
+		add_element(&new_element);
+		std::cout << "element stored, referencing it in its nodes" << std::endl;
+		new_element.propogate_into_nodes();
+		std::cout << "all done!" << std::endl;
+
+		std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+	}
+	std::cout << "gonna close me some files" << std::endl;
 	sectionsfile_.close();
 	elementsfile_.close();
 	nodesfile_.close();
+
+	// Every element now has a list of nodes that it make it,
+	// and every node has a list of every element that makes
+	// use of it. In 1-D we may now simply make our way through
+	// the list of elements, adding 
+	
+	std::cout << "Producing element links" << std::endl;
+	int n = n_elements();
+	for (int i=0; i < n; i++) {
+		
+	
 }
 
 /******************** TDS_DISPLAY METHODS ********************/
