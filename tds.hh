@@ -17,6 +17,7 @@
 #include "TTree.h"
 #include "TBranch.h"
 #include <forward_list>
+#include <bitset>
 
 #include "conversions.hh"
 
@@ -223,6 +224,7 @@ private:
 	tds_nodes nodes_;
 	tds_elements elements_;
 	conversion* units_;
+	std::bitset<8> element_dimensions;
 
 	std::map<std::string,tds_material*> material_map_;
 	
