@@ -4,8 +4,6 @@
 #include <iostream>
 #include "tds.hh"
 
-using namespace std;
-
 UserInterface* UI=NULL;
 tds_display* tds=NULL;
 tds_batch* tds_b=NULL;
@@ -23,11 +21,15 @@ int main(int nArg, char** vArg){
 	string textfile("config_file.conf");
 	string prefix;
 	cCommandLine cl(nArg,vArg);// decompose the command line.
+	std::cout << "Number of 'arguments': " << cl.size() << std::endl;
+	for (unsigned i=0; i < cl.size(); ++i) {
+		std::cout << "Argument " << i << ": " << cl[i].arg << std::endl;
+	}
 	int t=cl.flag("t|test");
 	int b=cl.flag("b|batch");
 	if (t>=0) {
 		// looks like we're testing functionality rather than using the display or batch processing
-		string basename = "simple";
+		string basename = "simple2d";
 		string configname = "simple";
 		tds_t = new tds_run();
 		tds_t->basename(basename);

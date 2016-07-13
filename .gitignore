@@ -33,6 +33,7 @@ viewer
 *.nodes
 *.elements
 *.sections
+*.materials
 *.msh
 *.units
 *.geo
