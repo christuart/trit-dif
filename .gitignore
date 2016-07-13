@@ -35,6 +35,7 @@ viewer
 *.sections
 *.msh
 *.units
+*.geo
 
 # Emacs
 *~

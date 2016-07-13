@@ -568,32 +568,39 @@ void tds_run::initialise() {
 		// We don't want to use the global elements list, but instead
 		// iterate through each section's list of elements. This allows
 		// us to treat source and/or outgassing sections differently
-		// from the rest. (next to be implemented...)
-		// for (int s = 0; s < n_sections(); s++ ) {
-		int n, m, o;
-		n = n_elements();
-		for (int i=0; i < n; i++) {
-			m = element(i).n_nodes();
-			for (int j=0; j < m; j++) {
-				o = element(i).node(j).n_elements();
-				std::cout << "Element " << &element(i) << " links to node " << &(element(i).node(j)) << " which currently links to " << o << " more elements." << std::endl;
-				for (int k=o; k > 0; k--) {
-					if (&element(i) == &(element(i).node(j).element(k-1))) {
-						std::cout << "Skipping - don't need to link to self!" << std::endl;
-					} else {
-						std::cout << "Making link from " << &element(i) << " to "
-						          << &(element(i).node(j).element(k-1)) << std::endl;
-						tds_element_link* new_link = new tds_element_link(&element(i),
-						                                   &(element(i).node(j).element(k-1)));
-						element_link_count++;
-						std::cout << "Made link" << std::endl;
-						element(i).add_element_link(new_link);
-						element(i).node(j).element(k-1).add_element_link(new_link);
+		// from the rest.
+		int n, m, o, t = 0;
+		for (int s = 0; s < n_sections(); s++ ) {
+			n = section(s).n_elements();
+		//{
+		//	n = n_elements();
+			t += n;
+			for (int i=0; i < n; i++) {
+				m = section(s).element(i).n_nodes();
+				for (int j=0; j < m; j++) {
+					o = section(s).element(i).node(j).n_elements();
+					std::cout << "Element " << &section(s).element(i) << " links to node "
+					          << &(section(s).element(i).node(j)) << " which currently links to "
+					          << o << " more elements." << std::endl;
+					for (int k=o; k > 0; k--) {
+						if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
+							std::cout << "Skipping - don't need to link to self!" << std::endl;
+						} else {
+							std::cout << "Making link from " << &section(s).element(i) << " to "
+							          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
+							tds_element_link* new_link = new tds_element_link(&section(s).element(i),
+							                                                  &(section(s).element(i).node(j).element(k-1)));
+							element_link_count++;
+							std::cout << "Made link" << std::endl;
+							section(s).element(i).add_element_link(new_link);
+							section(s).element(i).node(j).element(k-1).add_element_link(new_link);
+						}
+						section(s).element(i).node(j).remove_last_element();
 					}
-					element(i).node(j).remove_last_element();
 				}
 			}
 		}
+		std::cout << t << " elements trawled for links." << std::endl;
 		std::cout << "Made " << element_link_count << " element link objects." << std::endl;
 	} else {
 		std::cout << "Element links could not be made, only 1-D programmed." << std::endl;
