@@ -34,6 +34,10 @@ int main(int nArg, char** vArg){
 		string outputname = "output";
 		float delta_t = 3600.0*24.0;
 		int steps = 10;
+		vector<int> element_ids;
+		element_ids.push_back(1);
+		element_ids.push_back(2);
+		element_ids.push_back(tds_t->n_elements());
 		bool basename_set = false, configname_set = false, outputname_set = false;
 		for (unsigned i=0; i < cl.size(); ++i) {
 			if (i < cl.size()-1) {
@@ -49,7 +53,17 @@ int main(int nArg, char** vArg){
 				} else if (cl[i].arg == 's') { 
 					istringstream iss(cl[++i].arg);
 					iss >> steps;
-				}
+				} else if (cl[i].arg == 't') {
+					element_ids.resize(0);
+					int this_id;
+					while (i++ < cl.size()) {
+						istringstream iss(cl[++i].arg);
+						iss >> this_id;
+						std::cout << "Tracking " << this_id << std::endl;
+						element_ids.push_back(this_id);
+					}
+					return 0;
+				}		
 			}
 		}
 		std::cout << "basename: " << basename << std::endl;
@@ -61,11 +75,8 @@ int main(int nArg, char** vArg){
 		tds_t->outputname(outputname);
 		tds_t->initialise();
 		// run with five 1 day steps and no tracked elements for first tests.
-		vector<int> element_ids;
-		element_ids.push_back(1);
-		element_ids.push_back(2);
-		element_ids.push_back(tds_t->n_elements());
 		tds_t->make_analysis(delta_t, steps, element_ids);
+		return 0;
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
 		//string testoutput = "test.txt";
