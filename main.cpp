@@ -28,9 +28,12 @@ int main(int nArg, char** vArg){
 	int t=cl.flag("t|test");
 	int b=cl.flag("b|batch");
 	if (t>=0) {
+		// looks like we're testing functionality rather than using the display or batch processing
 		string basename = "simple2d";
 		string configname = "simple";
 		string outputname = "output";
+		float delta_t = 3600.0*24.0;
+		int steps = 10;
 		bool basename_set = false, configname_set = false, outputname_set = false;
 		for (unsigned i=0; i < cl.size(); ++i) {
 			if (i < cl.size()-1) {
@@ -40,20 +43,29 @@ int main(int nArg, char** vArg){
 					configname = cl[++i].arg; configname_set = true;
 				} else if (cl[i].arg == 'o' && !outputname_set) { 
 					outputname = cl[++i].arg; outputname_set = true;
+				} else if (cl[i].arg == 'd') {
+					istringstream iss(cl[++i].arg);
+					iss >> delta_t;
+				} else if (cl[i].arg == 's') { 
+					istringstream iss(cl[++i].arg);
+					iss >> steps;
 				}
 			}
 		}
 		std::cout << "basename: " << basename << std::endl;
 		std::cout << "configname: " << configname << std::endl;
 		std::cout << "outputname: " << outputname << std::endl;
-		// looks like we're testing functionality rather than using the display or batch processing
 		tds_t = new tds_run();
 		tds_t->basename(basename);
 		tds_t->configname(configname);
+		tds_t->outputname(outputname);
 		tds_t->initialise();
 		// run with five 1 day steps and no tracked elements for first tests.
-		tds_elements these_elements;
-		tds_t->make_analysis(3600.0*24.0, 5, these_elements);
+		vector<int> element_ids;
+		element_ids.push_back(1);
+		element_ids.push_back(2);
+		element_ids.push_back(tds_t->n_elements());
+		tds_t->make_analysis(delta_t, steps, element_ids);
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
 		//string testoutput = "test.txt";

@@ -95,20 +95,23 @@ void tds_node::remove_last_element() {
 }
 
 /******************** TDS_ELEMENT METHODS ********************/
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination),contaminationB_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
 	// e.g. triangular element r_COM = r_A + (2/3) * (r_AB + 0.5 * r_BC)
 	origin_.reserve(3);
 	set_origin_from_nodes();
+	calculate_size();
 	flagAB(false);
 }
 
 tds_element::tds_element(tds_nodes _nodes, tds_material* _material, vector<float> _origin, float _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
+	calculate_size();
 	flagAB(false);
 }
 tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _origin_x, float _origin_y, float _origin_z, float _contamination):nodes_(_nodes),contaminationA_(_contamination) {
 	origin_.reserve(3);
 	origin(_origin_x, _origin_y, _origin_z);
+	calculate_size();
 	flagAB(false);
 }
 
@@ -120,6 +123,8 @@ void tds_element::add_element_link(tds_element_link* new_element_link) {
 }
 
 void tds_element::transfer_contaminant(float _quantity) {
+	std::cout << "Received quantity of " << _quantity << " and have size() of "
+	          << size() << std::endl;
 	contamination(contamination()+_quantity/size());
 	flagAB(!flagAB());
 }
@@ -158,17 +163,68 @@ void tds_element::set_origin_from_nodes() {
 	debug(&origin());
 }
 
-void tds_element::update(float delta_T) {//method to update parameters
+void tds_element::update(float delta_t) {//method to update parameters
 	float total_flow = 0.0f;
 	for (int i = 0; i < n_neighbours(); i++) {
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 	}
+	std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
+	std::cout << "Takes contamination from " << contamination();
+	transfer_contaminant(total_flow * delta_t);
+	std::cout << " to " << contamination() << std::endl;
 }
 void tds_element::propogate_into_nodes() {
 	std::cout << "Propogating at element " << this << " i.e. through " << n_nodes() << " nodes." << std::endl;
 	for (int i=0; i < n_nodes(); i++) {
 		node(i).add_element(this);
 	}
+}
+void tds_element::calculate_size() {
+	vector<float> vecPQ, vecPR;
+	switch (n_nodes()) {
+	case 2:
+		vecPQ.resize(3);
+		vecPQ = node(1).position() - node(0).position();
+		if (vecPQ.at(1) == 0.0 && vecPQ.at(2) == 0.0) {
+			size(abs(vecPQ.at(1)-vecPQ.at(0)));
+		} else {
+			vecPQ *= vecPQ;
+			size(sqrt(vecPQ.at(0)+vecPQ.at(1)+vecPQ.at(2)));
+		}
+		break;
+	case 3:
+		// triangle PQR, area is 1/2 mod(PQ x PR)
+		vecPQ.resize(3);
+		vecPQ = node(1).position() - node(0).position();
+		vecPR.resize(3);
+		vecPR = node(2).position() - node(0).position();
+		if (vecPQ.at(2) == 0.0 && vecPR.at(2) == 0.0) {
+			//2D cross product nice and simple
+			size(0.5 * abs(vecPQ.at(1)*vecPR.at(0) - vecPQ.at(0)*vecPR.at(1)));
+		} else {
+			//3D cross product instead boooooo
+			size(
+			     0.5 *
+			     sqrt(
+			          (vecPQ.at(1)*vecPR.at(2)-vecPQ.at(2)*vecPR.at(1))
+			          *(vecPQ.at(1)*vecPR.at(2)-vecPQ.at(2)*vecPR.at(1)) + 
+			          (vecPQ.at(2)*vecPR.at(0)-vecPQ.at(0)*vecPR.at(2))
+			          *(vecPQ.at(2)*vecPR.at(0)-vecPQ.at(0)*vecPR.at(2)) + 
+			          (vecPQ.at(0)*vecPR.at(1)-vecPQ.at(1)*vecPR.at(0))
+			          *(vecPQ.at(0)*vecPR.at(1)-vecPQ.at(1)*vecPR.at(0))
+			          )
+			     );
+		}
+		break;
+	case 4:
+		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF QUADRANGLES OR TETRAHEDRA YET!" << std::endl;
+		break;
+	default:
+		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF THIS ELEMENT SHAPE YET!" << std::endl;
+	}
+}
+void tds_element::debug_contamination() {
+	std::cout << "Address: " << this << "; flagAB: " << flagAB() << "; Cont A: " << contaminationA_ << "; Cont B: " << contaminationB_ << std::endl;
 }
 
 /******************** TDS_MATERIAL METHODS ********************/
@@ -264,12 +320,21 @@ float tds_element_link::flow_rate(bool _AB) {
 	// AB flag system used because the same flow needn't be calculated twice for M->N and N->M
 	// instead we calculate it and store it, and only recalculate when the flag switches
 	if (_AB != flagAB()) {
+		std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
+		          << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
+		          << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
 		flow_rate_ = ( a_n_dot_eMN_over_modMN() *
-		               (elementN().contamination() - elementM().contamination()) *
-		               elementM().material().diffusion_constant() );
+		               (elementN().contamination(_AB) - elementM().contamination(_AB)) *
+		               diffusion_constant() );
 		flagAB(_AB);
 	}
 	return flow_rate_;
+}
+float tds_element_link::diffusion_constant() {
+	float D1 = elementM().material().diffusion_constant();
+	float D2 = elementN().material().diffusion_constant();
+	if (D1 > D2) return D1;
+	return D2;
 }
 void tds_element_link::set_flag_against(tds_element* _element) {
 	flagAB(!_element->flagAB());
@@ -347,10 +412,19 @@ void tds::output_model_summary(bool show_materials, bool show_sections, bool sho
 			          << " - " << element(i).n_nodes() << " nodes - "
 			          << element(i).n_neighbours() << " neighbours - contamination at "
 			          << element(i).contamination() << std::endl;
+			std::cout << "\tOrigin at [" << element(i).origin(0) << ", " << element(i).origin(1)
+			          << ", " << element(i).origin(2) << "]" << std::endl;
+			for (int j = 0; j < element(i).n_nodes(); j++) {
+				std::cout << "\tNode " << (j+1) << ": "
+				          << &(element(i).node(j))
+				          << std::endl;
+			}
 			if (show_element_links) {
 				for (int j = 0; j < element(i).n_neighbours(); j++) {
 					std::cout << "\tNeighbour " << (j+1) << ": "
 					          << (element(i).neighbour(j).neighbour_of(&element(i)))
+					          << " area " << (element(i).neighbour(j).interface_area())
+					          << " multiplier " << (element(i).neighbour(j).a_n_dot_eMN_over_modMN())
 					          << std::endl;
 				}
 			}
@@ -422,21 +496,16 @@ tds_run::~tds_run(){
 // 	add_section(new tds_section());
 // }
 
-void tds_run::make_analysis(float delta_t, int _steps, tds_elements& tracked_elements) {
+void tds_run::make_analysis(float delta_t, int _steps, vector<int>& tracked_elements) {
 
 	std::cout << "Running the model..." << endl;
 
 	// This is a very basic implementation of 'make_analysis' which has constant
 	// even source and no outgassing
 
-	// Set the source contamination
-	float source_contamination = 1.0;
-	for (int i=0; i < n_sections(); ++i) {
-		if (section(i).material().is_source()) {
-			for (int j=0; j < section(i).n_elements(); ++j) {
-				section(i).element(j).contamination(source_contamination);
-			}
-		}
+	// Allow the user to specify '-1' as the final element
+	for (int i=0; i < tracked_elements.size(); ++i) {
+		if (tracked_elements[i] < 0) tracked_elements[i] += n_elements();
 	}
 
 	// Set AB flags (just in case!)
@@ -450,7 +519,30 @@ void tds_run::make_analysis(float delta_t, int _steps, tds_elements& tracked_ele
 		}
 	}
 
+	// Set the source contamination
+	float source_contamination = 1.0e13;
+	for (int i=0; i < n_sections(); ++i) {
+		if (section(i).material().is_source()) {
+			std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is " << section(i).material().name() << " which is... source?????: " << section(i).material().is_source() << std::endl;
+			for (int j=0; j < section(i).n_elements(); ++j) {
+				section(i).element(j).debug_contamination();
+				section(i).element(j).contamination(source_contamination);
+				section(i).element(j).flagAB(!section(i).element(j).flagAB());
+				section(i).element(j).contamination(source_contamination);
+				section(i).element(j).flagAB(!section(i).element(j).flagAB());
+			}
+		}
+	}
+	for (int i=0; i < n_elements(); ++i)
+		element(i).debug_contamination();
+
 	float time = 0.0;
+
+	contaminationsfile_.open(outputname_ + ".contaminations");
+	contaminationsfile_ << "element, time, contamination" << std::endl;
+	contaminationsfile_ << std::scientific;
+	for (int i=0; i < tracked_elements.size(); ++i)
+		contaminationsfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
 	
 	for (int step = 0; step < _steps; ++step) {
 		
@@ -472,14 +564,21 @@ void tds_run::make_analysis(float delta_t, int _steps, tds_elements& tracked_ele
 			}
 		}
 		time += delta_t;
+		
 		// 2) Switch flags in elements
-		this_flag != this_flag;
-		for (int i=0; i < n_elements(); ++i) {
-			element(i).flagAB(this_flag);
-		}
+		//this_flag != this_flag;
+		//for (int i=0; i < n_elements(); ++i) {
+		//	element(i).flagAB(this_flag);
+		//}
+		//
 		// 3)
+		for (int i=0; i < tracked_elements.size(); ++i)
+			contaminationsfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
+		for (int i=0; i < n_elements(); ++i)
+			element(i).debug_contamination();
 		std::cout << "Step " << step << " complete. Time now is " << time << "s." << std::endl;
 	}
+	contaminationsfile_.close();
 }
 
 void tds_run::initialise() {

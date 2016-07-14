@@ -117,6 +117,7 @@ public:
 	inline bool flagAB() { return flagAB_; }
 	inline float size() { return size_; }
 	virtual inline float contamination() { if (flagAB()) return contaminationB_; else return contaminationA_; }
+	virtual inline float contamination(bool _AB) { if (_AB) return contaminationB_; else return contaminationA_; }
 	inline float origin(int i) { return origin_[i]; }
 	inline vector<float>& origin() { return origin_; }
 	inline tds_material& material() { return *material_; }
@@ -143,6 +144,10 @@ public:
 	virtual void update(float delta_t);
 	// gives each node in the element a reference to it, so that element links may later be built
 	void propogate_into_nodes();
+	// calculates and stores the length or area of volume of the element in size_
+	void calculate_size();
+
+	void debug_contamination();
 };
 
 class tds_material {
@@ -196,6 +201,7 @@ public:
 // and refers to a specific direction of flow, positive when going from N into M. This means that
 // you halve the number of link instances, but need to check whether the updating element is
 // stored as M or N with the method "bool positive_flow(tds_element* whoami);"
+
 class tds_element_link {
 public:
 private:
@@ -222,6 +228,13 @@ protected:
 	inline void modMN(float _modMN) { modMN_ = _modMN; }
 	inline void a_n_dot_eMN_over_modMN(float _f) { a_n_dot_eMN_over_modMN_ = _f; }
 	inline void flagAB(bool _AB) { flagAB_ = _AB; }
+public:
+	tds_element_link(tds_element* _M, tds_element* _N);
+	virtual ~tds_element_link();
+	void initialise();
+
+	//setters
+	void set_flag_against(tds_element* _element);
 	//getters
 	inline vector<float>& norm_vector() { return norm_vector_; }
 	inline float norm_vector(int i) { return norm_vector_[i]; }
@@ -233,14 +246,7 @@ protected:
 	inline tds_node& shared_node(int i) { return *shared_nodes_[i]; }
 	inline tds_element& elementM() { return *elementM_; }
 	inline tds_element& elementN() { return *elementN_; }
-public:
-	tds_element_link(tds_element* _M, tds_element* _N);
-	virtual ~tds_element_link();
-	void initialise();
-
-	//setters
-	void set_flag_against(tds_element* _element);
-	//getters
+	float diffusion_constant();
 	virtual float flow_rate(bool _AB); // virtual: may well want to do some kind of convection-analogue at the surfaces or something
 	inline bool flagAB() { return flagAB_; }
 	// positive flow is defined as from N to M, so M's contamination rises
@@ -344,19 +350,22 @@ private:
 	ofstream contaminationsfile_;
 	std::string basename_;
 	std::string configname_;
+	std::string outputname_;
 protected:
 public:
 	tds_run();
 	virtual ~tds_run();
 	void check_coincidence();
-	void make_analysis(float delta_t, int _steps, tds_elements& tracked_elements);
+	void make_analysis(float delta_t, int _steps, vector<int>& tracked_elements);
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { basename_ = _basename; };
 	inline void configname(std::string _configname) { configname_ = _configname; };
+	inline void outputname(std::string _outputname) { outputname_ = _outputname; };
 	//getters
 	inline std::string basename() { return basename_; };
 	inline std::string configname() { return configname_; };
+	inline std::string outputname() { return outputname_; };
 };
 
 class tds_display: public tds_run {
