@@ -125,12 +125,22 @@ public:
 	inline tds_element_link& neighbour(int i) { return *neighbours_[i]; }
 	inline int n_neighbours() { return neighbours_.size(); }
 
-	// will add the correct quantity to contamination and switch flag
+	// Will add the correct quantity to contamination and switch flag
 	void transfer_contaminant(float _quantity);
-	// finds the centre of mass (at present) to be used in calculating distances between elements
+	// Finds the centre of mass (at present) to be used in calculating distances between elements
 	void set_origin_from_nodes();
-	// will calculate and apply the total amounts to be transferred to the element
-	void update(float delta_T);
+	// Will calculate and apply the total amounts to be transferred to the element
+	// This is virtual in order to allow different types of element to be of child
+	// classes in the future (e.g. to clean out the basic update() function and have
+	// class tds_decaying_element : public tds_element {
+	//         virtual void update(float delta_t) {
+	//                  tds_element::update(delta_t);
+	//                  do_decay(delta_T);
+	//         }
+	// }
+	// or to have a tds_source_element that has non constant value or that records much
+	// how tritium entered the material or outgassing that records how much left etc.
+	virtual void update(float delta_t);
 	// gives each node in the element a reference to it, so that element links may later be built
 	void propogate_into_nodes();
 };
@@ -229,8 +239,9 @@ public:
 	void initialise();
 
 	//setters
+	void set_flag_against(tds_element* _element);
 	//getters
-	float flow_rate(bool _AB);
+	virtual float flow_rate(bool _AB); // virtual: may well want to do some kind of convection-analogue at the surfaces or something
 	inline bool flagAB() { return flagAB_; }
 	// positive flow is defined as from N to M, so M's contamination rises
 	inline short positive_flow(tds_element* whoami) { if (elementM_ == whoami) return 1; else return -1; }
@@ -338,7 +349,7 @@ public:
 	tds_run();
 	virtual ~tds_run();
 	void check_coincidence();
-	void make_analysis(float deltaT, int _steps, tds_elements tracked_elements);
+	void make_analysis(float delta_t, int _steps, tds_elements& tracked_elements);
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { basename_ = _basename; };

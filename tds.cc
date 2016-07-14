@@ -271,7 +271,9 @@ float tds_element_link::flow_rate(bool _AB) {
 	}
 	return flow_rate_;
 }
-	
+void tds_element_link::set_flag_against(tds_element* _element) {
+	flagAB(!_element->flagAB());
+}
 /******************** TDS METHODS ********************/
 tds::tds():sections_(){
 	element_dimensions_ = 0x0;
@@ -420,8 +422,64 @@ tds_run::~tds_run(){
 // 	add_section(new tds_section());
 // }
 
-void tds_run::make_analysis(float deltaT, int _steps, tds_elements tracked_elements) {
-	std::cout << "Run the model..." << endl;
+void tds_run::make_analysis(float delta_t, int _steps, tds_elements& tracked_elements) {
+
+	std::cout << "Running the model..." << endl;
+
+	// This is a very basic implementation of 'make_analysis' which has constant
+	// even source and no outgassing
+
+	// Set the source contamination
+	float source_contamination = 1.0;
+	for (int i=0; i < n_sections(); ++i) {
+		if (section(i).material().is_source()) {
+			for (int j=0; j < section(i).n_elements(); ++j) {
+				section(i).element(j).contamination(source_contamination);
+			}
+		}
+	}
+
+	// Set AB flags (just in case!)
+	bool this_flag = false;
+	for (int i=0; i < n_elements(); ++i) {
+		element(i).flagAB(this_flag);
+		for (int j=0; j < element(i).n_neighbours(); ++j) {
+			// Links should start with the opposite flag, so that they
+			// calculate the flow_rate properly the first step.
+			element(i).neighbour(j).set_flag_against(&element(i));
+		}
+	}
+
+	float time = 0.0;
+	
+	for (int step = 0; step < _steps; ++step) {
+		
+		// Every step we need to:
+		// 1) Update every element (each element decides what it needs to do to consitute an update)
+		// 2) Switch all of the flags in the elements (BUT NOT IN THE LINKS!)
+		// 3a) Output any outputs that have been requested and any warnings to std::cout
+		// 3b) Output any outputs that have been requested to the output file
+		// It may be necessary for speed's sake to put these outputs into arrays or buffers
+		// and output only at the end of simulation.
+
+		// 1) Update elements
+		for (int i=0; i < n_sections(); ++i) {
+			// Note simple model with constant source so no need to update them
+			if (!section(i).material().is_source()) {
+				for (int j=0; j < section(i).n_elements(); ++j) {
+					section(i).element(j).update(delta_t);
+				}
+			}
+		}
+		time += delta_t;
+		// 2) Switch flags in elements
+		this_flag != this_flag;
+		for (int i=0; i < n_elements(); ++i) {
+			element(i).flagAB(this_flag);
+		}
+		// 3)
+		std::cout << "Step " << step << " complete. Time now is " << time << "s." << std::endl;
+	}
 }
 
 void tds_run::initialise() {

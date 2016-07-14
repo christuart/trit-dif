@@ -30,23 +30,30 @@ int main(int nArg, char** vArg){
 	if (t>=0) {
 		string basename = "simple2d";
 		string configname = "simple";
-		bool basename_set = false, configname_set = false;
+		string outputname = "output";
+		bool basename_set = false, configname_set = false, outputname_set = false;
 		for (unsigned i=0; i < cl.size(); ++i) {
 			if (i < cl.size()-1) {
 				if (cl[i].arg == 'm' && !basename_set) {
 					basename = cl[++i].arg; basename_set = true;
 				} else if (cl[i].arg == 'c' && !configname_set) { 
 					configname = cl[++i].arg; configname_set = true;
+				} else if (cl[i].arg == 'o' && !outputname_set) { 
+					outputname = cl[++i].arg; outputname_set = true;
 				}
 			}
 		}
 		std::cout << "basename: " << basename << std::endl;
 		std::cout << "configname: " << configname << std::endl;
+		std::cout << "outputname: " << outputname << std::endl;
 		// looks like we're testing functionality rather than using the display or batch processing
 		tds_t = new tds_run();
 		tds_t->basename(basename);
 		tds_t->configname(configname);
 		tds_t->initialise();
+		// run with five 1 day steps and no tracked elements for first tests.
+		tds_elements these_elements;
+		tds_t->make_analysis(3600.0*24.0, 5, these_elements);
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
 		//string testoutput = "test.txt";
