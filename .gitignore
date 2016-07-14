@@ -33,5 +33,20 @@ viewer
 *.nodes
 *.elements
 *.sections
+*.materials
 *.msh
+*.units
+*.geo
 
+# Emacs
+*~
+.\#*
+\#*\#
+
+# Testing tools
+output.txt
+output
+foo
+foo.txt
+test
+test.txt

@@ -4,11 +4,10 @@
 #include <iostream>
 #include "tds.hh"
 
-using namespace std;
-
 UserInterface* UI=NULL;
 tds_display* tds=NULL;
 tds_batch* tds_b=NULL;
+tds_run* tds_t=NULL;
 
 /*===========================================================================*/
 // GUI (FLUID) INTERFACE PROCEDURES.
@@ -22,12 +21,32 @@ int main(int nArg, char** vArg){
 	string textfile("config_file.conf");
 	string prefix;
 	cCommandLine cl(nArg,vArg);// decompose the command line.
+	std::cout << "Number of 'arguments': " << cl.size() << std::endl;
+	for (unsigned i=0; i < cl.size(); ++i) {
+		std::cout << "Argument " << i << ": " << cl[i].arg << std::endl;
+	}
 	int t=cl.flag("t|test");
 	int b=cl.flag("b|batch");
 	if (t>=0) {
+		string basename = "simple2d";
+		string configname = "simple";
+		bool basename_set = false, configname_set = false;
+		for (unsigned i=0; i < cl.size(); ++i) {
+			if (i < cl.size()-1) {
+				if (cl[i].arg == 'm' && !basename_set) {
+					basename = cl[++i].arg; basename_set = true;
+				} else if (cl[i].arg == 'c' && !configname_set) { 
+					configname = cl[++i].arg; configname_set = true;
+				}
+			}
+		}
+		std::cout << "basename: " << basename << std::endl;
+		std::cout << "configname: " << configname << std::endl;
 		// looks like we're testing functionality rather than using the display or batch processing
-		string basename = "simple";
-		
+		tds_t = new tds_run();
+		tds_t->basename(basename);
+		tds_t->configname(configname);
+		tds_t->initialise();
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
 		//string testoutput = "test.txt";

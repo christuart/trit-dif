@@ -16,7 +16,7 @@ guiinc:= -I/usr/include
 x11libs:= -L/usr/X11R6/lib -lX11 -lXext
 
 raVen:
-	g++ -c -O3 -Wno-deprecated -m32 -g \
+	g++ -c -O3 -Wno-deprecated -std=c++0x -m32 -g \
 	-I/usr/include \
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
 	*.cc *.cxx *.cpp
@@ -26,7 +26,7 @@ raVen:
 	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
 
 64:
-	g++ -c -O3 -Wno-deprecated -m64 -g \
+	g++ -c -O3 -Wno-deprecated -std=c++0x -m64 -g \
 	-I/usr/include \
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
 	*.cc *.cxx *.cpp
