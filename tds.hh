@@ -155,6 +155,7 @@ public:
 	inline std::string material_density_unit() { return material_density_unit_; }
 	inline std::string material_diffusion_constant_unit() { return material_diffusion_constant_unit_; }
 	inline std::string name() { return material_name_; }
+	inline bool is_source() { return material_name_=="source"; }
 };
 
 

@@ -624,30 +624,57 @@ void tds_run::initialise() {
 		int n, m, o, t = 0;
 		for (int s = 0; s < n_sections(); s++ ) {
 			n = section(s).n_elements();
-		//{
-		//	n = n_elements();
 			t += n;
-			for (int i=0; i < n; i++) {
-				m = section(s).element(i).n_nodes();
-				for (int j=0; j < m; j++) {
-					o = section(s).element(i).node(j).n_elements();
-					std::cout << "Element " << &section(s).element(i) << " links to node "
-					          << &(section(s).element(i).node(j)) << " which currently links to "
-					          << o << " more elements." << std::endl;
-					for (int k=o; k > 0; k--) {
-						if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
-							std::cout << "Skipping - don't need to link to self!" << std::endl;
-						} else {
-							std::cout << "Making link from " << &section(s).element(i) << " to "
-							          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
-							tds_element_link* new_link = new tds_element_link(&section(s).element(i),
-							                                                  &(section(s).element(i).node(j).element(k-1)));
-							element_link_count++;
-							std::cout << "Made link" << std::endl;
-							section(s).element(i).add_element_link(new_link);
-							section(s).element(i).node(j).element(k-1).add_element_link(new_link);
+			if (section(s).material().is_source()) {
+				for (int i=0; i < n; i++) {
+					m = section(s).element(i).n_nodes();
+					for (int j=0; j < m; j++) {
+						o = section(s).element(i).node(j).n_elements();
+						std::cout << "Source element " << &section(s).element(i) << " links to node "
+						          << &(section(s).element(i).node(j)) << " which currently links to "
+						          << o << " more elements." << std::endl;
+						for (int k=o; k > 0; k--) {
+							if (section(s).element(i).node(j).element(k-1).material().is_source()) {
+								std::cout << "No need to give a link from source to source, skipping." << std::endl;
+							} else if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
+								std::cout << "Skipping - don't need to link to self!" << std::endl;
+							} else {
+								std::cout << "Making link from " << &section(s).element(i) << " to "
+								          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
+								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
+								                                                  &(section(s).element(i).node(j).element(k-1)));
+								element_link_count++;
+								std::cout << "Made link" << std::endl;
+								section(s).element(i).add_element_link(new_link);
+								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
+							}
+							section(s).element(i).node(j).remove_last_element();
 						}
-						section(s).element(i).node(j).remove_last_element();
+					}
+				}
+			} else {
+				for (int i=0; i < n; i++) {
+					m = section(s).element(i).n_nodes();
+					for (int j=0; j < m; j++) {
+						o = section(s).element(i).node(j).n_elements();
+						std::cout << "Element " << &section(s).element(i) << " links to node "
+						          << &(section(s).element(i).node(j)) << " which currently links to "
+						          << o << " more elements." << std::endl;
+						for (int k=o; k > 0; k--) {
+							if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
+								std::cout << "Skipping - don't need to link to self!" << std::endl;
+							} else {
+								std::cout << "Making link from " << &section(s).element(i) << " to "
+								          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
+								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
+								                                                  &(section(s).element(i).node(j).element(k-1)));
+								element_link_count++;
+								std::cout << "Made link" << std::endl;
+								section(s).element(i).add_element_link(new_link);
+								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
+							}
+							section(s).element(i).node(j).remove_last_element();
+						}
 					}
 				}
 			}
