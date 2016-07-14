@@ -281,6 +281,10 @@ public:
 	inline void size_z_unit(std::string sz_z_unit){ size_z_unit_=sz_z_unit; }
 	inline void size_z(float sz_z){ size_z_=sz_z; }
 	inline void units(conversion* _units) { units_ = _units; }
+	void expected_materials(int _n);
+	void expected_sections(int _n);
+	void expected_nodes(int _n);
+	void expected_elements(int _n);
 	//getters
 	inline std::string tds_name() { return tds_name_; }
 	inline std::string size_unit() { return size_unit_; }
@@ -310,6 +314,7 @@ public:
 	inline int n_elements() { return elements_.size(); }
 	inline tds_element& element(int i) { return *elements_[i]; }
 	inline bool element_dimensions(int bit_number) { return element_dimensions_.test(bit_number); }
+	inline bitset<8> element_dimensions() { return element_dimensions_; }
 
 	void register_element_type(int element_type);
 	void output_model_summary(bool show_materials, bool show_sections, bool show_elements, bool show_element_links, bool show_nodes);

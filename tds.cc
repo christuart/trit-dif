@@ -316,6 +316,10 @@ void tds::clean_elements(){
 	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
 	elements_.resize(0);
 }
+void tds::expected_materials(int _n) { materials_.reserve(_n); }
+void tds::expected_sections(int _n) { sections_.reserve(_n); }
+void tds::expected_nodes(int _n) { nodes_.reserve(_n); }
+void tds::expected_elements(int _n) { elements_.reserve(_n); }
 
 void tds::output_model_summary(bool show_materials, bool show_sections, bool show_elements, bool show_element_links, bool show_nodes) {
 	std::cout << std::endl << "We now have " << n_materials() << " materials, " << n_sections() << " sections, "
@@ -351,10 +355,11 @@ void tds::output_model_summary(bool show_materials, bool show_sections, bool sho
 		}
 	}
 	if (show_nodes) {
-		for (int i = 0; i < n_elements(); i++) {
-			std::cout << "Node " << (i+1) << " (" << &node(i) << "): [" << node(i).position(0) << ","
-			          << node(i).position(1) << "," << node(i).position(2) << "] - "
-			          << node(i).n_elements() << " elements" << std::endl;
+		for (int i = 0; i < n_nodes(); i++) {
+			std::cout << "Node " << (i+1) << " (" << &node(i) << "):" << std::endl;
+			std::cout << "[" << node(i).position(0) << ","
+			          << node(i).position(1) << "," << node(i).position(2) << "]" << std::endl;
+			std::cout << node(i).n_elements() << " elements" << std::endl;
 		}
 	}
 	std::cout << std::endl;
@@ -425,28 +430,41 @@ void tds_run::initialise() {
 	// any settings about (measurement) units we can find
 	conversion _conversion((configname() + ".units").c_str());
 	units(&_conversion);
-	cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
+	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
 	
 	// Now read in data
 	// First open all the necessary files (no point in getting half way through
 	// processing only to find a file we need is missing)
 	cout << "gonna open me some files" << endl;
-	materialsfile_.open((basename() + ".materials").c_str());
+	materialsfile_.open((configname() + ".materials").c_str());
 	sectionsfile_.open((basename() + ".sections").c_str());
 	elementsfile_.open((basename() + ".elements").c_str());
 	nodesfile_.open((basename() + ".nodes").c_str());
+
+	int materials_count, sections_count, elements_count, nodes_count;
 	
 	cout << "gonna read me some files" << endl;
 	std::string line;
 		
 	//Let's start off by populating tds with some materials
+	if (std::getline(materialsfile_, line)) {
+		std::istringstream sizess(line);
+		if (!(sizess >> materials_count)) {
+			std::cerr << "Materials count not found, segmentation violations will occur after "
+			          << "vector expands to accommodate many materials." << std::endl;
+		} else {
+			std::cout << "Expanding materials vector to accommodate " << materials_count
+			          << " materials." << std::endl;
+			expected_materials(materials_count+3); // not forgetting error, source and outgassing = +3
+		}
+	}
 	while (std::getline(materialsfile_, line)) {
 		std::istringstream iss(line);
 		std::string _name, _density_unit, _diffusion_constant_unit;
 		double _density, _diffusion_constant;
 		
 		if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
-			std::cerr << "Invalid line, skipping.\n";
+			std::cerr << "Invalid line, skipping. (material)\n";
 			continue;
 		}
 
@@ -466,13 +484,24 @@ void tds_run::initialise() {
 	add_material(new tds_material("outgassing", 1.0, 0.0));
 	
 	//Now we've got materials, let's get the physical sections which use them
+	if (std::getline(sectionsfile_, line)) {
+		std::istringstream sizess(line);
+		if (!(sizess >> sections_count)) {
+			std::cerr << "Sections count not found, segmentation violations will occur after "
+			          << "vector expands to accommodate many sections." << std::endl;
+		} else {
+			std::cout << "Expanding sections vector to accommodate " << sections_count
+			          << " sections." << std::endl;
+			expected_sections(sections_count);
+		}
+	}
 	while (std::getline(sectionsfile_, line)) {
 		std::istringstream iss(line);
 		int _dim, _id;
 		std::string _name;
 		
 		if (!(iss >> _dim >> _id >> _name)) {
-			std::cerr << "Invalid line, skipping.\n";
+			std::cerr << "Invalid line, skipping. (section)\n";
 			continue;
 		}
 
@@ -491,13 +520,24 @@ void tds_run::initialise() {
 		std::cout << "Now " << n_sections() << " sections." << std::endl;
 	}
 	//Next we'll get some nodes in
+	if (std::getline(nodesfile_, line)) {
+		std::istringstream sizess(line);
+		if (!(sizess >> nodes_count)) {
+			std::cerr << "Nodes count not found, segmentation violations will occur after "
+			          << "vector expands to accommodate many nodes." << std::endl;
+		} else {
+			std::cout << "Expanding nodes vector to accommodate " << nodes_count
+			          << " nodes." << std::endl;
+			expected_nodes(nodes_count);
+		}
+	}
 	while (std::getline(nodesfile_, line)) {
 		std::istringstream iss(line);
 		int id;
 		float _x, _y, _z;
 		
 		if (!(iss >> id >> _x >> _y >> _z)) {
-			std::cerr << "Invalid line, skipping.\n";
+			std::cerr << "Invalid line, skipping. (node)\n";
 			continue;
 		}
 
@@ -510,13 +550,24 @@ void tds_run::initialise() {
 		add_node(new tds_node(_x,_y,_z));
 	}
 	//Now finally we'll read the elements
+	if (std::getline(elementsfile_, line)) {
+		std::istringstream sizess(line);
+		if (!(sizess >> elements_count)) {
+			std::cerr << "Elements count not found, segmentation violations will occur after "
+			          << "vector expands to accommodate many elements." << std::endl;
+		} else {
+			std::cout << "Expanding elements vector to accommodate " << elements_count
+			          << " elements." << std::endl;
+			expected_elements(elements_count);
+		}
+	}
 	while (std::getline(elementsfile_, line)) {
 		std::istringstream iss(line);
 		int id, type, n_tags, section_id, entity_id;
 		std::ostringstream extra_tags;
 		
 		if (!(iss >> id >> type >> n_tags)) {
-			std::cerr << "Invalid line, skipping.\n";
+			std::cerr << "Invalid line, skipping. (element)\n";
 			continue;
 		}
 		register_element_type(type);
@@ -562,8 +613,9 @@ void tds_run::initialise() {
 	
 	std::cout << "Producing element links" << std::endl;
 	int element_link_count = 0;
-	if (!(element_dimensions(two_d) || element_dimensions(three_d) || element_dimensions(second_order_or_worse)) ||
-	    !(element_dimensions(one_d))
+	std::cout << "Discovered dimensions bitset is: " << element_dimensions() << std::endl;
+	if (!(element_dimensions(two_d) || element_dimensions(three_d) || element_dimensions(second_order_or_worse)) &&
+	    (element_dimensions(one_d))
 	    ) {
 		// We don't want to use the global elements list, but instead
 		// iterate through each section's list of elements. This allows

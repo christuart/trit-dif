@@ -28,9 +28,21 @@ int main(int nArg, char** vArg){
 	int t=cl.flag("t|test");
 	int b=cl.flag("b|batch");
 	if (t>=0) {
-		// looks like we're testing functionality rather than using the display or batch processing
 		string basename = "simple2d";
 		string configname = "simple";
+		bool basename_set = false, configname_set = false;
+		for (unsigned i=0; i < cl.size(); ++i) {
+			if (i < cl.size()-1) {
+				if (cl[i].arg == 'm' && !basename_set) {
+					basename = cl[++i].arg; basename_set = true;
+				} else if (cl[i].arg == 'c' && !configname_set) { 
+					configname = cl[++i].arg; configname_set = true;
+				}
+			}
+		}
+		std::cout << "basename: " << basename << std::endl;
+		std::cout << "configname: " << configname << std::endl;
+		// looks like we're testing functionality rather than using the display or batch processing
 		tds_t = new tds_run();
 		tds_t->basename(basename);
 		tds_t->configname(configname);
