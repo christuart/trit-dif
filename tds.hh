@@ -1,7 +1,6 @@
 #ifndef TDS_HH
 #define TDS_HH
 
-#include <vector>
 #include <list>
 #include <iostream>
 #include "utilities.hh"
@@ -21,73 +20,19 @@
 #include <algorithm>
 
 #include "conversions.hh"
+#include "tds_parts.hh"
+#include "vector_ops.hh"
 
-class tds_node;
-class tds_element;
-class tds_material;
-class tds_section;
-class tds_element_link;
 class tds;
 class tds_run;
 class tds_display;
 class tds_batch;
-
-typedef vector<tds_material*> tds_materials;
-typedef vector<tds_section*> tds_sections;
-typedef vector<tds_element*> tds_elements;
-typedef forward_list<tds_element*> tds_quick_elements;
-typedef vector<tds_node*> tds_nodes;
-typedef vector<tds_element_link*> tds_links;
-
-void operator+=(vector<float>& u, const vector<float>& v);
-void operator-=(vector<float>& u, const vector<float>& v);
-void operator*=(vector<float>& u, const vector<float>& v);
-void operator*=(vector<float>& u, const float& v);
-void operator*=(const float& v, vector<float>& u);
-vector<float> operator+(const vector<float>& u, const vector<float>& v);
-vector<float> operator-(const vector<float>& u, const vector<float>& v);
-vector<float> operator*(const vector<float>& u, const vector<float>& v);
-vector<float> operator*(const vector<float>& u, const float& v);
-vector<float> operator*(const float& v, const vector<float>& u);
-float dot(const vector<float>& u, const vector<float>& v);
-vector<float> cross(const vector<float>& u, const vector<float>& v);
-float magnitude(vector<float>& u);
-void normalise(vector<float>& u);
-inline void debug(vector<float>* u) { std::cout << "["; std::cout << u->at(0) << ","; std::cout
-		                                << u->at(1) << ","; std::cout << u->at(2) << "]" << std::endl; }
 
 const int one_d = 0;
 const int two_d = 1;
 const int three_d = 2;
 const int second_order_or_worse = 3;
 
-class tds_node {
-public:
-private:
-	vector<float> position_;
-	tds_elements elements_;
-	// used during construction only, because links can't be made
-	// until both elements exist, so the node needs to gradually
-	// learn which elements it is linked to.
-protected:
-public:
-	tds_node(float _x, float _y, float _z);
-	tds_node(vector<float> _position);
-	~tds_node();
-	//adders
-	void add_element(tds_element* new_element);
-	//setters
-	inline void position(vector<float> _position) { position_ = _position; }
-	inline void position(int i, float _p) { position_[i] = _p; }
-	//getters
-	inline vector<float> position() { return position_; }
-	inline float position(int i) { return position_[i]; }
-	inline tds_element& element(int i) { return *elements_[i]; }
-	inline bool elements_empty() { return elements_.empty(); }
-	inline int n_elements() { return elements_.size(); }
-	void clean_elements();
-	void remove_last_element();
-};
 
 class tds_element {
 public:
