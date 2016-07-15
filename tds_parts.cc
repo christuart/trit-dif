@@ -95,13 +95,15 @@ void tds_element::set_origin_from_nodes() {
 	origin_.reserve(3);
 	int n_nodes = nodes_.size();
 	float x,y,z;
-	std::cout << "There are " << n_nodes << " nodes." << std::endl;
+	// std::cout << "There are " << n_nodes << " nodes." << std::endl;
 	
 	switch (n_nodes) {
 	case 2:
 	case 3:
 	case 4:
 		// can use the mean of the vectors for basic elements
+		// might be able to for other elements, need to think
+		// about/do the integrations for these
 		x = 0;
 		y = 0;
 		z = 0;
@@ -110,7 +112,6 @@ void tds_element::set_origin_from_nodes() {
 			y += node(i).position(1);
 			z += node(i).position(2);
 		}
-		std::cout << "Sum of vectors is [" << x << "," << y << "," << z << "]." << std::endl;
 		x /= n_nodes;
 		y /= n_nodes;
 		z /= n_nodes;
@@ -118,11 +119,9 @@ void tds_element::set_origin_from_nodes() {
 	default:
 		std::cout << "!!! Looking for origin of " << nodes_.size() << " noded element, not programmed yet " << std::endl;
 	}
-	std::cout << "Average of vectors is [" << x << "," << y << "," << z << "]." << std::endl;
 	
 	origin(x,y,z); std::cout << x << std::endl;
-	std::cout << "asdasdasdasd " << origin().size() << std::endl;
-	debug(&origin());
+	// debug(&origin());
 }
 
 void tds_element::update(float delta_t) {//method to update parameters
@@ -281,7 +280,6 @@ void tds_element_link::initialise() {
 	flux_vector(elementN_->origin(0)-elementM_->origin(0),
 	            elementN_->origin(1)-elementM_->origin(1),
 	            elementN_->origin(2)-elementM_->origin(2));
-	std::vector<float> asd = elementM_->origin();
 
 	// find the common nodes between the two elements
 	shared_nodes_.clear();

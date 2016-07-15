@@ -166,8 +166,8 @@ do
 		sectionscount=$line
 		declare -i sectioni=0
 		echo "*** Storing $sectionscount physical names in $file_sections"
-                echo $sectionscount >> "../models/$file_sections"
-                echo "(dimensions id name)" >> "../models/$file_sections"
+                echo $sectionscount >> "./$file_sections"
+                echo "(dimensions id name)" >> "./$file_sections"
 		read line
 		while [ "$line" != "\$EndPhysicalNames" ]
 		do
@@ -177,7 +177,7 @@ do
 		    then
 			echo "!!! Physical names id mixup. File: $id; Script: $sectioni"
 		    fi
-		    echo $dim $id $name >> "../models/$file_sections"
+		    echo $dim $id $name >> "./$file_sections"
 		    read line
 		done
 		if [ "$sectionscount" != "$sectioni" ]
@@ -197,8 +197,8 @@ do
 		nodescount=$line
 		declare -i nodei=0
 		echo "*** Storing $nodescount nodes in $file_nodes"
-                echo $nodescount >> "../models/$file_nodes"
-                echo "(id x y z)" >> "../models/$file_nodes"
+                echo $nodescount >> "./$file_nodes"
+                echo "(id x y z)" >> "./$file_nodes"
 		read line
 		while [ "$line" != "\$EndNodes" ]
 		do
@@ -208,7 +208,7 @@ do
 		    then
 			echo "!!! Nodes id mixup. File: $id; Script: $nodei"
 		    fi
-		    echo $id $x $y $z >> "../models/$file_nodes"
+		    echo $id $x $y $z >> "./$file_nodes"
 		    read line
 		done
 	    else
@@ -224,8 +224,8 @@ do
 		elementscount=$line
 		declare -i elementi=0
 		echo "*** Storing $elementscount elements in $file_elements"
-                echo $elementscount >> "../models/$file_elements"
-                echo "(id element-type #-of-tags tag1:physical-section-id <other tags> <nodes>)" >> "../models/$file_elements"
+                echo $elementscount >> "./$file_elements"
+                echo "(id element-type #-of-tags tag1:physical-section-id <other tags> <nodes>)" >> "./$file_elements"
 		read line
 		while [ "$line" != "\$EndElements" ]
 		do
@@ -245,7 +245,7 @@ do
 			echo "!!! be accommodated for, so you might need to adjust the mesh for the"
 			echo "!!! diffusion model to work. (Found at element id $id.)"
 		    fi
-		    echo $id $type $tagdata >> "../models/$file_elements"
+		    echo $id $type $tagdata >> "./$file_elements"
 		    read line
 		done
 	    else
