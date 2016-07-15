@@ -30,12 +30,12 @@
 
 # Project specifics
 viewer
-*.nodes
-*.elements
-*.sections
-*.materials
-*.msh
-*.units
+# *.nodes
+# *.elements
+# *.sections
+# *.materials
+# *.msh
+# *.units
 *.geo
 *.contaminations
 *.tracking

@@ -1,0 +1,3 @@
+#! /bin/bash
+./viewer -t -m models/fine1D -c config/simple -d 600 -f 6e8 -e "1 2 3 4 5 10 20 50 100 150 -2 -1"
+
