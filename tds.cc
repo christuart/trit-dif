@@ -557,6 +557,33 @@ void tds_run::initialise() {
 		}
 		std::cout << t << " elements trawled for links." << std::endl;
 		std::cout << "Made " << element_link_count << " element link objects." << std::endl;
+	} else if (!(element_dimensions(three_d) || element_dimensions(second_order_or_worse)) &&
+	           (element_dimensions(two_d))
+	           ) {
+		// We don't want to use the global elements list, but instead
+		// iterate through each section's list of elements. This allows
+		// us to treat source and/or outgassing sections differently
+		// from the rest.
+
+		// 2D is nice because whatever shape the element is,
+		// it can only build an interface from two nodes.
+		
+		int n, m, o, p, t = 0;
+		for (int s = 0; s < n_sections(); s++ ) {
+			n = section(s).n_elements();
+			t += n;
+			if (section(s).is_source()) {
+
+			} else {
+				for (int i=0; i < n; ++i) {
+					m = section(s).element(i).n_nodes();
+					for (int j=0; j < m; ++j) {
+						n = 
+					}
+				}
+			}
+		}
+		
 	} else {
 		std::cout << "Element links could not be made, only 1-D programmed." << std::endl;
 	}
