@@ -20,32 +20,30 @@
 #include <pwd.h>
 #include <pthread.h>
 
-using namespace std;
-
 class cPipeOut;
 class cPipe;
 class cCommandLine;
 
 
 /*===========================================================================*/
-void cSeparateValues(vector<string>&, string& , string, string no="");
+void cSeparateValues(std::vector<std::string>&, std::string& , std::string, std::string no="");
 
 /*===========================================================================*/
-template <class Type> int cContains(vector<Type>& tgt, Type arg){
+template <class Type> int cContains(std::vector<Type>& tgt, Type arg){
  for (unsigned i=0; i<tgt.size(); ++i) if (tgt[i]==arg) return i; return -1;
 }
 
 //===========================================================================*/
   //Writes to 'std::string' through 'std::ostringstream'.
   //Use 'std::stringstream' instead of 'std::string' to read more than one field.
-template <class inType> string &operator<<(string &str, inType Data){
-ostringstream out; out << Data; return str+=out.str();
+template <class inType> std::string &operator<<(std::string &str, inType Data){
+std::ostringstream out; out << Data; return str+=out.str();
 }
 
 /*===========================================================================*/
 // Writes to 'std::string' through 'std::ostringstream'.
-template <class Type> string cString(Type Data){
-ostringstream out; out << Data; return out.str();
+template <class Type> std::string cString(Type Data){
+std::ostringstream out; out << Data; return out.str();
 }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -54,17 +52,17 @@ ostringstream out; out << Data; return out.str();
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 class cCommandLine {
 public: enum clType { cltFlag=0, cltArgument=1 };
-public: struct clParameter { clType type; string arg;
-    clParameter(clType t, string a):type(t),arg(a){ } };
+public: struct clParameter { clType type; std::string arg;
+    clParameter(clType t, std::string a):type(t),arg(a){ } };
 private: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     unsigned FnFlags, FnArgs;
-    vector<clParameter> FPList;
-    void FClassify(string name);
+    std::vector<clParameter> FPList;
+    void FClassify(std::string name);
 protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    void addArg(string name);
-    void addFlag(string name);
+    void addArg(std::string name);
+    void addFlag(std::string name);
 public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    cCommandLine(string line);
+    cCommandLine(std::string line);
     cCommandLine(int nArg, char** vArg);
     inline unsigned size(){ return FPList.size(); }
     inline clParameter& operator[](unsigned i){ return FPList[i]; }
@@ -72,7 +70,7 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     int arg(unsigned count, unsigned start=0);
     inline unsigned nFlags(){ return FnFlags; }
     int flag(unsigned count, unsigned start=0);
-    int flag(string name, unsigned start=0);
+    int flag(std::string name, unsigned start=0);
 };
 
 // /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -83,9 +81,9 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // private:
 // 	FILE *FPipe;
 // protected:
-// 	void Execute(const string cmd);
+// 	void Execute(const std::string cmd);
 // public:
-// 	cPipeOut(const string commandline);
+// 	cPipeOut(const std::string commandline);
 // 	~cPipeOut();
 // 	cPipeOut &operator<<(cFlag flag);
 // 	template <class argType> cPipeOut &operator<<(argType Arg);
@@ -94,7 +92,7 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // /*===========================================================================*/
 // // Put 'Arg' into pipe.
 // template <class argType> cPipeOut &cPipeOut::operator<<(argType Arg){
-// ostringstream out; out << Arg;  Execute(out.str());
+// std::ostringstream out; out << Arg;  Execute(out.str());
 //  return *this;
 // }
 
@@ -107,21 +105,21 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // private: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // 	int FOUT[2], FIN[2], FERR[2], FPID;
 // protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//     void OnChild(string &comand, string &args);
+//     void OnChild(std::string &comand, std::string &args);
 //     void OnParent();
 // public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//     cPipe(string command, string args="");
+//     cPipe(std::string command, std::string args="");
 //     ~cPipe(){ close(FIN[mWRITE]); close(FOUT[mREAD]); close(FERR[mREAD]); }
 //     void waitForChild(){ int status; int s; waitpid(FPID,&status,0); }
 // 	template <class argType> cPipe &operator<<(argType arg);
-//     cPipe &operator>>(ostringstream &arg);
-//     cPipe &operator>>(string &arg);
+//     cPipe &operator>>(std::ostringstream &arg);
+//     cPipe &operator>>(std::string &arg);
 // 	cPipe &operator<<(cFlag arg);
 // };
 
 // /*===========================================================================*/
 // template <class argType> cPipe &cPipe::operator<<(argType arg){
-// ostringstream bff; bff << arg; string out(bff.str());
+// std::ostringstream bff; bff << arg; std::string out(bff.str());
 //  write(FIN[mWRITE],out.c_str(),out.size());
 //  return *this;
 // }

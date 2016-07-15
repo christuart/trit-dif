@@ -43,11 +43,11 @@ private:
 	tds_material* material_;
 	tds_nodes nodes_;
 	tds_links neighbours_;
-	vector<float> origin_;
+	std::vector<float> origin_;
 protected:
 public:
 	tds_element(tds_nodes _nodes, tds_material* _material, float _contamination);
-	tds_element(tds_nodes _nodes, tds_material* _material, vector<float> _origin, float _contamination);
+	tds_element(tds_nodes _nodes, tds_material* _material, std::vector<float> _origin, float _contamination);
 	tds_element(tds_nodes _nodes, tds_material* _material, float _origin_x, float _origin_y, float _origin_z, float _contamination);
 	virtual ~tds_element();
 	//adders
@@ -64,7 +64,7 @@ public:
 	virtual inline float contamination() { if (flagAB()) return contaminationB_; else return contaminationA_; }
 	virtual inline float contamination(bool _AB) { if (_AB) return contaminationB_; else return contaminationA_; }
 	inline float origin(int i) { return origin_[i]; }
-	inline vector<float>& origin() { return origin_; }
+	inline std::vector<float>& origin() { return origin_; }
 	inline tds_material& material() { return *material_; }
 	inline tds_node& node(int i) { return *nodes_[i]; }
 	inline int n_nodes() { return nodes_.size(); }
@@ -152,18 +152,18 @@ public:
 private:
 	tds_element *elementM_, *elementN_; // note that each pointer needs its own asterisk!
 	tds_nodes shared_nodes_;
-	vector<float> norm_vector_, flux_vector_;
+	std::vector<float> norm_vector_, flux_vector_;
 	float interface_area_, flow_rate_, modMN_, a_n_dot_eMN_over_modMN_;
 	bool flagAB_;
 protected:
 	//setters
-	inline void norm_vector(vector<float>& _norm_vector) { norm_vector(_norm_vector.at(0),_norm_vector.at(1),_norm_vector.at(2)); }
+	inline void norm_vector(std::vector<float>& _norm_vector) { norm_vector(_norm_vector.at(0),_norm_vector.at(1),_norm_vector.at(2)); }
 	inline void norm_vector(float _x, float _y, float _z) { norm_vector_.resize(3);
 		                                                norm_vector(0,_x);
 		                                                norm_vector(1,_y);
 		                                                norm_vector(2,_z); }
 	inline void norm_vector(int i, float _f) { norm_vector_[i]=_f; }
-	inline void flux_vector(vector<float>& _flux_vector) { flux_vector(_flux_vector[0],_flux_vector[1],_flux_vector[2]); }
+	inline void flux_vector(std::vector<float>& _flux_vector) { flux_vector(_flux_vector[0],_flux_vector[1],_flux_vector[2]); }
 	inline void flux_vector(int i, float _f) { flux_vector_[i]=_f; }
 	inline void flux_vector(float _x, float _y, float _z) { flux_vector_.resize(3);
 		                                                flux_vector(0,_x);
@@ -181,9 +181,9 @@ public:
 	//setters
 	void set_flag_against(tds_element* _element);
 	//getters
-	inline vector<float>& norm_vector() { return norm_vector_; }
+	inline std::vector<float>& norm_vector() { return norm_vector_; }
 	inline float norm_vector(int i) { return norm_vector_[i]; }
-	inline vector<float>& flux_vector() { return flux_vector_; }
+	inline std::vector<float>& flux_vector() { return flux_vector_; }
 	inline float flux_vector(int i) { return flux_vector_[i]; }
 	inline float interface_area() { return interface_area_; }
 	inline float modMN() { return modMN_; }
@@ -277,7 +277,7 @@ public:
 	inline int n_elements() { return elements_.size(); }
 	inline tds_element& element(int i) { return *elements_[i]; }
 	inline bool element_dimensions(int bit_number) { return element_dimensions_.test(bit_number); }
-	inline bitset<8> element_dimensions() { return element_dimensions_; }
+	inline std::bitset<8> element_dimensions() { return element_dimensions_; }
 
 	void register_element_type(int element_type);
 	void output_model_summary(bool show_materials, bool show_sections, bool show_elements, bool show_element_links, bool show_nodes);
@@ -302,7 +302,7 @@ public:
 	tds_run();
 	virtual ~tds_run();
 	void check_coincidence();
-	void make_analysis(float delta_t, int _steps, float recording_interval, vector<int>& tracked_elements);
+	void make_analysis(float delta_t, int _steps, float recording_interval, std::vector<int>& tracked_elements);
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { basename_ = _basename; };
@@ -317,8 +317,8 @@ public:
 class tds_display: public tds_run {
 private:
 	UserInterface *GUI_;
-	vector<double> X_, Y_;//for the timelines
-	vector<string> text_;
+	std::vector<double> X_, Y_;//for the timelines
+	std::vector<std::string> text_;
 	const char *filename_;
 	Fl_Text_Buffer FRootfileComments;
 	Fl_Text_Buffer FRootfileName;
@@ -358,9 +358,9 @@ public:
 	inline const char* rootfile_name() { return rootfile_name_; }
 	//setters
 	inline void rootfile_name(const char* _rootfile_name) { rootfile_name_=_rootfile_name; }
-	tds_batch(string infilename, string rootout);
+	tds_batch(std::string infilename, std::string rootout);
 	virtual ~tds_batch();
-	int run_batch(string filename, bool recreate, int filechain, int n_tot);
+	int run_batch(std::string filename, bool recreate, int filechain, int n_tot);
 	inline ifstream &inputfile() { return infile_; }
 };
 

@@ -18,8 +18,8 @@ void userAction(selection sel, Ca_Canvas *sender){ tds->action(sel,sender); }
 
 int main(int nArg, char** vArg){
 	int argsize = nArg;
-	string textfile("config_file.conf");
-	string prefix;
+	std::string textfile("config_file.conf");
+	std::string prefix;
 	cCommandLine cl(nArg,vArg);// decompose the command line.
 	std::cout << "Number of 'arguments': " << cl.size() << std::endl;
 	for (unsigned i=0; i < cl.size(); ++i) {
@@ -29,14 +29,14 @@ int main(int nArg, char** vArg){
 	int b=cl.flag("b|batch");
 	if (t>=0) {
 		// looks like we're testing functionality rather than using the display or batch processing
-		string basename = "simple2d";
-		string configname = "simple";
-		string outputname = "output";
+		std::string basename = "simple2d";
+		std::string configname = "simple";
+		std::string outputname = "output";
 		float delta_t = 3600.0*24.0;
 		float recording_interval = 3600*24*365.24;
 		float finish_time;
 		int steps = 10;
-		vector<int> element_ids;
+		std::vector<int> element_ids;
 		std::cout << "Testing..." << std::endl;
 		element_ids.push_back(1);
 		element_ids.push_back(2);
@@ -53,25 +53,25 @@ int main(int nArg, char** vArg){
 				} else if (cl[i].arg == 'o' && !outputname_set) { // output
 					outputname = cl[++i].arg; outputname_set = true;
 				} else if (cl[i].arg == 'd') { // delta_t
-					istringstream iss(cl[++i].arg);
+					std::istringstream iss(cl[++i].arg);
 					iss >> delta_t;
 				} else if (cl[i].arg == 's') { // steps
-					istringstream iss(cl[++i].arg);
+					std::istringstream iss(cl[++i].arg);
 					iss >> steps;
 				} else if (cl[i].arg == 'e') { // elements (to track)
 					element_ids.resize(0);
 					int this_id;
-					istringstream iss(cl[++i].arg);
+					std::istringstream iss(cl[++i].arg);
 					std::cout << "Tracking ids: " << iss.str() << std::endl;
 					while (iss >> this_id) {
 						std::cout << "Tracking " << this_id << std::endl;
 						element_ids.push_back(this_id);
 					}
 				} else if (cl[i].arg == 'r') { // recording interval
-					istringstream iss(cl[++i].arg);
+					std::istringstream iss(cl[++i].arg);
 					iss >> recording_interval;
 				} else if (cl[i].arg == 'f') { // finish time
-					istringstream iss(cl[++i].arg);
+					std::istringstream iss(cl[++i].arg);
 					iss >> finish_time;
 					steps = ceil(finish_time/delta_t);
 				}		
@@ -89,31 +89,31 @@ int main(int nArg, char** vArg){
 		tds_t->make_analysis(delta_t, steps, recording_interval, element_ids);
 		return 0;
 	} else if (b >= 0) {
-		//string textfile(vArg[2]);
-		//string testoutput = "test.txt";
+		//std::string textfile(vArg[2]);
+		//std::string testoutput = "test.txt";
 		//TFile *f = new TFile("out.root","RECREATE","tds batch file output");
-		//string rootout(vArg[3]);// = "output.root";
+		//std::string rootout(vArg[3]);// = "output.root";
 		
 		////////THIS SHOULD BE SHIFTED TO MAKE 1 input = 1 output
-		string rootfile(vArg[2]);
-		//cout<<"take in "<<rootfile<<endl;
-		//string append = "reduced.root";
-		//string rootout(vArg[2]+append);
+		std::string rootfile(vArg[2]);
+		//cout<<"take in "<<rootfile<<std::endl;
+		//std::string append = "reduced.root";
+		//std::string rootout(vArg[2]+append);
 		int filechain = 0;
 		int start_from = 0;
 		std::string exroot;
 		if(argsize>3) {
 			const char* start_str = vArg[3];
 			if(EOF==sscanf(start_str,"%d",&start_from)){}
-			cout<<"start at file "<<start_from<<endl;
+			std::cout<<"start at file "<<start_from<<std::endl;
 			filechain = start_from;
 		}
-		//cout<<"file chain starts from "<<filechain<<endl;
+		//std::cout<<"file chain starts from "<<filechain<<std::endl;
 		int end_at = 10000;
 		if(argsize>4) {
 			const char* end_str = vArg[4];
 			if(EOF==sscanf(end_str,"%d",&end_at)) {}
-			cout<<"end at file "<<end_at<<endl;
+			std::cout<<"end at file "<<end_at<<std::endl;
 		}
 		if(argsize>5) {
 			const char* pre_str = vArg[5];
@@ -124,7 +124,7 @@ int main(int nArg, char** vArg){
 		if(argsize>6) {///to restart reduction use this parameter to ensure pulse_entries leaves are ok
 			const char* pulses_entry = vArg[6];
 			if(EOF==sscanf(pulses_entry,"%d",&tot_pulses)) {}
-			cout<<"re-starting reduction at pulse "<<tot_pulses<<endl;////FIX SO AUTOMATIC!!!
+			std::cout<<"re-starting reduction at pulse "<<tot_pulses<<std::endl;////FIX SO AUTOMATIC!!!
 		}
 		bool chain_batch = true;
 		//int slab_entries,pulse_entries = 0;
@@ -132,7 +132,7 @@ int main(int nArg, char** vArg){
 		while(chain_batch) {
 			if(filechain==skip) {}
 			else {
-				//cout<<"in chain_batch "<<filechain<<endl;
+				//std::cout<<"in chain_batch "<<filechain<<std::endl;
 				std::stringstream filenum;
 				std::string fnum,fadd;
 				if(filechain<1000){filenum<<0;}//places a 0 infront of 0-999
@@ -140,23 +140,23 @@ int main(int nArg, char** vArg){
 				if(filechain<10){filenum<<0;}//places a 0 infront of 0-9
 				filenum << filechain;
 				fnum = filenum.str();
-				string append = "_"+fnum+"_reduced.root";
-				string rootout(vArg[2]+append);
+				std::string append = "_"+fnum+"_reduced.root";
+				std::string rootout(vArg[2]+append);
 				if(argsize>5) {
 					rootout = prefix+"tds"+append;
 				}
-				cout<<"output reduced to "<<rootout<<endl;
+				std::cout<<"output reduced to "<<rootout<<std::endl;
 				exroot = rootout;
 				tds_b = new tds_batch(textfile,rootout);
 				fadd = rootfile+fnum+".root";
 				std::string root_file = fadd;
-				//cout<<"rootfile = "<<root_file<<endl;
+				//std::cout<<"rootfile = "<<root_file<<std::endl;
 				TString r_file = fadd;
 				TFile* r_f = new TFile(r_file);
-				if(argsize>4 && filechain<end_at && r_f->IsZombie()) {cout<<"file missing but chain not finsihed, searching ahead..."<<endl;}
-				else if(r_f->IsZombie()) {cout<<"no more files to reduce"<<endl;chain_batch=false;}
+				if(argsize>4 && filechain<end_at && r_f->IsZombie()) {std::cout<<"file missing but chain not finsihed, searching ahead..."<<std::endl;}
+				else if(r_f->IsZombie()) {std::cout<<"no more files to reduce"<<std::endl;chain_batch=false;}
 				else {
-					cout<<"batch file running on: "<<root_file<<endl;
+					std::cout<<"batch file running on: "<<root_file<<std::endl;
 					//tot_pulses+=tds_b->run_batch(root_file,true);
 					tot_pulses+=tds_b->run_batch(root_file,true,filechain,tot_pulses);
 					//if(filechain==0){tot_pulses+=tds_b->run_batch(root_file,true);}//,tot_pulses);}
@@ -169,9 +169,9 @@ int main(int nArg, char** vArg){
 			filechain++;
 			if(filechain>end_at){break;}
 		}
-		cout<<"total root files reduced = "<<filechain-1<<", last file was "<<exroot<<endl;
-		cout<<"number of pulses found = "<<tot_pulses<<endl;
-		//cout<<"start at file "<<start_from<<" up to "<<end_at<<endl;
+		std::cout<<"total root files reduced = "<<filechain-1<<", last file was "<<exroot<<std::endl;
+		std::cout<<"number of pulses found = "<<tot_pulses<<std::endl;
+		//std::cout<<"start at file "<<start_from<<" up to "<<end_at<<std::endl;
 		return 0;
 	}
 	else{

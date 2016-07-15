@@ -1,27 +1,5 @@
 #include "tds.hh"
 
-/******************** TDS_NODE METHODS ********************/
-tds_node::tds_node(float _x, float _y, float _z) {
-	position_.reserve(3);
-	position_.push_back(_x);
-	position_.push_back(_y);
-	position_.push_back(_z);
-}
-tds_node::~tds_node() {
-}
-
-void tds_node::add_element(tds_element* new_element) {
-	std::cout<<"adding new element for node"<<endl;
-	// elements_.push_front(new_element);
-	elements_.push_back(new_element);
-}
-void tds_node::clean_elements() {
-	// while (!elements_empty()) elements_.pop_front();
-}
-void tds_node::remove_last_element() {
-	elements_.pop_back();
-}
-
 /******************** TDS_ELEMENT METHODS ********************/
 tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination),contaminationB_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
@@ -32,7 +10,7 @@ tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _conta
 	flagAB(false);
 }
 
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, vector<float> _origin, float _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_material* _material, std::vector<float> _origin, float _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
 	calculate_size();
 	flagAB(false);
 }
@@ -82,7 +60,7 @@ void tds_element::set_origin_from_nodes() {
 		z /= n_nodes;
 		break;
 	default:
-		std::cout << "!!! Looking for origin of " << nodes_.size() << " noded element, not programmed yet " << endl;
+		std::cout << "!!! Looking for origin of " << nodes_.size() << " noded element, not programmed yet " << std::endl;
 	}
 	std::cout << "Average of vectors is [" << x << "," << y << "," << z << "]." << std::endl;
 	
@@ -108,7 +86,7 @@ void tds_element::propogate_into_nodes() {
 	}
 }
 void tds_element::calculate_size() {
-	vector<float> vecPQ, vecPR;
+	std::vector<float> vecPQ, vecPR;
 	switch (n_nodes()) {
 	case 2:
 		vecPQ.resize(3);
@@ -171,7 +149,7 @@ tds_section::~tds_section() {
 }
 
 void tds_section::add_element(tds_element* new_element) {
-	std::cout<<"adding new element"<<endl;
+	std::cout<<"adding new element"<<std::endl;
 	elements_.push_back(new_element);
 }
 
@@ -196,7 +174,7 @@ void tds_element_link::initialise() {
 	flux_vector(elementN_->origin(0)-elementM_->origin(0),
 	            elementN_->origin(1)-elementM_->origin(1),
 	            elementN_->origin(2)-elementM_->origin(2));
-	vector<float> asd = elementM_->origin();
+	std::vector<float> asd = elementM_->origin();
 
 	// find the common nodes between the two elements
 	shared_nodes_.clear();
@@ -218,7 +196,7 @@ void tds_element_link::initialise() {
 		modMN(magnitude(flux_vector()));
 		norm_vector_ *= (1.0f/modMN());
 		if (norm_vector(1) != 0.0f || norm_vector(2) != 0.0f) {
-			std::cout << "!!! non 1-D elements had a 1 node interface -- not physically accurate" << endl;
+			std::cout << "!!! non 1-D elements had a 1 node interface -- not physically accurate" << std::endl;
 		}
 		interface_area(1.0f);
 		break;
@@ -227,7 +205,7 @@ void tds_element_link::initialise() {
 		norm_vector(0,shared_node(1).position(1) - shared_node(0).position(1));
 		norm_vector(1,shared_node(0).position(0) - shared_node(1).position(0));
 		if (shared_node(0).position(2) != 0.0f || shared_node(1).position(2) != 0.0f) {
-			std::cout << "!!! non 2-D elements had a 2 node interface -- not physically accurate" << endl;
+			std::cout << "!!! non 2-D elements had a 2 node interface -- not physically accurate" << std::endl;
 		}
 		// make use of this rotated vector as a measure of interface length, then normalise it
 		modMN(magnitude(flux_vector()));
@@ -237,7 +215,7 @@ void tds_element_link::initialise() {
 		if (dot(norm_vector(),flux_vector()) < 0.0f) norm_vector_ *= -1;
 		break;
 	case 3:
-		std::cout << "!!! haven't implemented 3d element link initialisation" << endl;
+		std::cout << "!!! haven't implemented 3d element link initialisation" << std::endl;
 		break;
 	}
 	
@@ -273,12 +251,12 @@ tds::tds():sections_(){
 }
 
 tds::~tds(){
-	std::cout<<"cleaning sections"<<endl;
+	std::cout<<"cleaning sections"<<std::endl;
 	clean_sections();
 }
 
 void tds::add_section(tds_section* new_section){
-	std::cout<<"adding a new section"<<endl;
+	std::cout<<"adding a new section"<<std::endl;
 	sections_.push_back(new_section);
 }
 void tds::add_material(tds_material* new_material){
@@ -287,11 +265,11 @@ void tds::add_material(tds_material* new_material){
 	materials_.push_back(new_material);
 }
 void tds::add_node(tds_node* new_node){
-	std::cout<<"adding a new node"<<endl;
+	std::cout<<"adding a new node"<<std::endl;
 	nodes_.push_back(new_node);
 }
 void tds::add_element(tds_element* new_element){
-	std::cout<<"adding a new element"<<endl;
+	std::cout<<"adding a new element"<<std::endl;
 	elements_.push_back(new_element);
 }
 
@@ -405,12 +383,12 @@ tds_run::~tds_run(){
 }
 
 // void tds_run::tdsfile_close(){
-//	std::cout<<"close tds file"<<endl;
+//	std::cout<<"close tds file"<<std::endl;
 // 	tdsfile_.close();	
 // }
 
-// void tds_run::tdsfile_open(string filename){
-// 	std::cout<<"opening a tds file"<<endl;
+// void tds_run::tdsfile_open(std::string filename){
+// 	std::cout<<"opening a tds file"<<std::endl;
 // 	tdsfile_close();
 // 	clean_sections();
 // 	put_filename(filename);
@@ -419,14 +397,14 @@ tds_run::~tds_run(){
 // }
 
 // void tds_run::read_file(){
-// 	std::cout<<"read file and add sections"<<endl;
+// 	std::cout<<"read file and add sections"<<std::endl;
 // 	//Add in a section
 // 	add_section(new tds_section());
 // }
 
-void tds_run::make_analysis(float delta_t, int _steps, float recording_interval, vector<int>& tracked_elements) {
+void tds_run::make_analysis(float delta_t, int _steps, float recording_interval, std::vector<int>& tracked_elements) {
 
-	std::cout << "Running the model..." << endl;
+	std::cout << "Running the model..." << std::endl;
 
 	// This is a very basic implementation of 'make_analysis' which has constant
 	// even source and no outgassing
@@ -539,12 +517,12 @@ void tds_run::initialise() {
 	// any settings about (measurement) units we can find
 	conversion _conversion((configname() + ".units").c_str());
 	units(&_conversion);
-	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << endl;
+	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << std::endl;
 	
 	// Now read in data
 	// First open all the necessary files (no point in getting half way through
 	// processing only to find a file we need is missing)
-	// std::cout << "gonna open me some files" << endl;
+	// std::cout << "gonna open me some files" << std::endl;
 	materialsfile_.open((configname() + ".materials").c_str());
 	sectionsfile_.open((basename() + ".sections").c_str());
 	elementsfile_.open((basename() + ".elements").c_str());
@@ -552,7 +530,7 @@ void tds_run::initialise() {
 
 	int materials_count, sections_count, elements_count, nodes_count;
 	
-	cout << "gonna read me some files" << endl;
+	//std::cout << "gonna read me some files" << std::endl;
 	std::string line;
 		
 	//Let's start off by populating tds with some materials
@@ -813,7 +791,7 @@ tds_display::~tds_display(){
 void tds_display::dialog_open(){
 	const char *filePtr=fl_file_chooser("Input File",NULL,"",0);
 	if(filePtr){
-		std::cout<<"open"<<endl;
+		std::cout<<"open"<<std::endl;
 		filename(filePtr);
 		load_section(0);
 		FRootfileName.text(filePtr);
@@ -822,51 +800,51 @@ void tds_display::dialog_open(){
 
 void tds_display::load_event(){
 	int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
-	std::cout<<"event to load = "<<e_number<<endl;
+	std::cout<<"event to load = "<<e_number<<std::endl;
 }
 
 void tds_display::load_section(int chnum){
 	int c_number = int(GUI_->channel->value());
-	std::cout<<"loading a section"<<endl;
+	std::cout<<"loading a section"<<std::endl;
 	load_section(c_number,chnum);
 }
 
 void tds_display::load_section(unsigned int ch_n, int chnum){
-	std::cout<<"load section"<<endl;
+	std::cout<<"load section"<<std::endl;
 	FRootfileComments.text(display_tl_info().c_str());
 }
 
 void tds_display::resize_plot(int c){
-	std::cout<<"resize plot"<<endl;
+	std::cout<<"resize plot"<<std::endl;
 }
 
 void tds_display::plot(){
-	std::cout<<"make a plot"<<endl;		
+	std::cout<<"make a plot"<<std::endl;		
 }
 
 void tds_display::makeZoomBox(selection sel,int event,int section){
-	std::cout<<"zoom in"<<endl;
+	std::cout<<"zoom in"<<std::endl;
 }
 
 void tds_display::action(selection sel, Fl_Widget *sender){
-	std::cout<<"un zoom"<<endl;
+	std::cout<<"un zoom"<<std::endl;
 }
 
 void tds_display::action(Fl_Widget *sender){
-	std::cout<<"display action"<<endl;
+	std::cout<<"display action"<<std::endl;
 }
 
 /******************** TDS_BATCH METHODS ********************/
-tds_batch::tds_batch(string filename, string rootout):infile_(filename.c_str()),rootfile_name_(rootout.c_str()),tds_run(){
+tds_batch::tds_batch(std::string filename, std::string rootout):infile_(filename.c_str()),rootfile_name_(rootout.c_str()),tds_run(){
 }
 
 tds_batch::~tds_batch(){
 	infile_.close();
 }
 
-int tds_batch::run_batch(string filename, bool recreate, int filechain, int n_tot){
+int tds_batch::run_batch(std::string filename, bool recreate, int filechain, int n_tot){
 	int tot_element_num=0; 
-	std::cout<<"make root file"<<endl;
+	std::cout<<"make root file"<<std::endl;
 	infile_.close();
 	return tot_element_num;
 }
