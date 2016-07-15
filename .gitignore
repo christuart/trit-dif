@@ -37,6 +37,8 @@ viewer
 *.msh
 *.units
 *.geo
+*.contaminations
+*.tracking
 
 # Emacs
 *~

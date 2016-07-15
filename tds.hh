@@ -347,6 +347,7 @@ private:
 	ifstream elementsfile_;
 	ifstream sourcefile_;
 	ifstream simparamsfile_;
+	ofstream trackingfile_;
 	ofstream contaminationsfile_;
 	std::string basename_;
 	std::string configname_;
@@ -356,7 +357,7 @@ public:
 	tds_run();
 	virtual ~tds_run();
 	void check_coincidence();
-	void make_analysis(float delta_t, int _steps, vector<int>& tracked_elements);
+	void make_analysis(float delta_t, int _steps, float recording_interval, vector<int>& tracked_elements);
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { basename_ = _basename; };

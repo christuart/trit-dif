@@ -123,8 +123,8 @@ void tds_element::add_element_link(tds_element_link* new_element_link) {
 }
 
 void tds_element::transfer_contaminant(float _quantity) {
-	std::cout << "Received quantity of " << _quantity << " and have size() of "
-	          << size() << std::endl;
+	// std::cout << "Received quantity of " << _quantity << " and have size() of "
+	//           << size() << std::endl;
 	contamination(contamination()+_quantity/size());
 	flagAB(!flagAB());
 }
@@ -168,10 +168,10 @@ void tds_element::update(float delta_t) {//method to update parameters
 	for (int i = 0; i < n_neighbours(); i++) {
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 	}
-	std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
-	std::cout << "Takes contamination from " << contamination();
+	// std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
+	// std::cout << "Takes contamination from " << contamination();
 	transfer_contaminant(total_flow * delta_t);
-	std::cout << " to " << contamination() << std::endl;
+	// std::cout << " to " << contamination() << std::endl;
 }
 void tds_element::propogate_into_nodes() {
 	std::cout << "Propogating at element " << this << " i.e. through " << n_nodes() << " nodes." << std::endl;
@@ -224,7 +224,7 @@ void tds_element::calculate_size() {
 	}
 }
 void tds_element::debug_contamination() {
-	std::cout << "Address: " << this << "; flagAB: " << flagAB() << "; Cont A: " << contaminationA_ << "; Cont B: " << contaminationB_ << std::endl;
+	// std::cout << "Address: " << this << "; flagAB: " << flagAB() << "; Cont A: " << contaminationA_ << "; Cont B: " << contaminationB_ << std::endl;
 }
 
 /******************** TDS_MATERIAL METHODS ********************/
@@ -320,9 +320,9 @@ float tds_element_link::flow_rate(bool _AB) {
 	// AB flag system used because the same flow needn't be calculated twice for M->N and N->M
 	// instead we calculate it and store it, and only recalculate when the flag switches
 	if (_AB != flagAB()) {
-		std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
-		          << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
-		          << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
+		// std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
+		//           << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
+		//           << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
 		flow_rate_ = ( a_n_dot_eMN_over_modMN() *
 		               (elementN().contamination(_AB) - elementM().contamination(_AB)) *
 		               diffusion_constant() );
@@ -496,7 +496,7 @@ tds_run::~tds_run(){
 // 	add_section(new tds_section());
 // }
 
-void tds_run::make_analysis(float delta_t, int _steps, vector<int>& tracked_elements) {
+void tds_run::make_analysis(float delta_t, int _steps, float recording_interval, vector<int>& tracked_elements) {
 
 	std::cout << "Running the model..." << endl;
 
@@ -537,13 +537,15 @@ void tds_run::make_analysis(float delta_t, int _steps, vector<int>& tracked_elem
 		element(i).debug_contamination();
 
 	float time = 0.0;
-
-	contaminationsfile_.open(outputname_ + ".contaminations");
-	contaminationsfile_ << "element, time, contamination" << std::endl;
-	contaminationsfile_ << std::scientific;
-	for (int i=0; i < tracked_elements.size(); ++i)
-		contaminationsfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
+	float next_time_recording = recording_interval;
 	
+	trackingfile_.open(outputname_ + ".tracking");
+	trackingfile_ << "element, time, contamination" << std::endl;
+	trackingfile_ << std::scientific;
+	for (int i=0; i < tracked_elements.size(); ++i)
+		trackingfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
+	
+	int reporting_interval = ceil(_steps/100);
 	for (int step = 0; step < _steps; ++step) {
 		
 		// Every step we need to:
@@ -572,12 +574,34 @@ void tds_run::make_analysis(float delta_t, int _steps, vector<int>& tracked_elem
 		//}
 		//
 		// 3)
-		for (int i=0; i < tracked_elements.size(); ++i)
-			contaminationsfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
+		if (next_time_recording < time) {
+			for (int i=0; i < tracked_elements.size(); ++i) {
+				trackingfile_ << (tracked_elements[i]) << ", " << time
+				              << ", " << element(tracked_elements[i]-1).contamination()
+				              //<< ", " << element(tracked_elements[i]-1).contamination(false)
+				              //<< ", " << element(tracked_elements[i]-1).contamination(true)
+				              << std::endl;
+			}
+			next_time_recording += recording_interval;
+		}
 		for (int i=0; i < n_elements(); ++i)
 			element(i).debug_contamination();
-		std::cout << "Step " << step << " complete. Time now is " << time << "s." << std::endl;
+		if (step % reporting_interval == 0)
+			std::cout << "Step " << (step+1) << " complete. Time now is " << time << "s." << std::endl;
 	}
+	trackingfile_.close();
+
+	// Contaminations: final values at all elements
+	contaminationsfile_.open(outputname_ + ".contaminations");
+	contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
+	                    << delta_t << "; time steps: " << _steps << "; final time: " << time
+	                    << "s" << std::endl;
+	contaminationsfile_ << "element, x, y, z, contamination" << std::endl;
+	contaminationsfile_ << std::scientific;
+	for (int i=0; i < n_elements(); ++i)
+		contaminationsfile_ << (i+1) << ", " << element(i).origin(0) << ", " << element(i).origin(1)
+		                    << ", " << element(i).origin(2) << ", " << element(i).contamination()
+		                    << std::endl;
 	contaminationsfile_.close();
 }
 
@@ -592,7 +616,7 @@ void tds_run::initialise() {
 	// Now read in data
 	// First open all the necessary files (no point in getting half way through
 	// processing only to find a file we need is missing)
-	cout << "gonna open me some files" << endl;
+	// std::cout << "gonna open me some files" << endl;
 	materialsfile_.open((configname() + ".materials").c_str());
 	sectionsfile_.open((basename() + ".sections").c_str());
 	elementsfile_.open((basename() + ".elements").c_str());
@@ -757,7 +781,7 @@ void tds_run::initialise() {
 
 		std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
 	}
-	std::cout << "gonna close me some files" << std::endl;
+	// std::cout << "gonna close me some files" << std::endl;
 	sectionsfile_.close();
 	elementsfile_.close();
 	nodesfile_.close();

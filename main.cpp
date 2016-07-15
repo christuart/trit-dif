@@ -33,36 +33,47 @@ int main(int nArg, char** vArg){
 		string configname = "simple";
 		string outputname = "output";
 		float delta_t = 3600.0*24.0;
+		float recording_interval = 3600*24*365.24;
+		float finish_time;
 		int steps = 10;
 		vector<int> element_ids;
+		std::cout << "Testing..." << std::endl;
 		element_ids.push_back(1);
 		element_ids.push_back(2);
-		element_ids.push_back(tds_t->n_elements());
+		element_ids.push_back(3);
+		element_ids.push_back(4);
+		element_ids.push_back(5);
 		bool basename_set = false, configname_set = false, outputname_set = false;
 		for (unsigned i=0; i < cl.size(); ++i) {
 			if (i < cl.size()-1) {
-				if (cl[i].arg == 'm' && !basename_set) {
+				if (cl[i].arg == 'm' && !basename_set) { // model
 					basename = cl[++i].arg; basename_set = true;
-				} else if (cl[i].arg == 'c' && !configname_set) { 
+				} else if (cl[i].arg == 'c' && !configname_set) { // config
 					configname = cl[++i].arg; configname_set = true;
-				} else if (cl[i].arg == 'o' && !outputname_set) { 
+				} else if (cl[i].arg == 'o' && !outputname_set) { // output
 					outputname = cl[++i].arg; outputname_set = true;
-				} else if (cl[i].arg == 'd') {
+				} else if (cl[i].arg == 'd') { // delta_t
 					istringstream iss(cl[++i].arg);
 					iss >> delta_t;
-				} else if (cl[i].arg == 's') { 
+				} else if (cl[i].arg == 's') { // steps
 					istringstream iss(cl[++i].arg);
 					iss >> steps;
-				} else if (cl[i].arg == 't') {
+				} else if (cl[i].arg == 'e') { // elements (to track)
 					element_ids.resize(0);
 					int this_id;
-					while (i++ < cl.size()) {
-						istringstream iss(cl[++i].arg);
-						iss >> this_id;
+					istringstream iss(cl[++i].arg);
+					std::cout << "Tracking ids: " << iss.str() << std::endl;
+					while (iss >> this_id) {
 						std::cout << "Tracking " << this_id << std::endl;
 						element_ids.push_back(this_id);
 					}
-					return 0;
+				} else if (cl[i].arg == 'r') { // recording interval
+					istringstream iss(cl[++i].arg);
+					iss >> recording_interval;
+				} else if (cl[i].arg == 'f') { // finish time
+					istringstream iss(cl[++i].arg);
+					iss >> finish_time;
+					steps = ceil(finish_time/delta_t);
 				}		
 			}
 		}
@@ -75,7 +86,7 @@ int main(int nArg, char** vArg){
 		tds_t->outputname(outputname);
 		tds_t->initialise();
 		// run with five 1 day steps and no tracked elements for first tests.
-		tds_t->make_analysis(delta_t, steps, element_ids);
+		tds_t->make_analysis(delta_t, steps, recording_interval, element_ids);
 		return 0;
 	} else if (b >= 0) {
 		//string textfile(vArg[2]);
