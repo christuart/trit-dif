@@ -61,6 +61,7 @@ std::vector<float> cross(const std::vector<float>& u, const std::vector<float>& 
 }
 float magnitude(std::vector<float>& u) {
 	float m = 0.0f;
+	std::cout << "u.size() = " << u.size() << std::endl;
 	for (int i = 0; i < u.size(); i++) {
 		m += u[i]*u[i];
 	}

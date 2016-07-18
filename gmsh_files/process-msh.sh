@@ -92,7 +92,7 @@ file_elements=$(echo $file_name | sed 's/\([a-z]*\)\(.msh\)$/\1.elements/')
 file_sections=$(echo $file_name | sed 's/\([a-z]*\)\(.msh\)$/\1.sections/')
 
 # Check for overwriting
-if [ -f $file_nodes ] || [ -f $file_elements ] || [ -f $file_sections ]
+if [ -f ../models/$file_nodes ] || [ -f ../models/$file_elements ] || [ -f ../models/$file_sections ]
 then
     # Check whether already specified to append or delete
     if [ -z $append]
@@ -122,20 +122,20 @@ then
     fi
     if [ $delete ]
     then
-	if [ -f $file_nodes ]
+	if [ -f "../models/$file_nodes" ]
 	then
 	    echo "*** Deleting $file_nodes"
-	    rm $file_nodes
+	    rm "../models/$file_nodes"
 	fi
-	if [ -f $file_elements ]
+	if [ -f "../models/$file_elements" ]
 	then
 	    echo "*** Deleting $file_elements"
-	    rm $file_elements
+	    rm "../models/$file_elements"
 	fi
-	if [ -f $file_sections ]
+	if [ -f "../models/$file_sections" ]
 	then
 	    echo "*** Deleting $file_sections"
-	    rm $file_sections
+	    rm "../models/$file_sections"
 	fi
     fi
 fi

@@ -120,7 +120,7 @@ void tds_element::set_origin_from_nodes() {
 		std::cout << "!!! Looking for origin of " << nodes_.size() << " noded element, not programmed yet " << std::endl;
 	}
 	
-	origin(x,y,z); std::cout << x << std::endl;
+	origin(x,y,z);
 	// debug(&origin());
 }
 
@@ -160,6 +160,7 @@ void tds_element::calculate_size() {
 		vecPR.resize(3);
 		vecPR = node(2).position() - node(0).position();
 		if (vecPQ.at(2) == 0.0 && vecPR.at(2) == 0.0) {
+		std::cout << "Calculating size for triangular element " << this << std::endl;
 			//2D cross product nice and simple
 			size(0.5 * abs(vecPQ.at(1)*vecPR.at(0) - vecPQ.at(0)*vecPR.at(1)));
 		} else {
@@ -186,6 +187,15 @@ void tds_element::calculate_size() {
 }
 void tds_element::debug_contamination() {
 	// std::cout << "Address: " << this << "; flagAB: " << flagAB() << "; Cont A: " << contaminationA_ << "; Cont B: " << contaminationB_ << std::endl;
+}
+bool tds_element::is_linked_to(tds_element* _element) {
+	std::cout << "Checking at element " << this << " whether linked to " << _element << std::endl;
+	for (int i=0; i < n_neighbours(); ++i) {
+		std::cout << "Link " << i << " is with " << neighbour(i).neighbour_of(this) << std::endl;
+		if ((neighbour(i).neighbour_of(this)) == _element)
+			return true;
+	}
+	return false;
 }
 
 
@@ -273,8 +283,8 @@ tds_element_link::tds_element_link(tds_element* _M, tds_element* _N) {
 tds_element_link::~tds_element_link() {
 }
 void tds_element_link::initialise() {
-	norm_vector_.reserve(3);
-	flux_vector_.reserve(3);
+	norm_vector_.resize(3);
+	flux_vector_.resize(3);
 
 	// get flux vector, which is the vector from COM of one element to the COM of the next
 	flux_vector(elementN_->origin(0)-elementM_->origin(0),
@@ -307,13 +317,23 @@ void tds_element_link::initialise() {
 		break;
 	case 2:
 		// first get the vector along the edge, but rotated 90deg, i.e. [y; -x]
+		std::cout << "Jamaica: finding interface area length from ("
+		          << shared_node(0).position(0) << ","
+		          << shared_node(0).position(1) << ") to ("
+			  << shared_node(1).position(0) << ","
+		          << shared_node(1).position(1) << ")" << std::endl;
 		norm_vector(0,shared_node(1).position(1) - shared_node(0).position(1));
 		norm_vector(1,shared_node(0).position(0) - shared_node(1).position(0));
+		std::cout << "Rotated vector: " << norm_vector(0)
+		          << "," << norm_vector(1) << " i.e. magnitude "
+		          << magnitude(norm_vector()) << std::endl;
 		if (shared_node(0).position(2) != 0.0f || shared_node(1).position(2) != 0.0f) {
 			std::cout << "!!! non 2-D elements had a 2 node interface -- not physically accurate" << std::endl;
 		}
 		// make use of this rotated vector as a measure of interface length, then normalise it
 		modMN(magnitude(flux_vector()));
+		std::cout << "norm_vector().size() = " << norm_vector().size() << std::endl;
+		std::cout << "Jamaica: " << magnitude(norm_vector()) << std::endl;
 		interface_area(magnitude(norm_vector()));
 		norm_vector_ *= (1/interface_area());
 		// now make sure it is in the outward direction to follow standard conventions

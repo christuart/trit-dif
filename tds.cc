@@ -218,7 +218,7 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 	float source_contamination = 1.0e13;
 	for (int i=0; i < n_sections(); ++i) {
 		if (section(i).material().is_source()) {
-			std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is " << section(i).material().name() << " which is... source?????: " << section(i).material().is_source() << std::endl;
+			std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination." << std::endl;
 			for (int j=0; j < section(i).n_elements(); ++j) {
 				section(i).element(j).debug_contamination();
 				section(i).element(j).contamination(source_contamination);
@@ -568,17 +568,56 @@ void tds_run::initialise() {
 		// 2D is nice because whatever shape the element is,
 		// it can only build an interface from two nodes.
 		
-		int n, m, o, p, t = 0;
+		int n, m, o, p, t = 0, c;
 		for (int s = 0; s < n_sections(); s++ ) {
+			std::cout << "Starting section " << s << " (" << section(s).material().name() << ")" << std::endl;
 			n = section(s).n_elements();
 			t += n;
-			if (section(s).is_source()) {
-
-			} else {
+			//if (section(s).material().is_source()) {
+				// probably do something slightly different here as more exclusions can be made for elements in source sections
+			//} else {
+			{
 				for (int i=0; i < n; ++i) {
+					std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
 					m = section(s).element(i).n_nodes();
 					for (int j=0; j < m; ++j) {
-						n = 
+						std::cout << "\tStarting j: node " << j << std::endl;
+						o = section(s).element(i).node(j).n_elements();
+						for (int k=0; k < o; ++k) {
+							std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
+							// don't try and link to yourself, or to something already linked:
+							if (
+							    (&section(s).element(i) != &section(s).element(i).node(j).element(k)) &&
+							    (section(s).element(i).is_linked_to(
+							                                         ( &section(s).element(i).node(j).element(k) )
+							                                         )==false)
+							    ) {
+								p = section(s).element(i).node(j).element(k).n_nodes();
+								c = 1; // we know that one node is the same already
+								for (int l=0; (l < p && c < 2); ++l) { // we only need two common nodes to connect elements in 2D
+									// ignore that one node
+									if (&section(s).element(i).node(j) != &section(s).element(i).node(j).element(k).node(l)) {
+										for (int q=0; (q < m && c < 2); ++q) {
+											if (&section(s).element(i).node(j).element(k).node(l) == &section(s).element(i).node(q)) {
+												++c;
+											}
+										}
+									}
+								}
+								if (c >= 2) {
+									std::cout << "Making link from " << &section(s).element(i) << " to "
+									          << &(section(s).element(i).node(j).element(k)) << std::endl;
+									tds_element_link* new_link = new tds_element_link(&section(s).element(i),
+									                                                  &(section(s).element(i).node(j).element(k)));
+									element_link_count++;
+									std::cout << "Made link" << std::endl;
+									section(s).element(i).add_element_link(new_link);
+									section(s).element(i).node(j).element(k).add_element_link(new_link);
+									std::cout << "OR DID WE??" << std::endl;
+								}									
+							}
+							std::cout << "\t\tFinished with k of " << k << std::endl;
+						}
 					}
 				}
 			}

@@ -102,6 +102,7 @@ public:
 	void calculate_size();
 
 	void debug_contamination();
+	bool is_linked_to(tds_element* _element);
 };
 
 class tds_material {
