@@ -226,10 +226,11 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 				section(i).element(j).contamination(source_contamination);
 				section(i).element(j).flagAB(!section(i).element(j).flagAB());
 			}
+			std::cout << "Contaminations set." << std::endl;
 		}
 	}
-	for (int i=0; i < n_elements(); ++i)
-		element(i).debug_contamination();
+	//for (int i=0; i < n_elements(); ++i)
+	//	element(i).debug_contamination();
 
 	float time = 0.0;
 	float next_time_recording = recording_interval;

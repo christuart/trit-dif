@@ -86,7 +86,7 @@ void tds_element::add_element_link(tds_element_link* new_element_link) {
 
 void tds_element::transfer_contaminant(float _quantity) {
 	// std::cout << "Received quantity of " << _quantity << " and have size() of "
-	//           << size() << std::endl;
+	//            << size() << std::endl;
 	contamination(contamination()+_quantity/size());
 	flagAB(!flagAB());
 }
@@ -128,6 +128,7 @@ void tds_element::update(float delta_t) {//method to update parameters
 	float total_flow = 0.0f;
 	for (int i = 0; i < n_neighbours(); i++) {
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
+		//std::cout << "Flow is now " << total_flow << std::endl;
 	}
 	// std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
 	// std::cout << "Takes contamination from " << contamination();
@@ -147,7 +148,7 @@ void tds_element::calculate_size() {
 		vecPQ.resize(3);
 		vecPQ = node(1).position() - node(0).position();
 		if (vecPQ.at(1) == 0.0 && vecPQ.at(2) == 0.0) {
-			size(abs(vecPQ.at(1)-vecPQ.at(0)));
+			size(fabs(vecPQ.at(1)-vecPQ.at(0)));
 		} else {
 			vecPQ *= vecPQ;
 			size(sqrt(vecPQ.at(0)+vecPQ.at(1)+vecPQ.at(2)));
@@ -157,12 +158,19 @@ void tds_element::calculate_size() {
 		// triangle PQR, area is 1/2 mod(PQ x PR)
 		vecPQ.resize(3);
 		vecPQ = node(1).position() - node(0).position();
+		std::cout << "PQ: [" << vecPQ.at(0) << "; " << vecPQ.at(1)
+		          << "; " << vecPQ.at(2) << "]" << std::endl;
 		vecPR.resize(3);
 		vecPR = node(2).position() - node(0).position();
+		std::cout << "PR: [" << vecPR.at(0) << "; " << vecPR.at(1)
+		          << "; " << vecPR.at(2) << "]" << std::endl;
 		if (vecPQ.at(2) == 0.0 && vecPR.at(2) == 0.0) {
-		std::cout << "Calculating size for triangular element " << this << std::endl;
+		// std::cout << "Calculating size for triangular element " << this << std::endl;
+		// std::cout << "This is from size(0.5 * fabs(" << vecPQ.at(1) << "*" << vecPR.at(0)
+		//           << " - " << vecPQ.at(0) << "*" << vecPR.at(1) << "))" << std::endl;
+		// std::cout << "=size(0.5 * fabs(" << vecPQ.at(1)*vecPR.at(0)-vecPQ.at(0)*vecPR.at(1) << "))" << std::endl;
 			//2D cross product nice and simple
-			size(0.5 * abs(vecPQ.at(1)*vecPR.at(0) - vecPQ.at(0)*vecPR.at(1)));
+			size(0.5 * fabs(vecPQ.at(1)*vecPR.at(0) - vecPQ.at(0)*vecPR.at(1)));
 		} else {
 			//3D cross product instead boooooo
 			size(
@@ -352,8 +360,8 @@ float tds_element_link::flow_rate(bool _AB) {
 	// instead we calculate it and store it, and only recalculate when the flag switches
 	if (_AB != flagAB()) {
 		// std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
-		//           << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
-		//           << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
+		//            << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
+		//            << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
 		flow_rate_ = ( a_n_dot_eMN_over_modMN() *
 		               (elementN().contamination(_AB) - elementM().contamination(_AB)) *
 		               diffusion_constant() );
