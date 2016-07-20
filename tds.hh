@@ -118,14 +118,14 @@ public:
 class tds_run: public tds {
 public:
 private:
-	ifstream materialsfile_;
-	ifstream sectionsfile_;
-	ifstream nodesfile_;
-	ifstream elementsfile_;
-	ifstream sourcefile_;
-	ifstream simparamsfile_;
-	ofstream trackingfile_;
-	ofstream contaminationsfile_;
+	std::ifstream materialsfile_;
+	std::ifstream sectionsfile_;
+	std::ifstream nodesfile_;
+	std::ifstream elementsfile_;
+	std::ifstream sourcefile_;
+	std::ifstream simparamsfile_;
+	std::ofstream trackingfile_;
+	std::ofstream contaminationsfile_;
 	std::string basename_;
 	std::string configname_;
 	std::string outputname_;
@@ -234,7 +234,7 @@ public:
 
 class tds_batch: public tds_run {
 private:
-	ifstream infile_;
+	std::ifstream infile_;
 	const char* rootfile_name_;
 protected:
 public:
@@ -245,7 +245,7 @@ public:
 	tds_batch(std::string infilename, std::string rootout);
 	virtual ~tds_batch();
 	int run_batch(std::string filename, bool recreate, int filechain, int n_tot);
-	inline ifstream &inputfile() { return infile_; }
+	inline std::ifstream &inputfile() { return infile_; }
 };
 
 #endif
