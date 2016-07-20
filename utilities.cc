@@ -157,3 +157,20 @@ std::vector<std::string> mul; cSeparateValues(mul,name,"|");
 //   case cEndl: this->operator<<("\n"); break;
 //   default: throw Exception("cFlag","cPipe::operator<<(cFlag)","Unknown type");
 // } return *this; }
+
+std::string find_replace(const std::string& pattern,const std::string& rep,std::string str) {
+	size_t match_start = 0;
+	while (match_start <= (str.size() - pattern.size())){
+		// Try to find a new match
+		match_start = str.find(pattern, match_start);
+		if (match_start == std::string::npos)
+			break;
+     
+		// Replace `pattern` by `rep` and fill the remaining
+		// space with '\0' character.
+		for (size_t j = 0; j < pattern.size(); ++j) {
+			str[match_start + j] = j < rep.size() ? rep[j] : '\0';
+		}
+	}
+	return str;
+}

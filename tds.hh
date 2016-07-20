@@ -134,6 +134,41 @@ private:
 	int steps_;
 	float tracking_interval_;
 	std::vector<int>* tracked_elements_;
+	struct plugin_file {
+		std::string file_name;
+		bool needed_after_initialisation;
+	};
+	struct run_settings {
+		run_settings():models_directory("models/"),
+		               config_directory("config/"),
+		               output_directory("output/"),
+		               delta_t(60.0),
+		               simulation_length(31556736.0),
+		               contamination_mode_time("constant"),
+		               contamination_mode_space("constant"),
+		               tracking_mode("all"),
+		               tracking_interval(604800.0){}
+		std::string models_directory;
+		std::string config_directory;
+		std::string output_directory;
+		std::string gmsh_bin_directory;
+		std::string model_name;
+		std::string config_name;
+		std::string output_name;
+		float delta_t;
+		float simulation_length;
+		std::string contamination_mode_time;
+		std::string contamination_mode_space;
+		float contamination;
+		std::string contaminations_file;
+		std::map<std::string, plugin_file> plugin_files;
+		std::string tracking_mode;
+		std::vector<int>* tracking_list;
+		int tracking_n;
+		std::vector<std::string> activate_plugins;
+		float tracking_interval;
+	} settings;
+		
 protected:
 public:
 	tds_run();
@@ -142,23 +177,23 @@ public:
 	void make_analysis();
 	void initialise();
 	//setters
-	inline void basename(std::string _basename) { basename_ = _basename; };
-	inline void configname(std::string _configname) { configname_ = _configname; };
-	inline void outputname(std::string _outputname) { outputname_ = _outputname; };
-	inline void delta_t(float _delta_t) { delta_t_ = _delta_t; }
+	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.models_directory,"",_basename); };
+	inline void configname(std::string _configname) { settings.config_name = find_replace(settings.config_directory,"",_configname); };
+	inline void outputname(std::string _outputname) { settings.output_name = find_replace(settings.output_directory,"",_outputname); };
+	inline void delta_t(float _delta_t) { settings.delta_t = _delta_t; }
 	inline void steps(int _steps) { steps_ = _steps; }
-	inline void tracking_interval(float _tracking_interval) { tracking_interval_ = _tracking_interval; }
-	inline void tracked_elements(std::vector<int>& _tracked_elements) { tracked_elements_ = &_tracked_elements; }
-	inline void tracked_element(int i, int element) { tracked_elements_->at(i) = element; }
+	inline void tracking_interval(float _tracking_interval) { settings.tracking_interval = _tracking_interval; }
+	inline void tracked_elements(std::vector<int>& _tracked_elements) { settings.tracking_list = &_tracked_elements; }
+	inline void tracked_element(int i, int element) { settings.tracking_list->at(i) = element; }
 	//getters
-	inline std::string basename() { return basename_; };
-	inline std::string configname() { return configname_; };
-	inline std::string outputname() { return outputname_; };
-	inline float delta_t() { return delta_t_; }
+	inline std::string basename() { return settings.model_name; };
+	inline std::string configname() { return settings.config_name; };
+	inline std::string outputname() { return settings.output_name; };
+	inline float delta_t() { return settings.delta_t; }
 	inline int steps() { return steps_; }
-	inline float tracking_interval() { return tracking_interval_; }
-	inline int tracked_element(int i) { return tracked_elements_->at(i); }
-	inline std::vector<int>* tracked_elements() { return tracked_elements_; }
+	inline float tracking_interval() { return settings.tracking_interval; }
+	inline int tracked_element(int i) { return settings.tracking_list->at(i); }
+	inline std::vector<int>* tracked_elements() { return settings.tracking_list; }
 
 	void read_run_file(std::string run_file_name);
 };

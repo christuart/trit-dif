@@ -625,6 +625,18 @@ void tds_run::initialise() {
 
 void tds_run::read_run_file(std::string run_file_name) {
 	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
+
+	// Set defaults before reading from the file
+	std::string basename = "simple2d";
+	std::string configname = "simple";
+	std::string outputname = "output";
+	float delta_t = 3600.0*24.0;
+	float recording_interval = 3600*24*365.24;
+	float finish_time;
+	int steps = 10;
+	std::vector<int> element_ids;
+	
+	
 	std::cout << "Run file reading not yet implemented!" << std::endl;
 }
 
