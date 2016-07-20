@@ -21,7 +21,7 @@ raVen:
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
 	*.cc *.cxx *.cpp
 
-	g++ -m32 *.o -o viewer \
+	g++ -m32 *.o -o trit-dif \
 	-L/usr/include \
 	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
 
@@ -31,16 +31,16 @@ raVen:
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
 	*.cc *.cxx *.cpp
 
-	g++ -m64 *.o -o viewer \
+	g++ -m64 *.o -o trit-dif \
 	-L/usr/include \
 	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
 
 veto_file.o: viewer.hh
 
 access:
-	chmod a+rwx viewer
+	chmod a+rwx trit-dif
 
 clean:
-	rm -f *.o viewer
+	rm -f *.o trit-dif
 rm:
 	rm *.txt *.root

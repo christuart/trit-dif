@@ -129,21 +129,38 @@ private:
 	std::string basename_;
 	std::string configname_;
 	std::string outputname_;
+	float initial_contamination;
+	float delta_t_;
+	int steps_;
+	float tracking_interval_;
+	std::vector<int>* tracked_elements_;
 protected:
 public:
 	tds_run();
 	virtual ~tds_run();
 	void check_coincidence();
-	void make_analysis(float delta_t, int _steps, float recording_interval, std::vector<int>& tracked_elements);
+	void make_analysis();
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { basename_ = _basename; };
 	inline void configname(std::string _configname) { configname_ = _configname; };
 	inline void outputname(std::string _outputname) { outputname_ = _outputname; };
+	inline void delta_t(float _delta_t) { delta_t_ = _delta_t; }
+	inline void steps(int _steps) { steps_ = _steps; }
+	inline void tracking_interval(float _tracking_interval) { tracking_interval_ = _tracking_interval; }
+	inline void tracked_elements(std::vector<int>& _tracked_elements) { tracked_elements_ = &_tracked_elements; }
+	inline void tracked_element(int i, int element) { tracked_elements_->at(i) = element; }
 	//getters
 	inline std::string basename() { return basename_; };
 	inline std::string configname() { return configname_; };
 	inline std::string outputname() { return outputname_; };
+	inline float delta_t() { return delta_t_; }
+	inline int steps() { return steps_; }
+	inline float tracking_interval() { return tracking_interval_; }
+	inline int tracked_element(int i) { return tracked_elements_->at(i); }
+	inline std::vector<int>* tracked_elements() { return tracked_elements_; }
+
+	void read_run_file(std::string run_file_name);
 };
 
 class tds_display: public tds_run {

@@ -29,7 +29,7 @@
 *.app
 
 # Project specifics
-viewer
+trit-dif
 # *.nodes
 # *.elements
 # *.sections

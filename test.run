@@ -1,0 +1,16 @@
+mode	 			testing
+version 			1
+models-directory		models/
+config-directory 		config/
+output-directory 		output/
+gmsh-bin-directory 		~/gmsh-2.12.0-Linux/bin/
+model-name			simpler2d
+config-name			simple
+output-name			demo2d
+delta-t				60 seconds
+tracking-interval		1 month
+simulation-length		4 years
+contamination-mode-time 	constant
+contamination-mode-space	constant
+contamination 			1e13
+tracking-mode			all

@@ -1,13 +1,4 @@
 #include "tds.hh"
-
-
-
-
-
-
-
-
-
 /******************** TDS METHODS ********************/
 
 
@@ -191,7 +182,7 @@ tds_run::~tds_run(){
 // 	add_section(new tds_section());
 // }
 
-void tds_run::make_analysis(float delta_t, int _steps, float recording_interval, std::vector<int>& tracked_elements) {
+void tds_run::make_analysis() {
 
 	std::cout << "Running the model..." << std::endl;
 
@@ -199,8 +190,8 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 	// even source and no outgassing
 
 	// Allow the user to specify '-1' as the final element
-	for (int i=0; i < tracked_elements.size(); ++i) {
-		if (tracked_elements[i] < 0) tracked_elements[i] += n_elements();
+	for (int i=0; i < tracked_elements()->size(); ++i) {
+		if (tracked_element(i) < 0) tracked_element(i,tracked_element(i)+n_elements());
 	}
 
 	// Set AB flags (just in case!)
@@ -233,16 +224,16 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 	//	element(i).debug_contamination();
 
 	float time = 0.0;
-	float next_time_recording = recording_interval;
+	float next_time_recording = tracking_interval();
 	
 	trackingfile_.open(outputname_ + ".tracking");
 	trackingfile_ << "element, time, contamination" << std::endl;
 	trackingfile_ << std::scientific;
-	for (int i=0; i < tracked_elements.size(); ++i)
-		trackingfile_ << (tracked_elements[i]) << ", " << time << ", " << element(tracked_elements[i]-1).contamination() << std::endl;
+	for (int i=0; i < tracked_elements()->size(); ++i)
+		trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
 	
-	int reporting_interval = ceil(_steps/100);
-	for (int step = 0; step < _steps; ++step) {
+	int reporting_interval = ceil(steps()/100);
+	for (int step = 0; step < steps(); ++step) {
 		
 		// Every step we need to:
 		// 1) Update every element (each element decides what it needs to do to consitute an update)
@@ -257,11 +248,11 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 			// Note simple model with constant source so no need to update them
 			if (!section(i).material().is_source()) {
 				for (int j=0; j < section(i).n_elements(); ++j) {
-					section(i).element(j).update(delta_t);
+					section(i).element(j).update(delta_t());
 				}
 			}
 		}
-		time += delta_t;
+		time += delta_t();
 		
 		// 2) Switch flags in elements
 		//this_flag != this_flag;
@@ -271,14 +262,14 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 		//
 		// 3)
 		if (next_time_recording < time) {
-			for (int i=0; i < tracked_elements.size(); ++i) {
-				trackingfile_ << (tracked_elements[i]) << ", " << time
-				              << ", " << element(tracked_elements[i]-1).contamination()
-				              //<< ", " << element(tracked_elements[i]-1).contamination(false)
-				              //<< ", " << element(tracked_elements[i]-1).contamination(true)
+			for (int i=0; i < tracked_elements()->size(); ++i) {
+				trackingfile_ << (tracked_element(i)) << ", " << time
+				              << ", " << element(tracked_element(i)-1).contamination()
+				              //<< ", " << element(tracked_element(i)-1).contamination(false)
+				              //<< ", " << element(tracked_element(i)-1).contamination(true)
 				              << std::endl;
 			}
-			next_time_recording += recording_interval;
+			next_time_recording += tracking_interval();
 		}
 		for (int i=0; i < n_elements(); ++i)
 			element(i).debug_contamination();
@@ -290,7 +281,7 @@ void tds_run::make_analysis(float delta_t, int _steps, float recording_interval,
 	// Contaminations: final values at all elements
 	contaminationsfile_.open(outputname_ + ".contaminations");
 	contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
-	                    << delta_t << "; time steps: " << _steps << "; final time: " << time
+	                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
 	                    << "s" << std::endl;
 	contaminationsfile_ << "element, x, y, z, contamination" << std::endl;
 	contaminationsfile_ << std::scientific;
@@ -630,6 +621,11 @@ void tds_run::initialise() {
 
 	output_model_summary(true,true,true,true,true);
 	
+}
+
+void tds_run::read_run_file(std::string run_file_name) {
+	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
+	std::cout << "Run file reading not yet implemented!" << std::endl;
 }
 
 
