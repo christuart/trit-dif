@@ -636,6 +636,9 @@ void tds_run::initialise() {
 }
 
 void tds_run::read_run_file(std::string run_file_name) {
+
+        if (run_file_name.rfind(".run") != run_file_name.length()-4) run_file_name += ".run";
+        
 	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
 
 	// Set defaults before reading from the file
@@ -650,6 +653,59 @@ void tds_run::read_run_file(std::string run_file_name) {
 	
 	
 	std::cout << "Run file reading not yet implemented!" << std::endl;
+		
+	//Let's start off by populating tds with some materials
+        std::ifstream run_file_(run_file_name);
+        std::string line, setting, value;
+        int version;
+        std::istringstream line_processing;
+	if (std::getline(run_file_, line)) {
+		line_processing.str(line);
+		if (!(line_processing >> setting >> value)) {
+                        std::cerr << "Error at first line of '" << run_file_name
+                                  << "'. Expecting run mode." << std::endl;
+                        std::cerr << "Instead got: " << line << std::endl;
+                        throw;
+		} else {
+			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
+                        std::cout << "\t" << value << std::endl;
+		}
+	} else {
+                std::cerr << "Error at first line of '" << run_file_name
+                          << "'. Expecting run mode." << std::endl;
+                throw;
+        }
+	if (std::getline(run_file_, line)) {
+		line_processing.str(line);
+		if (!(line_processing >> setting >> version)) {
+                        std::cerr << "Error at second line of '" << run_file_name
+                                  << "'. Expecting .run file format version." << std::endl;
+                        std::cerr << "Instead got: " << line_processing.str() << std::endl;
+                        throw;
+		} else {
+			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
+                        std::cout << "\t" << value << std::endl;
+		}
+	} else {
+                std::cerr << "Error at second line of '" << run_file_name
+                          << "'. Expecting  .run file format version." << std::endl;
+                throw;
+        }
+	while (std::getline(materialsfile_, line)) {
+		line_processing.str(line);
+		if (!(line_processing >> setting >> value)) {
+                        std::cerr << "Error at second line of '" << run_file_name
+                                  << "'. Expecting .run file format version." << std::endl;
+                        throw;
+		} else {
+			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
+                        std::cout << "\t" << value << std::endl;
+		}
+                if (setting != "the-final-thing-that-a-setting-could-be-called") {
+                        std::cerr << "Invalid line, skipping. (Setting name was '" << setting << "'." << std::endl;
+			continue;
+		}
+	}
 }
 
 
