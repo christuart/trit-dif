@@ -72,3 +72,18 @@ float conversion::convert_diffusion_constant_to(std::string _unit, float _diffus
 	}
 	return _diffusion_constant / diffusion_constant_units_[_unit];
 }
+float conversion::convert_time_from(std::string _unit, float _time) {
+	if (time_units_.count(_unit) == 0) {
+		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
+		return 0.0;
+	}
+	return _time * time_units_[_unit];
+}
+float conversion::convert_time_to(std::string _unit, float _time) {
+	if (time_units_.count(_unit) == 0) {
+		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
+		return 0.0;
+	}
+	return _time / time_units_[_unit];
+}
+

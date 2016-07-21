@@ -34,6 +34,7 @@ class conversion {
 	inline void units_file(std::string _units_file) { units_file_ = _units_file; }
 	//getters
 	inline std::string units_file() { return units_file_; }
+	
 	float convert_length_from(std::string _unit, float _length);
 	float convert_length_to(std::string _unit, float _length);
 	float convert_time_from(std::string _unit, float _time);

@@ -292,12 +292,23 @@ void tds_run::make_analysis() {
 	contaminationsfile_.close();
 }
 
+void tds_run::set_units_from_file(const char* units_file_address_) {
+
+	if (!units_set_) {
+		conversion _conversion(units_file_address_);
+		units(&_conversion);
+		units_set_ = true;
+	} else {
+		std::cerr << "Units have already been set, but the program has asked to set them again. Request ignored." << std::endl;
+	}
+	
+}
+
 void tds_run::initialise() {
 
 	// Before we can read in any data, we should look for
 	// any settings about (measurement) units we can find
-	conversion _conversion(units_file_address());
-	units(&_conversion);
+	set_units_from_file(units_file_address());
 	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << std::endl;
 	
 	// Now read in data
@@ -637,7 +648,7 @@ void tds_run::initialise() {
 
 void tds_run::read_run_file(std::string run_file_name) {
 
-        if (run_file_name.rfind(".run") != run_file_name.length()-4) run_file_name += ".run";
+	ensure_ending(run_file_name,".run");
         
 	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
 
@@ -675,9 +686,10 @@ void tds_run::read_run_file(std::string run_file_name) {
                           << "'. Expecting run mode." << std::endl;
                 throw;
         }
+	line_processing.clear();
 	if (std::getline(run_file_, line)) {
 		line_processing.str(line);
-		if (!(line_processing >> setting >> version)) {
+		if (!(line_processing >> setting >> value)) {
                         std::cerr << "Error at second line of '" << run_file_name
                                   << "'. Expecting .run file format version." << std::endl;
                         std::cerr << "Instead got: " << line_processing.str() << std::endl;
@@ -691,20 +703,100 @@ void tds_run::read_run_file(std::string run_file_name) {
                           << "'. Expecting  .run file format version." << std::endl;
                 throw;
         }
-	while (std::getline(materialsfile_, line)) {
+	line_processing.clear();
+	int line_n = 2;
+	bool config_given = false;
+	while (std::getline(run_file_, line)) {
 		line_processing.str(line);
-		if (!(line_processing >> setting >> value)) {
-                        std::cerr << "Error at second line of '" << run_file_name
-                                  << "'. Expecting .run file format version." << std::endl;
+		++line_n;
+		if (!(line_processing >> setting && std::getline(line_processing,value))) {
+                        std::cerr << "Error at line " << line_n << " of '" << run_file_name
+                                  << "'." << std::endl;
+                        std::cerr << "Line: " << line_processing.str() << std::endl;
                         throw;
 		} else {
+			trim(value);
 			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
                         std::cout << "\t" << value << std::endl;
 		}
-                if (setting != "the-final-thing-that-a-setting-could-be-called") {
-                        std::cerr << "Invalid line, skipping. (Setting name was '" << setting << "'." << std::endl;
-			continue;
+		std::istringstream interpreter;
+		// Following is the list of available instructions in a .run file
+                if (setting == "models-directory") {
+	                std::cout << "\tSetting the models directory: " << value << std::endl;
+	                settings.model_directory = value;
+                } else if (setting == "config-directory") {
+	                std::cout << "\tSetting the config directory: " << value << std::endl;
+	                settings.config_directory = value;
+                } else if (setting == "output-directory") {
+	                std::cout << "\tSetting the output directory: " << value << std::endl;
+	                settings.output_directory = value;
+                } else if (setting == "gmsh-bin-directory") {
+	                std::cout << "\tSetting the gmsh directory: " << value << std::endl;
+	                settings.gmsh_bin_directory = value;
+                } else if (setting == "model-name") {
+	                std::cout << "\tSetting the model name: " << value << std::endl;
+	                settings.model_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                settings.config_name = value;
+	                config_given = true;
+	                set_units_from_file(units_file_address());
+                } else if (setting == "output-name") {
+	                std::cout << "\tSetting the output name: " << value << std::endl;
+	                settings.output_name = value;
+                } else if (setting == "delta-t") {
+	                std::cout << "\tSetting the time step: " << value << std::endl;
+	                if (config_given) {
+		                std::string unit;
+		                interpreter.str(value);
+		                if (!(interpreter >> settings.delta_t >> unit)) {
+			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+		                } else
+			                settings.delta_t = units().convert_time_from(unit,settings.delta_t);
+	                } else
+		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+                } else if (setting == "simulation-length") {
+	                std::cout << "\tSetting the minimum total simulation time: " << value << std::endl;
+	                if (config_given) {
+		                std::string unit;
+		                interpreter.str(value);
+		                if (!(interpreter >> settings.simulation_length >> unit)) {
+			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+		                } else
+			                settings.simulation_length = units().convert_time_from(unit,settings.simulation_length);
+	                } else
+		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else if (setting == "config-name") {
+	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                // settings.config_name = value;
+                } else {
+                        std::cerr << "\t(Didn't know what to do with '" << setting << "'.)" << std::endl;
 		}
+                line_processing.clear();
 	}
 }
 

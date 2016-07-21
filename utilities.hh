@@ -125,5 +125,7 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // }
 
 std::string find_replace(const std::string& pattern,const std::string& rep,const std::string& str);
+void ensure_ending(std::string& str, const std::string& suffix);
+void trim(std::string& str);
 
 #endif

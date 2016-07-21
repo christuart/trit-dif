@@ -176,3 +176,26 @@ std::string find_replace(const std::string& pattern,const std::string& rep,const
 	out = out + str.substr(matched);
 	return out;
 }
+
+void ensure_ending(std::string& str, const std::string& suffix) {
+	std::cout << "ensure ending /" << str << "/" << suffix << "/" << std::endl;
+        if (str.rfind(suffix) != str.length()-suffix.length()) str += suffix;
+}
+
+void trim(std::string& str) {
+	size_t endpos = str.find_last_not_of(" \t");
+	if (std::string::npos != endpos) {
+		// trim leading spaces
+		size_t startpos = str.find_first_not_of(" \t");
+		if (std::string::npos != startpos) {
+			str = str.substr(startpos, endpos+1);
+		} else {
+			str = str.substr(0, endpos+1);
+		}
+	} else {
+		size_t startpos = str.find_first_not_of(" \t");
+		if (std::string::npos != startpos) {
+			str = str.substr(startpos);
+		}
+	}
+}

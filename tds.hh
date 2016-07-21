@@ -129,6 +129,7 @@ private:
 	std::string basename_;
 	std::string configname_;
 	std::string outputname_;
+	bool units_set_;
 	float initial_contamination;
 	float delta_t_;
 	int steps_;
@@ -175,6 +176,7 @@ public:
 	virtual ~tds_run();
 	void check_coincidence();
 	void make_analysis();
+	void set_units_from_file(const char* units_file_address_);
 	void initialise();
 	//setters
 	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.model_directory,"",_basename); basename_ = settings.model_directory + settings.model_name; };

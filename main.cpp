@@ -45,6 +45,7 @@ int main(int nArg, char** vArg){
 			show_usage();
 			return -1;
 		} else {
+			tds_r = new tds_run();
 			tds_r->read_run_file(cl[2].arg);
 			tds_r->make_analysis();
 			return 0;
