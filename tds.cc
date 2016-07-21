@@ -296,7 +296,7 @@ void tds_run::initialise() {
 
 	// Before we can read in any data, we should look for
 	// any settings about (measurement) units we can find
-	conversion _conversion((configname() + ".units").c_str());
+	conversion _conversion(units_file_address());
 	units(&_conversion);
 	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << std::endl;
 	
@@ -304,10 +304,10 @@ void tds_run::initialise() {
 	// First open all the necessary files (no point in getting half way through
 	// processing only to find a file we need is missing)
 	// std::cout << "gonna open me some files" << std::endl;
-	materialsfile_.open((configname() + ".materials").c_str());
-	sectionsfile_.open((basename() + ".sections").c_str());
-	elementsfile_.open((basename() + ".elements").c_str());
-	nodesfile_.open((basename() + ".nodes").c_str());
+	materialsfile_.open(materials_file_address());
+	sectionsfile_.open(sections_file_address());
+	elementsfile_.open(elements_file_address());
+	nodesfile_.open(nodes_file_address());
 
 	int materials_count, sections_count, elements_count, nodes_count;
 	
@@ -325,24 +325,27 @@ void tds_run::initialise() {
 			          << " materials." << std::endl;
 			expected_materials(materials_count+3); // not forgetting error, source and outgassing = +3
 		}
-	}
-	while (std::getline(materialsfile_, line)) {
-		std::istringstream iss(line);
-		std::string _name, _density_unit, _diffusion_constant_unit;
-		double _density, _diffusion_constant;
+		while (std::getline(materialsfile_, line)) {
+			std::istringstream iss(line);
+			std::string _name, _density_unit, _diffusion_constant_unit;
+			double _density, _diffusion_constant;
 		
-		if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
-			std::cerr << "Invalid line, skipping. (material)\n";
-			continue;
-		}
+			if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
+				std::cerr << "Invalid line, skipping. (material)\n";
+				continue;
+			}
 
-		std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
+			std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
 		
-		// let's make all names lower case
-		std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
+			// let's make all names lower case
+			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
 		
-		tds_material* _m = new tds_material(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
-		add_material(_m);
+			tds_material* _m = new tds_material(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
+			add_material(_m);
+		}
+	} else {
+		std::cerr << "No materials found? Is the config name good?" << std::endl;
+		throw;
 	}
 	// we'll add an error material for when a bad name is given
 	// and source/outgassings materials for the regions which will
@@ -362,30 +365,33 @@ void tds_run::initialise() {
 			          << " sections." << std::endl;
 			expected_sections(sections_count);
 		}
-	}
-	while (std::getline(sectionsfile_, line)) {
-		std::istringstream iss(line);
-		int _dim, _id;
-		std::string _name;
+		while (std::getline(sectionsfile_, line)) {
+			std::istringstream iss(line);
+			int _dim, _id;
+			std::string _name;
 		
-		if (!(iss >> _dim >> _id >> _name)) {
-			std::cerr << "Invalid line, skipping. (section)\n";
-			continue;
-		}
+			if (!(iss >> _dim >> _id >> _name)) {
+				std::cerr << "Invalid line, skipping. (section)\n";
+				continue;
+			}
 
-		std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
+			std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
 		
-		// Get rid of the double quotes Gmsh puts in, and put to lower case
-		_name.erase(_name.end()-1); _name.erase(_name.begin());
-		std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
+			// Get rid of the double quotes Gmsh puts in, and put to lower case
+			_name.erase(_name.end()-1); _name.erase(_name.begin());
+			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
 
-		if (_id != n_sections()+1) {
-			std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
-			continue;
+			if (_id != n_sections()+1) {
+				std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
+				continue;
+			}
+			std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
+			add_section(new tds_section(&material(_name)));
+			std::cout << "Now " << n_sections() << " sections." << std::endl;
 		}
-		std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
-		add_section(new tds_section(&material(_name)));
-		std::cout << "Now " << n_sections() << " sections." << std::endl;
+	} else {
+		std::cerr << "No sections found? Is the model name good?" << std::endl;
+		throw;
 	}
 	//Next we'll get some nodes in
 	if (std::getline(nodesfile_, line)) {
@@ -398,24 +404,27 @@ void tds_run::initialise() {
 			          << " nodes." << std::endl;
 			expected_nodes(nodes_count);
 		}
-	}
-	while (std::getline(nodesfile_, line)) {
-		std::istringstream iss(line);
-		int id;
-		float _x, _y, _z;
+		while (std::getline(nodesfile_, line)) {
+			std::istringstream iss(line);
+			int id;
+			float _x, _y, _z;
 		
-		if (!(iss >> id >> _x >> _y >> _z)) {
-			std::cerr << "Invalid line, skipping. (node)\n";
-			continue;
-		}
+			if (!(iss >> id >> _x >> _y >> _z)) {
+				std::cerr << "Invalid line, skipping. (node)\n";
+				continue;
+			}
 
-		std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
+			std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
 
-		if (id != n_nodes()+1) {
-			std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
-			continue;
+			if (id != n_nodes()+1) {
+				std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
+				continue;
+			}
+			add_node(new tds_node(_x,_y,_z));
 		}
-		add_node(new tds_node(_x,_y,_z));
+	} else {
+		std::cerr << "No nodes found? Is the model name good?" << std::endl;
+		throw;
 	}
 	//Now finally we'll read the elements
 	if (std::getline(elementsfile_, line)) {
@@ -428,45 +437,48 @@ void tds_run::initialise() {
 			          << " elements." << std::endl;
 			expected_elements(elements_count);
 		}
-	}
-	while (std::getline(elementsfile_, line)) {
-		std::istringstream iss(line);
-		int id, type, n_tags, section_id, entity_id;
-		std::ostringstream extra_tags;
+		while (std::getline(elementsfile_, line)) {
+			std::istringstream iss(line);
+			int id, type, n_tags, section_id, entity_id;
+			std::ostringstream extra_tags;
 		
-		if (!(iss >> id >> type >> n_tags)) {
-			std::cerr << "Invalid line, skipping. (element)\n";
-			continue;
-		}
-		register_element_type(type);
-		if (id != n_elements()+1) {
-			std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
-			continue;
-		}
-		int tags_processed = 0;
-		iss >> section_id >> entity_id;
-		for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
-			extra_tags << iss << " ";
-		}
-		if (extra_tags.str().length() > 0)
-			std::cout << "Unprocessed tags: " << extra_tags.str() << std::endl;
-		tds_nodes _element_nodes;
-		int this_node;
-		while (iss >> this_node) {
-			std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
-			_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
-		}
-		std::cout << "all nodes ready to place into the element" << std::endl;
-		tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1).material()),0.0);
-		std::cout << "element created, with nodes" << std::endl;
-		add_element(new_element);
-		std::cout << "element stored, referencing it in its nodes" << std::endl;
-		(*new_element).propogate_into_nodes();
-		std::cout << "element also stored in section" << std::endl;
-		section(section_id-1).add_element(new_element);
-		std::cout << "all done!" << std::endl;
+			if (!(iss >> id >> type >> n_tags)) {
+				std::cerr << "Invalid line, skipping. (element)\n";
+				continue;
+			}
+			register_element_type(type);
+			if (id != n_elements()+1) {
+				std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
+				continue;
+			}
+			int tags_processed = 0;
+			iss >> section_id >> entity_id;
+			for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
+				extra_tags << iss << " ";
+			}
+			if (extra_tags.str().length() > 0)
+				std::cout << "Unprocessed tags: " << extra_tags.str() << std::endl;
+			tds_nodes _element_nodes;
+			int this_node;
+			while (iss >> this_node) {
+				std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
+				_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
+			}
+			std::cout << "all nodes ready to place into the element" << std::endl;
+			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1).material()),0.0);
+			std::cout << "element created, with nodes" << std::endl;
+			add_element(new_element);
+			std::cout << "element stored, referencing it in its nodes" << std::endl;
+			(*new_element).propogate_into_nodes();
+			std::cout << "element also stored in section" << std::endl;
+			section(section_id-1).add_element(new_element);
+			std::cout << "all done!" << std::endl;
 
-		std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+			std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+		}
+	} else {
+		std::cerr << "No elements found? Is the model name good?" << std::endl;
+		throw;
 	}
 	// std::cout << "gonna close me some files" << std::endl;
 	sectionsfile_.close();

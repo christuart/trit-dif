@@ -124,6 +124,6 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //  return *this;
 // }
 
-std::string find_replace(const std::string& pattern,const std::string& rep,std::string str);
+std::string find_replace(const std::string& pattern,const std::string& rep,const std::string& str);
 
 #endif
