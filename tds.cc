@@ -748,11 +748,15 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                std::cout << "\tSetting the time step: " << value << std::endl;
 	                if (config_given) {
 		                std::string unit;
+		                std::cout << "\tMade a string for the unit to sit in." << std::endl;
 		                interpreter.str(value);
+		                std::cout << "\tMade a stringstream from " << value << std::endl;
 		                if (!(interpreter >> settings.delta_t >> unit)) {
 			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
-		                } else
+		                } else {
+			                std::cout << "Got the delta_t and the unit, need to do the conversion." << std::endl;
 			                settings.delta_t = units().convert_time_from(unit,settings.delta_t);
+		                }
 	                } else
 		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
                 } else if (setting == "simulation-length") {

@@ -12,8 +12,8 @@ typedef enum {
     DIM_TIME, // cannot reuse name time
     DIM_DENSITY,
     DIM_DIFFUSION_CONSTANT,
-    DIM_VOLUME,
-    DIM_AREA
+    DIM_AREA,
+    DIM_VOLUME
 } enum_dimensions;
 
 class conversion {
@@ -24,8 +24,8 @@ class conversion {
 	std::map<std::string,float> time_units_;
 	std::map<std::string,float> density_units_;
 	std::map<std::string,float> diffusion_constant_units_;
-	std::map<std::string,float> volume_units_;
 	std::map<std::string,float> area_units_;
+	std::map<std::string,float> volume_units_;
 	std::map<std::string,int> dimensions_;
 	protected:
 	public:
@@ -43,10 +43,10 @@ class conversion {
 	float convert_density_to(std::string _unit, float _density);
 	float convert_diffusion_constant_from(std::string _unit, float _diffusion_constant);
 	float convert_diffusion_constant_to(std::string _unit, float _diffusion_constant);
-	float convert_volume_from(std::string _unit, float _volume);
-	float convert_volume_to(std::string _unit, float _volume);
 	float convert_area_from(std::string _unit, float _area);
 	float convert_area_to(std::string _unit, float _area);
+	float convert_volume_from(std::string _unit, float _volume);
+	float convert_volume_to(std::string _unit, float _volume);
 	void initialise();
 
 };
