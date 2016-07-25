@@ -25,14 +25,14 @@ void conversion::initialise() {
 		double _value;
 		
 		if (!(iss >> _dimension >> _unit >> _value)) {
-			std::cerr << "Invalid line, skipping.\n";
+			std::cerr << "\t\tInvalid line, skipping.\n";
 			continue;			
 		}
 		if (dimensions_.count(_dimension) == 0) {
 			std::cerr << "Invalid dimension was read from unit file (" << _dimension << ") for the unit '" << _unit << "'" << std::endl;
 			continue;
 		}
-		std::cout << "We obtained three values [" << _dimension << ", " << _unit << ", " << _value << "].\n";
+		std::cout << "\t\tWe obtained three values [" << _dimension << ", " << _unit << ", " << _value << "].\n";
 		
 		int dim_code = dimensions_[_dimension];
 		switch (dim_code) {
@@ -60,6 +60,7 @@ void conversion::initialise() {
 		
 	}
 	units_file_stream.close();
+	
 }
 
 float conversion::convert_density_from(std::string _unit, float _density) {
@@ -91,7 +92,6 @@ float conversion::convert_diffusion_constant_to(std::string _unit, float _diffus
 	return _diffusion_constant / diffusion_constant_units_[_unit];
 }
 float conversion::convert_time_from(std::string _unit, float _time) {
-	std::cout << "Converting " << _time << " " << _unit << " into seconds." << std::endl;
 	if (time_units_.count(_unit) == 0) {
 		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
 		return _time;

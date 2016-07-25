@@ -188,20 +188,20 @@ public:
 	inline void tracked_elements(std::vector<int>& _tracked_elements) { settings.tracking_list = &_tracked_elements; }
 	inline void tracked_element(int i, int element) { settings.tracking_list->at(i) = element; }
 	//getters
-	inline std::string basename() { return basename_; };
-	inline std::string configname() { return configname_; };
-	inline std::string outputname() { return outputname_; };
+	inline std::string basename() { return settings.model_name; };
+	inline std::string configname() { return settings.config_name; };
+	inline std::string outputname() { return settings.output_name; };
 	inline float delta_t() { return settings.delta_t; }
 	inline int steps() { return steps_; }
 	inline float tracking_interval() { return settings.tracking_interval; }
 	inline int tracked_element(int i) { return settings.tracking_list->at(i); }
 	inline std::vector<int>* tracked_elements() { return settings.tracking_list; }
 	
-	inline const char* units_file_address() { std::string temp = configname() + ".units"; return temp.c_str(); }
-	inline const char* materials_file_address() { std::string temp = configname() + ".materials"; return temp.c_str(); }
-	inline std::string sections_file_address() { std::string temp = basename() + ".sections"; return temp.c_str(); }
-	inline std::string nodes_file_address() { std::string temp = basename() + ".nodes"; return temp.c_str(); }
-	inline std::string elements_file_address() { std::string temp = basename() + ".elements"; return temp.c_str(); }
+	inline const char* units_file_address() { std::string temp = settings.config_directory + configname() + ".units"; return temp.c_str(); }
+	inline const char* materials_file_address() { std::string temp = settings.config_directory + configname() + ".materials"; return temp.c_str(); }
+	inline std::string sections_file_address() { std::string temp = settings.model_directory + basename() + ".sections"; return temp.c_str(); }
+	inline std::string nodes_file_address() { std::string temp = settings.model_directory + basename() + ".nodes"; return temp.c_str(); }
+	inline std::string elements_file_address() { std::string temp = settings.model_directory + basename() + ".elements"; return temp.c_str(); }
 
 
 	void read_run_file(std::string run_file_name);

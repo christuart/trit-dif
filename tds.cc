@@ -295,8 +295,8 @@ void tds_run::make_analysis() {
 void tds_run::set_units_from_file(const char* units_file_address_) {
 
 	if (!units_set_) {
-		conversion _conversion(units_file_address_);
-		units(&_conversion);
+		//conversion _conversion(units_file_address_);
+		units(new conversion(units_file_address_));
 		units_set_ = true;
 	} else {
 		std::cerr << "Units have already been set, but the program has asked to set them again. Request ignored." << std::endl;
@@ -722,15 +722,19 @@ void tds_run::read_run_file(std::string run_file_name) {
 		std::istringstream interpreter;
 		// Following is the list of available instructions in a .run file
                 if (setting == "models-directory") {
+	                ensure_ending(value, "/");
 	                std::cout << "\tSetting the models directory: " << value << std::endl;
 	                settings.model_directory = value;
                 } else if (setting == "config-directory") {
+	                ensure_ending(value, "/");
 	                std::cout << "\tSetting the config directory: " << value << std::endl;
 	                settings.config_directory = value;
                 } else if (setting == "output-directory") {
+	                ensure_ending(value, "/");
 	                std::cout << "\tSetting the output directory: " << value << std::endl;
 	                settings.output_directory = value;
                 } else if (setting == "gmsh-bin-directory") {
+	                ensure_ending(value, "/");
 	                std::cout << "\tSetting the gmsh directory: " << value << std::endl;
 	                settings.gmsh_bin_directory = value;
                 } else if (setting == "model-name") {
@@ -740,6 +744,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                std::cout << "\tSetting the config name: " << value << std::endl;
 	                settings.config_name = value;
 	                config_given = true;
+	                std::cout << "\tSetting the units from " << units_file_address() << std::endl;
 	                set_units_from_file(units_file_address());
                 } else if (setting == "output-name") {
 	                std::cout << "\tSetting the output name: " << value << std::endl;
@@ -748,13 +753,10 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                std::cout << "\tSetting the time step: " << value << std::endl;
 	                if (config_given) {
 		                std::string unit;
-		                std::cout << "\tMade a string for the unit to sit in." << std::endl;
 		                interpreter.str(value);
-		                std::cout << "\tMade a stringstream from " << value << std::endl;
 		                if (!(interpreter >> settings.delta_t >> unit)) {
 			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
 		                } else {
-			                std::cout << "Got the delta_t and the unit, need to do the conversion." << std::endl;
 			                settings.delta_t = units().convert_time_from(unit,settings.delta_t);
 		                }
 	                } else
