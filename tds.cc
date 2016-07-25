@@ -206,18 +206,20 @@ void tds_run::make_analysis() {
 	}
 
 	// Set the source contamination
-	float source_contamination = 1.0e13;
-	for (int i=0; i < n_sections(); ++i) {
-		if (section(i).material().is_source()) {
-			std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination." << std::endl;
-			for (int j=0; j < section(i).n_elements(); ++j) {
-				section(i).element(j).debug_contamination();
-				section(i).element(j).contamination(source_contamination);
-				section(i).element(j).flagAB(!section(i).element(j).flagAB());
-				section(i).element(j).contamination(source_contamination);
-				section(i).element(j).flagAB(!section(i).element(j).flagAB());
+	if (settings.contamination_mode_time == "constant" && settings.contamination_mode_space == "constant") {
+		float source_contamination = settings.contamination;
+		for (int i=0; i < n_sections(); ++i) {
+			if (section(i).material().is_source()) {
+				std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination." << std::endl;
+				for (int j=0; j < section(i).n_elements(); ++j) {
+					section(i).element(j).debug_contamination();
+					section(i).element(j).contamination(source_contamination);
+					section(i).element(j).flagAB(!section(i).element(j).flagAB());
+					section(i).element(j).contamination(source_contamination);
+					section(i).element(j).flagAB(!section(i).element(j).flagAB());
+				}
+				std::cout << "Contaminations set." << std::endl;
 			}
-			std::cout << "Contaminations set." << std::endl;
 		}
 	}
 	//for (int i=0; i < n_elements(); ++i)
@@ -642,7 +644,21 @@ void tds_run::initialise() {
 	}
 
 	output_model_summary(true,true,true,true,true);
-	
+
+	if (settings.tracking_mode == "all") {
+		settings.tracking_list = new std::vector<int>();
+		for (int i = 1; i <= n_elements(); ++i)
+			settings.tracking_list->push_back(i);
+	} else if (settings.tracking_mode == "first-last") {
+		settings.tracking_list = new std::vector<int>();
+		int i;
+		for (i = 1; (i <= settings.tracking_n && i <= n_elements()); ++i) {
+			settings.tracking_list->push_back(i);
+		}
+		for (i = std::max(std::max(1,n_elements()+1-settings.tracking_n),i); (i <= n_elements()); ++i) {
+			settings.tracking_list->push_back(i);
+		}
+	}
 }
 
 void tds_run::read_run_file(std::string run_file_name) {
@@ -764,6 +780,18 @@ void tds_run::read_run_file(std::string run_file_name) {
 		                }
 	                } else
 		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+                } else if (setting == "tracking-interval") {
+	                std::cout << "\tSetting the time interval for recording contaminations: " << value << std::endl;
+	                if (config_given) {
+		                std::string unit;
+		                interpreter.str(value);
+		                if (!(interpreter >> settings.tracking_interval >> unit)) {
+			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+		                } else {
+			                settings.tracking_interval = units().convert_time_from(unit,settings.tracking_interval);
+		                }
+	                } else
+		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
                 } else if (setting == "simulation-length") {
 	                std::cout << "\tSetting the minimum total simulation time: " << value << std::endl;
 	                if (config_given) {
@@ -775,33 +803,56 @@ void tds_run::read_run_file(std::string run_file_name) {
 			                settings.simulation_length = units().convert_time_from(unit,settings.simulation_length);
 	                } else
 		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
-                } else if (setting == "config-name") {
+                } else if (setting == "contamination-mode-time") {
+	                std::cout << "\tSetting the contamination mode for time: " << value << std::endl;
+	                settings.contamination_mode_time = value;
+                } else if (setting == "contamination-mode-space") {
+	                std::cout << "\tSetting the contamination mode for space: " << value << std::endl;
+	                settings.contamination_mode_space = value;
+                } else if (setting == "contamination") {
+	                std::cout << "\tSetting the basic contamination: " << value << std::endl;
+	                if (config_given) {
+		                std::string unit;
+		                interpreter.str(value);
+		                if (!(interpreter >> settings.contamination >> unit)) {
+			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+		                } else
+			                settings.contamination = units().convert_contamination_from(unit,settings.contamination);
+	                } else
+		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+                } else if (setting == "contaminations-file") {
+	                std::cout << "\tSetting the contaminations file name: " << value << std::endl;
+	                settings.contaminations_file = value;
+                } else if (setting == "activate-plugin") {
+	                std::cout << "\tAdding a plug-in to activate: " << value << std::endl;
+	                settings.activated_plugins.push_back(value);
+                } else if (setting == "plugin-file") {
+	                std::cout << "\tSetting the file for a plugin: " << value << std::endl;
+	                std::string plugin;
+	                std::string init_only;
+	                std::string file;
+	                interpreter.str(value);
+	                if (!(interpreter >> plugin >> init_only >> file)) {
+		                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+	                } else {
+		                settings.plugin_files[plugin].file_name = file;
+		                settings.plugin_files[plugin].needed_after_initialisation = (init_only != "init-only");
+	                }
+                } else if (setting == "tracking-mode") {
+	                std::cout << "\tSetting the tracking mode: " << value << std::endl;
+	                settings.tracking_mode = value;
+                } else if (setting == "track") {
 	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
-                } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
-	                // settings.config_name = value;
+	                interpreter.str(value);
+	                if (settings.tracking_mode == "ids") {
+		                settings.tracking_list = new std::vector<int>();
+		                int id;
+		                while (interpreter >> id)
+			                settings.tracking_list->push_back(id);
+	                } else {
+		                if (!(interpreter >> settings.tracking_n))
+			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+	                }
                 } else {
                         std::cerr << "\t(Didn't know what to do with '" << setting << "'.)" << std::endl;
 		}

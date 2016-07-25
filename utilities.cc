@@ -178,7 +178,7 @@ std::string find_replace(const std::string& pattern,const std::string& rep,const
 }
 
 void ensure_ending(std::string& str, const std::string& suffix) {
-	std::cout << "ensure ending /" << str << "/" << suffix << "/" << std::endl;
+	std::cout << "ensure ending {" << str << "} {" << suffix << "}" << std::endl;
         if (str.rfind(suffix) != str.length()-suffix.length()) str += suffix;
 }
 

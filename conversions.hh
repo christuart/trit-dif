@@ -13,7 +13,8 @@ typedef enum {
     DIM_DENSITY,
     DIM_DIFFUSION_CONSTANT,
     DIM_AREA,
-    DIM_VOLUME
+    DIM_VOLUME,
+    DIM_CONTAMINATION
 } enum_dimensions;
 
 class conversion {
@@ -26,6 +27,7 @@ class conversion {
 	std::map<std::string,float> diffusion_constant_units_;
 	std::map<std::string,float> area_units_;
 	std::map<std::string,float> volume_units_;
+	std::map<std::string,float> contamination_units_;
 	std::map<std::string,int> dimensions_;
 	protected:
 	public:
@@ -47,6 +49,8 @@ class conversion {
 	float convert_area_to(std::string _unit, float _area);
 	float convert_volume_from(std::string _unit, float _volume);
 	float convert_volume_to(std::string _unit, float _volume);
+	float convert_contamination_from(std::string _unit, float _contamination);
+	float convert_contamination_to(std::string _unit, float _contamination);
 	void initialise();
 
 };

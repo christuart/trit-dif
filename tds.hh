@@ -148,7 +148,11 @@ private:
 		               contamination_mode_time("constant"),
 		               contamination_mode_space("constant"),
 		               tracking_mode("all"),
-		               tracking_interval(604800.0){}
+		               tracking_interval(604800.0) {
+			activated_plugins.resize(0);
+			plugin_files.clear();
+			//tracking_list->resize(0);
+		}
 		std::string model_directory;
 		std::string config_directory;
 		std::string output_directory;
@@ -162,11 +166,11 @@ private:
 		std::string contamination_mode_space;
 		float contamination;
 		std::string contaminations_file;
+		std::vector<std::string> activated_plugins;
 		std::map<std::string, plugin_file> plugin_files;
 		std::string tracking_mode;
 		std::vector<int>* tracking_list;
 		int tracking_n;
-		std::vector<std::string> activate_plugins;
 		float tracking_interval;
 	} settings;
 		

@@ -7,6 +7,7 @@ conversion::conversion(std::string _units_file):units_file_(_units_file) {
 	dimensions_["diffusion_constant"] = DIM_DIFFUSION_CONSTANT;
 	dimensions_["area"] = DIM_AREA;
 	dimensions_["volume"] = DIM_VOLUME;
+	dimensions_["contamination"] = DIM_CONTAMINATION;
 	initialise();
 }
 
@@ -53,6 +54,9 @@ void conversion::initialise() {
 			break;
 		case DIM_VOLUME:
 			volume_units_[_unit] = _value;
+			break;
+		case DIM_CONTAMINATION:
+			contamination_units_[_unit] = _value;
 			break;
 		default:
 			std::cerr << "Unhandled dimension was read from unit file (" << _dimension << ") for the unit '" << _unit << "'" << std::endl;
@@ -104,5 +108,19 @@ float conversion::convert_time_to(std::string _unit, float _time) {
 		return _time;
 	}
 	return _time / time_units_[_unit];
+}
+float conversion::convert_contamination_from(std::string _unit, float _contamination) {
+	if (contamination_units_.count(_unit) == 0) {
+		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
+		return _contamination;
+	}
+	return _contamination * contamination_units_[_unit];
+}
+float conversion::convert_contamination_to(std::string _unit, float _contamination) {
+	if (contamination_units_.count(_unit) == 0) {
+		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
+		return _contamination;
+	}
+	return _contamination / contamination_units_[_unit];
 }
 
