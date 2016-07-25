@@ -222,11 +222,10 @@ void tds_run::make_analysis() {
 	}
 	//for (int i=0; i < n_elements(); ++i)
 	//	element(i).debug_contamination();
-
 	float time = 0.0;
 	float next_time_recording = tracking_interval();
 	
-	trackingfile_.open(outputname_ + ".tracking");
+	trackingfile_.open(tracking_file_address());
 	trackingfile_ << "element, time, contamination" << std::endl;
 	trackingfile_ << std::scientific;
 	for (int i=0; i < tracked_elements()->size(); ++i)
@@ -279,7 +278,7 @@ void tds_run::make_analysis() {
 	trackingfile_.close();
 
 	// Contaminations: final values at all elements
-	contaminationsfile_.open(outputname_ + ".contaminations");
+	contaminationsfile_.open(contaminations_file_address());
 	contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
 	                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
 	                    << "s" << std::endl;
@@ -653,19 +652,23 @@ void tds_run::read_run_file(std::string run_file_name) {
 	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
 
 	// Set defaults before reading from the file
-	std::string basename = "simple2d";
-	std::string configname = "simple";
-	std::string outputname = "output";
-	float delta_t = 3600.0*24.0;
-	float recording_interval = 3600*24*365.24;
-	float finish_time;
-	int steps = 10;
-	std::vector<int> element_ids;
+	settings.model_name = "simple2d";
+	settings.config_name = "simple";
+	settings.output_name = "output";
+	settings.delta_t = 3600.0*24.0;
+	settings.tracking_interval = 3600*24*365.24;
+	settings.simulation_length = 3600*24*30.0;
+	settings.tracking_list = new std::vector<int>();
 	
 	
-	std::cout << "Run file reading not yet implemented!" << std::endl;
-		
-	//Let's start off by populating tds with some materials
+	std::cout << "Run file reading not yet fully implemented!" << std::endl;
+
+	// most importantly, the checks to make sure that the user has
+	// specified all the required fields in their .run file before
+	// we go ahead with the simulation are not yet in place.
+
+	// Let's start off by
+	//populating tds with some materials
         std::ifstream run_file_(run_file_name);
         std::string line, setting, value;
         int version;
@@ -804,6 +807,11 @@ void tds_run::read_run_file(std::string run_file_name) {
 		}
                 line_processing.clear();
 	}
+	// Set the number of simulation steps from the step size and simulation length
+	steps(ceil(settings.simulation_length/settings.delta_t));
+	// Now get the simulation to initialise using the data we have brought in
+	// from the instructions file
+	this->initialise();
 }
 
 
