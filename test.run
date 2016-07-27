@@ -4,7 +4,7 @@ models-directory		models/
 config-directory 		config/
 output-directory 		output/
 gmsh-bin-directory 		~/gmsh-2.12.0-Linux/bin/
-model-name			round
+model-name			simple2d
 config-name			simple
 output-name			runtest
 delta-t				60 seconds
@@ -13,5 +13,5 @@ simulation-length		4 years
 contamination-mode-time 	constant
 contamination-mode-space	constant
 contamination 			1e13 molesH3/m^3
-tracking-mode			first-last
+tracking-mode			all
 track				5

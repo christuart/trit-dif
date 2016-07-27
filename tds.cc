@@ -232,6 +232,14 @@ void tds_run::make_analysis() {
 	trackingfile_ << std::scientific;
 	for (int i=0; i < tracked_elements()->size(); ++i)
 		trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
+
+	// Let's do some timing
+	const int trail_length = 5;
+	int history_count = 0;
+	int history_index = trail_length-1;
+	float step_times[trail_length]; // values stored will be ms per step per element.
+	uint64 start_checkmark = GetTimeMs64();
+	uint64 last_checkmark = start_checkmark;
 	
 	int reporting_interval = ceil(steps()/100);
 	for (int step = 0; step < steps(); ++step) {
@@ -272,11 +280,43 @@ void tds_run::make_analysis() {
 			}
 			next_time_recording += tracking_interval();
 		}
-		for (int i=0; i < n_elements(); ++i)
-			element(i).debug_contamination();
-		if (step % reporting_interval == 0)
-			std::cout << "Step " << (step+1) << " complete. Time now is " << time << "s." << std::endl;
+		// for (int i=0; i < n_elements(); ++i)
+		// 	element(i).debug_contamination();
+		float remaining_time, elapsed_time;
+		if ((step+1) % reporting_interval == 0) {
+
+			++history_index;
+			history_index %= trail_length;
+
+			uint64 now = GetTimeMs64();
+			step_times[history_index] = (now - last_checkmark)/(1.0*(reporting_interval*n_elements()));
+			history_count = std::min(trail_length,++history_count);
+			elapsed_time = (now - start_checkmark)*1e-3;
+			// Added an extra 50% on the prediction, because it almost always underestimates
+			// This is as a result of the assumed initial sparseness of the model.
+			remaining_time = 1.5 * 1e-3*average_historic_time(step_times, history_count) * ((steps() - step) * n_elements());
+				
+			std::cout << "Last step: "
+			          << std::setw(8) << (step+1) << "; sim time: "
+			          << std::setw(13) << time << "s; elapsed "
+			          << std::setw(12) << elapsed_time << "s; remaining (est.): "
+			          << std::setw(12) << remaining_time << "s; total (est.): "
+			          << std::setw(12) << (elapsed_time+remaining_time) << "s" << std::endl;
+
+			// Add in some adaptive behaviour - aim for every ~2 seconds
+			float r = (now - last_checkmark)/2000.0;
+			r -=1;
+			r /=2;
+			r +=1;
+			r = std::fmax(0.5,std::fmin(r,2.0));
+			reporting_interval = std::ceil(reporting_interval/r);
+			last_checkmark = now;
+						
+		}
 	}
+	float elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
+	std::cout << "Total elapsed time: " << elapsed_time << "s" << std::endl;
+	
 	trackingfile_.close();
 
 	// Contaminations: final values at all elements

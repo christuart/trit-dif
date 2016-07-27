@@ -18,10 +18,12 @@
 #include <forward_list>
 #include <bitset>
 #include <algorithm>
+#include <iomanip>
 
 #include "conversions.hh"
 #include "tds_parts.hh"
 #include "vector_ops.hh"
+#include "timing.hh"
 
 class tds;
 class tds_run;
