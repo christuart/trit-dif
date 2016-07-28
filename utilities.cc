@@ -199,3 +199,17 @@ void trim(std::string& str) {
 		}
 	}
 }
+
+// Function by bnbertha from http://www.cplusplus.com/forum/unices/2259/#msg8505
+std::string get_timestamp() {
+   time_t now;
+   char the_date[MAX_DATE];
+   the_date[0] = '\0';
+   now = time(NULL);
+   if (now != -1)
+   {
+      strftime(the_date, MAX_DATE, "%a-%d-%b-%y_%H-%M-%S", gmtime(&now));
+   }
+
+   return std::string(the_date);
+}

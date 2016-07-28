@@ -46,5 +46,5 @@ float average_historic_time(float _history_times[], int _history_count) {
 	for (i=0; i < _history_count; ++i) {
 		a += _history_times[i];
 	}
-	return a/i;
+	return a/_history_count;
 }

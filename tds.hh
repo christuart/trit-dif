@@ -208,8 +208,8 @@ public:
 	inline std::string sections_file_address() { std::string temp = settings.model_directory + basename() + ".sections"; return temp.c_str(); }
 	inline std::string nodes_file_address() { std::string temp = settings.model_directory + basename() + ".nodes"; return temp.c_str(); }
 	inline std::string elements_file_address() { std::string temp = settings.model_directory + basename() + ".elements"; return temp.c_str(); }
-	inline std::string contaminations_file_address() { std::string temp = settings.output_directory + outputname() + ".contaminations"; return temp.c_str(); }
-	inline std::string tracking_file_address() { std::string temp = settings.output_directory + outputname() + ".tracking"; return temp.c_str(); }
+	inline std::string contaminations_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; return temp.c_str(); }
+	inline std::string tracking_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return temp.c_str(); }
 
 
 	void read_run_file(std::string run_file_name);

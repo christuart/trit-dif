@@ -294,20 +294,26 @@ void tds_run::make_analysis() {
 			elapsed_time = (now - start_checkmark)*1e-3;
 			// Added an extra 50% on the prediction, because it almost always underestimates
 			// This is as a result of the assumed initial sparseness of the model.
-			remaining_time = 1.5 * 1e-3*average_historic_time(step_times, history_count) * ((steps() - step) * n_elements());
+			remaining_time = n_elements() * average_historic_time(step_times, history_count) * 1.5 * (0.001) * (steps() - step);
+			/*
+			std::cout << "remaining_time = " << 1.5 << " * " << (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << steps() << " - " << step << ") * " << n_elements() << std::endl;
+			std::cout << "remaining_time = " << 1.5 * (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << (steps() - step) << ") * " << n_elements() << std::endl;
+			std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) << " * " << ((steps() - step) * n_elements()) << std::endl;
+			std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) * ((steps() - step) * n_elements()) << std::endl;
+			*/
 				
 			std::cout << "Last step: "
-			          << std::setw(8) << (step+1) << "; sim time: "
+			          << std::setw(8) << (step+1) << "/" << steps() << "; sim time: "
 			          << std::setw(13) << time << "s; elapsed "
 			          << std::setw(12) << elapsed_time << "s; remaining (est.): "
 			          << std::setw(12) << remaining_time << "s; total (est.): "
 			          << std::setw(12) << (elapsed_time+remaining_time) << "s" << std::endl;
 
-			// Add in some adaptive behaviour - aim for every ~2 seconds
+			// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
 			float r = (now - last_checkmark)/2000.0;
-			r -=1;
-			r /=2;
-			r +=1;
+			r -= 1;
+			r /= history_count*2;
+			r += 1;
 			r = std::fmax(0.5,std::fmin(r,2.0));
 			reporting_interval = std::ceil(reporting_interval/r);
 			last_checkmark = now;
@@ -703,6 +709,10 @@ void tds_run::initialise() {
 
 void tds_run::read_run_file(std::string run_file_name) {
 
+	uint64 checkmark = GetTimeMs64();
+	uint64 now;
+	int progress;
+	
 	ensure_ending(run_file_name,".run");
         
 	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
@@ -902,7 +912,18 @@ void tds_run::read_run_file(std::string run_file_name) {
 	steps(ceil(settings.simulation_length/settings.delta_t));
 	// Now get the simulation to initialise using the data we have brought in
 	// from the instructions file
+
+	now = GetTimeMs64();
+	progress = (now - checkmark)/1000;
+	std::cout << "Instructions read in " << progress << " seconds. Initialising..." << std::endl;
+	checkmark = now;
 	this->initialise();
+	now = GetTimeMs64();
+	progress = (now - checkmark)/1000;
+	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
+	
+
+	
 }
 
 

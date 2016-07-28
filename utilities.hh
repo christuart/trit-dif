@@ -1,6 +1,8 @@
 #ifndef UTILITIES_HH
 #define UTILITIES_HH
 
+#define MAX_DATE 12
+
 //#include "exception.h"
 //#include "mathematic.h"
 #include <string>
@@ -127,5 +129,6 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 std::string find_replace(const std::string& pattern,const std::string& rep,const std::string& str);
 void ensure_ending(std::string& str, const std::string& suffix);
 void trim(std::string& str);
+std::string get_timestamp();
 
 #endif
