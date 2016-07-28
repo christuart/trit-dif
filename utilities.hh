@@ -1,7 +1,7 @@
 #ifndef UTILITIES_HH
 #define UTILITIES_HH
 
-#define MAX_DATE 12
+#define MAX_DATE 25
 
 //#include "exception.h"
 //#include "mathematic.h"

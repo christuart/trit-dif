@@ -8,6 +8,10 @@
 #include <ctime>
 #endif
 
+#include <iostream>
+#include <sstream>
+#include <cstdio>
+
 typedef long long int64; typedef unsigned long long uint64;
 
 // Andreas Bonini's timing method from http://stackoverflow.com/a/1861337
@@ -16,4 +20,7 @@ typedef long long int64; typedef unsigned long long uint64;
 uint64 GetTimeMs64();
 
 float average_historic_time(float _history_times[], int _history_count);
+
+std::string format_time(float time);
+	
 #endif

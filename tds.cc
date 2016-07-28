@@ -28,11 +28,11 @@ void tds::add_material(tds_material* new_material){
 	materials_.push_back(new_material);
 }
 void tds::add_node(tds_node* new_node){
-	std::cout<<"adding a new node"<<std::endl;
+	// std::cout<<"adding a new node"<<std::endl;
 	nodes_.push_back(new_node);
 }
 void tds::add_element(tds_element* new_element){
-	std::cout<<"adding a new element"<<std::endl;
+	// std::cout<<"adding a new element"<<std::endl;
 	elements_.push_back(new_element);
 }
 
@@ -119,14 +119,13 @@ void tds::register_element_type(int element_type) {
 	case 2: // 3 node triangle
 	case 3: // 4 node quadrangle
 		element_dimensions_.set(two_d);
-		std::cout << "Detected some 2-D stuff!" << std::endl;
 		break;
 	case 4: // 4 node tetrahedron
 	case 5: // 8 node hexahedron
 	case 6: // 6 node prism
 	case 7: // 5 node pyramid
 		element_dimensions_.set(three_d);
-		std::cout << "Detected some 3-D stuff!" << std::endl;
+		std::cerr << "Detected 3-D stuff. This hasn't been programmed for yet." << std::endl;
 		break;
 	case 15: // 1 node point
 		std::cerr << "Detected a single node point 'element' :/" << std::endl;
@@ -242,6 +241,11 @@ void tds_run::make_analysis() {
 	uint64 last_checkmark = start_checkmark;
 	
 	int reporting_interval = ceil(steps()/100);
+	reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
+	// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
+	// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
+	// there should be no problem.
+	
 	for (int step = 0; step < steps(); ++step) {
 		
 		// Every step we need to:
@@ -302,12 +306,18 @@ void tds_run::make_analysis() {
 			std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) * ((steps() - step) * n_elements()) << std::endl;
 			*/
 				
-			std::cout << "Last step: "
-			          << std::setw(8) << (step+1) << "/" << steps() << "; sim time: "
-			          << std::setw(13) << time << "s; elapsed "
-			          << std::setw(12) << elapsed_time << "s; remaining (est.): "
-			          << std::setw(12) << remaining_time << "s; total (est.): "
-			          << std::setw(12) << (elapsed_time+remaining_time) << "s" << std::endl;
+			std::cout << "Step: "
+			          << std::right << std::setw(12) << (step+1) << "/"
+			          << std::left << std::setw(12) << steps() << std::left
+			          << "        sim time: "
+			          << std::setw(13) << format_time(time)
+			          << "        elapsed: "
+			          << std::setw(13) << format_time(elapsed_time)
+			          << "        remaining (est.): "
+			          << std::setw(13) << format_time(remaining_time)
+			          << "        total (est.): "
+			          << std::setw(13) << format_time(elapsed_time+remaining_time)
+			          << std::endl;
 
 			// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
 			float r = (now - last_checkmark)/2000.0;
@@ -393,7 +403,7 @@ void tds_run::initialise() {
 				continue;
 			}
 
-			std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
+			//std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
 		
 			// let's make all names lower case
 			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
@@ -433,7 +443,7 @@ void tds_run::initialise() {
 				continue;
 			}
 
-			std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
+			//std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
 		
 			// Get rid of the double quotes Gmsh puts in, and put to lower case
 			_name.erase(_name.end()-1); _name.erase(_name.begin());
@@ -472,7 +482,7 @@ void tds_run::initialise() {
 				continue;
 			}
 
-			std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
+			//std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
 
 			if (id != n_nodes()+1) {
 				std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
@@ -515,24 +525,24 @@ void tds_run::initialise() {
 				extra_tags << iss << " ";
 			}
 			if (extra_tags.str().length() > 0)
-				std::cout << "Unprocessed tags: " << extra_tags.str() << std::endl;
+				std::cerr << "Unprocessed tags: " << extra_tags.str() << std::endl;
 			tds_nodes _element_nodes;
 			int this_node;
 			while (iss >> this_node) {
-				std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
+				//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
 				_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
 			}
-			std::cout << "all nodes ready to place into the element" << std::endl;
+			//std::cout << "all nodes ready to place into the element" << std::endl;
 			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1).material()),0.0);
-			std::cout << "element created, with nodes" << std::endl;
+			//std::cout << "element created, with nodes" << std::endl;
 			add_element(new_element);
-			std::cout << "element stored, referencing it in its nodes" << std::endl;
+			//std::cout << "element stored, referencing it in its nodes" << std::endl;
 			(*new_element).propogate_into_nodes();
-			std::cout << "element also stored in section" << std::endl;
+			//std::cout << "element also stored in section" << std::endl;
 			section(section_id-1).add_element(new_element);
-			std::cout << "all done!" << std::endl;
+			//std::cout << "all done!" << std::endl;
 
-			std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+			//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
 		}
 	} else {
 		std::cerr << "No elements found? Is the model name good?" << std::endl;
@@ -568,21 +578,21 @@ void tds_run::initialise() {
 					m = section(s).element(i).n_nodes();
 					for (int j=0; j < m; j++) {
 						o = section(s).element(i).node(j).n_elements();
-						std::cout << "Source element " << &section(s).element(i) << " links to node "
-						          << &(section(s).element(i).node(j)) << " which currently links to "
-						          << o << " more elements." << std::endl;
+						// std::cout << "Source element " << &section(s).element(i) << " links to node "
+						//           << &(section(s).element(i).node(j)) << " which currently links to "
+						//           << o << " more elements." << std::endl;
 						for (int k=o; k > 0; k--) {
 							if (section(s).element(i).node(j).element(k-1).material().is_source()) {
-								std::cout << "No need to give a link from source to source, skipping." << std::endl;
+								//std::cout << "No need to give a link from source to source, skipping." << std::endl;
 							} else if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
-								std::cout << "Skipping - don't need to link to self!" << std::endl;
+								//std::cout << "Skipping - don't need to link to self!" << std::endl;
 							} else {
-								std::cout << "Making link from " << &section(s).element(i) << " to "
-								          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
+								// std::cout << "Making link from " << &section(s).element(i) << " to "
+								//           << &(section(s).element(i).node(j).element(k-1)) << std::endl;
 								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
 								                                                  &(section(s).element(i).node(j).element(k-1)));
 								element_link_count++;
-								std::cout << "Made link" << std::endl;
+								// std::cout << "Made link" << std::endl;
 								section(s).element(i).add_element_link(new_link);
 								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
 							}
@@ -595,19 +605,19 @@ void tds_run::initialise() {
 					m = section(s).element(i).n_nodes();
 					for (int j=0; j < m; j++) {
 						o = section(s).element(i).node(j).n_elements();
-						std::cout << "Element " << &section(s).element(i) << " links to node "
-						          << &(section(s).element(i).node(j)) << " which currently links to "
-						          << o << " more elements." << std::endl;
+						// std::cout << "Element " << &section(s).element(i) << " links to node "
+						//           << &(section(s).element(i).node(j)) << " which currently links to "
+						//           << o << " more elements." << std::endl;
 						for (int k=o; k > 0; k--) {
 							if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
-								std::cout << "Skipping - don't need to link to self!" << std::endl;
+								//std::cout << "Skipping - don't need to link to self!" << std::endl;
 							} else {
-								std::cout << "Making link from " << &section(s).element(i) << " to "
-								          << &(section(s).element(i).node(j).element(k-1)) << std::endl;
+								// std::cout << "Making link from " << &section(s).element(i) << " to "
+								//           << &(section(s).element(i).node(j).element(k-1)) << std::endl;
 								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
 								                                                  &(section(s).element(i).node(j).element(k-1)));
 								element_link_count++;
-								std::cout << "Made link" << std::endl;
+								// std::cout << "Made link" << std::endl;
 								section(s).element(i).add_element_link(new_link);
 								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
 							}
@@ -640,13 +650,13 @@ void tds_run::initialise() {
 			//} else {
 			{
 				for (int i=0; i < n; ++i) {
-					std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
+					//std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
 					m = section(s).element(i).n_nodes();
 					for (int j=0; j < m; ++j) {
-						std::cout << "\tStarting j: node " << j << std::endl;
+						//std::cout << "\tStarting j: node " << j << std::endl;
 						o = section(s).element(i).node(j).n_elements();
 						for (int k=0; k < o; ++k) {
-							std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
+							//std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
 							// don't try and link to yourself, or to something already linked:
 							if (
 							    (&section(s).element(i) != &section(s).element(i).node(j).element(k)) &&
@@ -667,18 +677,17 @@ void tds_run::initialise() {
 									}
 								}
 								if (c >= 2) {
-									std::cout << "Making link from " << &section(s).element(i) << " to "
-									          << &(section(s).element(i).node(j).element(k)) << std::endl;
+									// std::cout << "Making link from " << &section(s).element(i) << " to "
+									//           << &(section(s).element(i).node(j).element(k)) << std::endl;
 									tds_element_link* new_link = new tds_element_link(&section(s).element(i),
 									                                                  &(section(s).element(i).node(j).element(k)));
 									element_link_count++;
-									std::cout << "Made link" << std::endl;
+									// std::cout << "Made link" << std::endl;
 									section(s).element(i).add_element_link(new_link);
 									section(s).element(i).node(j).element(k).add_element_link(new_link);
-									std::cout << "OR DID WE??" << std::endl;
 								}									
 							}
-							std::cout << "\t\tFinished with k of " << k << std::endl;
+							// std::cout << "\t\tFinished with k of " << k << std::endl;
 						}
 					}
 				}
@@ -689,7 +698,8 @@ void tds_run::initialise() {
 		std::cout << "Element links could not be made, only 1-D programmed." << std::endl;
 	}
 
-	output_model_summary(true,true,true,true,true);
+	//output_model_summary(true,true,true,true,true);
+	output_model_summary(false,false,false,false,false);
 
 	if (settings.tracking_mode == "all") {
 		settings.tracking_list = new std::vector<int>();

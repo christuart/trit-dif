@@ -208,7 +208,7 @@ std::string get_timestamp() {
    now = time(NULL);
    if (now != -1)
    {
-      strftime(the_date, MAX_DATE, "%a-%d-%b-%y_%H-%M-%S", gmtime(&now));
+      strftime(the_date, MAX_DATE, "%a-%d-%b-%y_%H-%M-%SGMT", gmtime(&now));
    }
 
    return std::string(the_date);

@@ -1,5 +1,4 @@
 #include "timing.hh"
-#include <iostream>
 
 uint64 GetTimeMs64()
 {
@@ -47,4 +46,49 @@ float average_historic_time(float _history_times[], int _history_count) {
 		a += _history_times[i];
 	}
 	return a/_history_count;
+}
+
+std::string format_time(float time) {
+
+	int reductions = 0;
+	// time is submitted in seconds
+	if (time > 90.0) {
+		time /= 60.0; // to minutes
+		++reductions;
+		if (time > 60.0) {
+			time /= 60.0; // to hours
+			++reductions;
+			if (time > 24.0) {
+				time /= 24.0; // to days
+				++reductions;
+				if (time > 31.0) { // to months
+					time /= 30.436666666666667;
+					++reductions;
+					if (time > 65.0) { // to months
+						time /= 30.436666666666667;
+						++reductions;
+						if (time > 24.0) { // to years
+							time /= 12.0;
+							++reductions;
+						}
+					}
+				}
+			}
+		}
+	}
+	std::ostringstream oss;
+	char temp[20];
+	
+	sprintf(temp, "%9.2f", time);
+	oss << std::string(temp);
+	switch (reductions) {
+	case 0:	oss << " sec.  "; break;
+	case 1:	oss << " min.  "; break;
+	case 2:	oss << " hours "; break;
+	case 3:	oss << " days  "; break;
+	case 4:	oss << " months"; break;
+	case 5:	oss << " years "; break;
+	}
+	return oss.str();
+	     
 }
