@@ -1,6 +1,7 @@
 material		density		density-unit		diffusion-constant		diffusion-unit
-steel			7.85		g/cm^3			0.0000000000000005		m^2/s
+steel			7.85		g/cm^3			0.005				m^2/s
 polymer			0.9		g/cm^3			0.0000000005			m^2/s
 air			0.0012		g/cm^3			0.000001			m^2/s
 concrete		2.4		g/cm^3			0.00000000001			m^2/s
 note that concrete diffusion constant was just made up on the spot
+steel D is currently set at 10^13 higher than it was before, to use au and have the source contamination as just "1"
