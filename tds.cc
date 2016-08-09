@@ -206,7 +206,7 @@ void tds_run::make_analysis() {
 
 	// Set the source contamination
 	if (settings.contamination_mode_time == "constant" && settings.contamination_mode_space == "constant") {
-		float source_contamination = settings.contamination;
+		double source_contamination = settings.contamination;
 		for (int i=0; i < n_sections(); ++i) {
 			if (section(i).material().is_source()) {
 				std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination." << std::endl;
@@ -223,8 +223,8 @@ void tds_run::make_analysis() {
 	}
 	//for (int i=0; i < n_elements(); ++i)
 	//	element(i).debug_contamination();
-	float time = 0.0;
-	float next_time_recording = tracking_interval();
+	double time = 0.0;
+	double next_time_recording = tracking_interval();
 	
 	trackingfile_.open(tracking_file_address());
 	trackingfile_ << "element, time, contamination" << std::endl;
@@ -236,7 +236,7 @@ void tds_run::make_analysis() {
 	const int trail_length = 5;
 	int history_count = 0;
 	int history_index = trail_length-1;
-	float step_times[trail_length]; // values stored will be ms per step per element.
+	double step_times[trail_length]; // values stored will be ms per step per element.
 	uint64 start_checkmark = GetTimeMs64();
 	uint64 last_checkmark = start_checkmark;
 	
@@ -286,7 +286,7 @@ void tds_run::make_analysis() {
 		}
 		// for (int i=0; i < n_elements(); ++i)
 		// 	element(i).debug_contamination();
-		float remaining_time, elapsed_time;
+		double remaining_time, elapsed_time;
 		if ((step+1) % reporting_interval == 0) {
 
 			++history_index;
@@ -320,7 +320,7 @@ void tds_run::make_analysis() {
 			          << std::endl;
 
 			// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
-			float r = (now - last_checkmark)/2000.0;
+			double r = (now - last_checkmark)/2000.0;
 			r -= 1;
 			r /= history_count*2;
 			r += 1;
@@ -330,8 +330,8 @@ void tds_run::make_analysis() {
 						
 		}
 	}
-	float elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
-	std::cout << "Total elapsed time: " << elapsed_time << "s" << std::endl;
+	double elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
+	std::cout << "Total elapsed time: " << format_time(elapsed_time) << std::endl;
 	
 	trackingfile_.close();
 
@@ -475,7 +475,7 @@ void tds_run::initialise() {
 		while (std::getline(nodesfile_, line)) {
 			std::istringstream iss(line);
 			int id;
-			float _x, _y, _z;
+			double _x, _y, _z;
 		
 			if (!(iss >> id >> _x >> _y >> _z)) {
 				std::cerr << "Invalid line, skipping. (node)\n";

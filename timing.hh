@@ -19,8 +19,8 @@ typedef long long int64; typedef unsigned long long uint64;
  * windows and linux. */
 uint64 GetTimeMs64();
 
-float average_historic_time(float _history_times[], int _history_count);
+double average_historic_time(double _history_times[], int _history_count);
 
-std::string format_time(float time);
+std::string format_time(double time);
 	
 #endif

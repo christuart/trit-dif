@@ -18,7 +18,7 @@
 
 
 
-tds_node::tds_node(float _x, float _y, float _z) {
+tds_node::tds_node(double _x, double _y, double _z) {
 	position_.reserve(3);
 	position_.push_back(_x);
 	position_.push_back(_y);
@@ -57,7 +57,7 @@ void tds_node::remove_last_element() {
 
 
 
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination),contaminationB_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_material* _material, double _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination),contaminationB_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
 	// e.g. triangular element r_COM = r_A + (2/3) * (r_AB + 0.5 * r_BC)
 	origin_.reserve(3);
@@ -66,11 +66,11 @@ tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _conta
 	flagAB(false);
 }
 
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, std::vector<float> _origin, float _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_material* _material, std::vector<double> _origin, double _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
 	calculate_size();
 	flagAB(false);
 }
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, float _origin_x, float _origin_y, float _origin_z, float _contamination):nodes_(_nodes),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_material* _material, double _origin_x, double _origin_y, double _origin_z, double _contamination):nodes_(_nodes),contaminationA_(_contamination) {
 	origin_.reserve(3);
 	origin(_origin_x, _origin_y, _origin_z);
 	calculate_size();
@@ -84,7 +84,7 @@ void tds_element::add_element_link(tds_element_link* new_element_link) {
 	neighbours_.push_back(new_element_link);
 }
 
-void tds_element::transfer_contaminant(float _quantity) {
+void tds_element::transfer_contaminant(double _quantity) {
 	// std::cout << "Received quantity of " << _quantity << " and have size() of "
 	//            << size() << std::endl;
 	contamination(contamination()+_quantity/size());
@@ -94,7 +94,7 @@ void tds_element::set_origin_from_nodes() {
 	//std::cout << "Setting origin from nodes." << std::endl;
 	origin_.reserve(3);
 	int n_nodes = nodes_.size();
-	float x,y,z;
+	double x,y,z;
 	// std::cout << "There are " << n_nodes << " nodes." << std::endl;
 	
 	switch (n_nodes) {
@@ -124,8 +124,8 @@ void tds_element::set_origin_from_nodes() {
 	// debug(&origin());
 }
 
-void tds_element::update(float delta_t) {//method to update parameters
-	float total_flow = 0.0f;
+void tds_element::update(double delta_t) {//method to update parameters
+	double total_flow = 0.0f;
 	for (int i = 0; i < n_neighbours(); i++) {
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 		//std::cout << "Flow is now " << total_flow << std::endl;
@@ -142,7 +142,7 @@ void tds_element::propogate_into_nodes() {
 	}
 }
 void tds_element::calculate_size() {
-	std::vector<float> vecPQ, vecPR;
+	std::vector<double> vecPQ, vecPR;
 	switch (n_nodes()) {
 	case 2:
 		vecPQ.resize(3);
@@ -224,7 +224,7 @@ bool tds_element::is_linked_to(tds_element* _element) {
 
 
 
-tds_material::tds_material(std::string _name, float _density, float _diffusion_constant):material_name_(_name),material_density_(_density),material_diffusion_constant_(_diffusion_constant) {
+tds_material::tds_material(std::string _name, double _density, double _diffusion_constant):material_name_(_name),material_density_(_density),material_diffusion_constant_(_diffusion_constant) {
 }
 
 tds_material::~tds_material() {
@@ -355,7 +355,7 @@ void tds_element_link::initialise() {
 	// calculate the geometry multiplier to turn D * (diff in contamination) into flow rate
 	a_n_dot_eMN_over_modMN(interface_area() * dot(norm_vector(),flux_vector())/(modMN()*modMN()) );
 }
-float tds_element_link::flow_rate(bool _AB) {
+double tds_element_link::flow_rate(bool _AB) {
 	// AB flag system used because the same flow needn't be calculated twice for M->N and N->M
 	// instead we calculate it and store it, and only recalculate when the flag switches
 	if (_AB != flagAB()) {
@@ -369,9 +369,9 @@ float tds_element_link::flow_rate(bool _AB) {
 	}
 	return flow_rate_;
 }
-float tds_element_link::diffusion_constant() {
-	float D1 = elementM().material().diffusion_constant();
-	float D2 = elementN().material().diffusion_constant();
+double tds_element_link::diffusion_constant() {
+	double D1 = elementM().material().diffusion_constant();
+	double D2 = elementN().material().diffusion_constant();
 	if (D1 > D2) return D1;
 	return D2;
 }

@@ -48,7 +48,7 @@ private:
 	std::map<std::string,tds_material*> material_map_;
 	
 	std::string tds_name_,size_unit_,size_x_unit_,size_y_unit_,size_z_unit_;
-	float size_,size_x_,size_y_,size_z_;
+	double size_,size_x_,size_y_,size_z_;
 	int dimensions;
 
 protected:
@@ -70,13 +70,13 @@ public:
 	//setters
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }
 	inline void size_unit(std::string sz_unit){ size_unit_=sz_unit; }
-	inline void size(float sz){ size_=sz; }
+	inline void size(double sz){ size_=sz; }
 	inline void size_x_unit(std::string sz_x_unit){ size_x_unit_=sz_x_unit; }
-	inline void size_x(float sz_x){ size_x_=sz_x; }
+	inline void size_x(double sz_x){ size_x_=sz_x; }
 	inline void size_y_unit(std::string sz_y_unit){ size_y_unit_=sz_y_unit; }
-	inline void size_y(float sz_y){ size_y_=sz_y; }
+	inline void size_y(double sz_y){ size_y_=sz_y; }
 	inline void size_z_unit(std::string sz_z_unit){ size_z_unit_=sz_z_unit; }
-	inline void size_z(float sz_z){ size_z_=sz_z; }
+	inline void size_z(double sz_z){ size_z_=sz_z; }
 	inline void units(conversion* _units) { units_ = _units; }
 	void expected_materials(int _n);
 	void expected_sections(int _n);
@@ -85,10 +85,10 @@ public:
 	//getters
 	inline std::string tds_name() { return tds_name_; }
 	inline std::string size_unit() { return size_unit_; }
-	inline float size() { return size_; }
-	inline float size_x() { return size_x_; }
-	inline float size_y() { return size_y_; }
-	inline float size_z() { return size_z_; }
+	inline double size() { return size_; }
+	inline double size_x() { return size_x_; }
+	inline double size_y() { return size_y_; }
+	inline double size_z() { return size_z_; }
 	inline std::string size_x_unit() { return size_x_unit_; }
 	inline std::string size_y_unit() { return size_y_unit_; }
 	inline std::string size_z_unit() { return size_z_unit_; }
@@ -132,10 +132,10 @@ private:
 	std::string configname_;
 	std::string outputname_;
 	bool units_set_;
-	float initial_contamination;
-	float delta_t_;
+	double initial_contamination;
+	double delta_t_;
 	int steps_;
-	float tracking_interval_;
+	double tracking_interval_;
 	std::vector<int>* tracked_elements_;
 	struct plugin_file {
 		std::string file_name;
@@ -162,18 +162,18 @@ private:
 		std::string model_name;
 		std::string config_name;
 		std::string output_name;
-		float delta_t;
-		float simulation_length;
+		double delta_t;
+		double simulation_length;
 		std::string contamination_mode_time;
 		std::string contamination_mode_space;
-		float contamination;
+		double contamination;
 		std::string contaminations_file;
 		std::vector<std::string> activated_plugins;
 		std::map<std::string, plugin_file> plugin_files;
 		std::string tracking_mode;
 		std::vector<int>* tracking_list;
 		int tracking_n;
-		float tracking_interval;
+		double tracking_interval;
 	} settings;
 		
 protected:
@@ -188,18 +188,18 @@ public:
 	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.model_directory,"",_basename); basename_ = settings.model_directory + settings.model_name; };
 	inline void configname(std::string _configname) { settings.config_name = std::string(find_replace(settings.config_directory,"",_configname)); configname_ = settings.config_directory + settings.config_name; };
 	inline void outputname(std::string _outputname) { settings.output_name = find_replace(settings.output_directory,"",_outputname); outputname_ = settings.output_directory + settings.output_name; };
-	inline void delta_t(float _delta_t) { settings.delta_t = _delta_t; }
+	inline void delta_t(double _delta_t) { settings.delta_t = _delta_t; }
 	inline void steps(int _steps) { steps_ = _steps; }
-	inline void tracking_interval(float _tracking_interval) { settings.tracking_interval = _tracking_interval; }
+	inline void tracking_interval(double _tracking_interval) { settings.tracking_interval = _tracking_interval; }
 	inline void tracked_elements(std::vector<int>& _tracked_elements) { settings.tracking_list = &_tracked_elements; }
 	inline void tracked_element(int i, int element) { settings.tracking_list->at(i) = element; }
 	//getters
 	inline std::string basename() { return settings.model_name; };
 	inline std::string configname() { return settings.config_name; };
 	inline std::string outputname() { return settings.output_name; };
-	inline float delta_t() { return settings.delta_t; }
+	inline double delta_t() { return settings.delta_t; }
 	inline int steps() { return steps_; }
-	inline float tracking_interval() { return settings.tracking_interval; }
+	inline double tracking_interval() { return settings.tracking_interval; }
 	inline int tracked_element(int i) { return settings.tracking_list->at(i); }
 	inline std::vector<int>* tracked_elements() { return settings.tracking_list; }
 	

@@ -5,21 +5,21 @@
 #include <vector>
 #include <math.h>
 
-void operator+=(std::vector<float>& u, const std::vector<float>& v);
-void operator-=(std::vector<float>& u, const std::vector<float>& v);
-void operator*=(std::vector<float>& u, const std::vector<float>& v);
-void operator*=(std::vector<float>& u, const float& v);
-void operator*=(const float& v, std::vector<float>& u);
-std::vector<float> operator+(const std::vector<float>& u, const std::vector<float>& v);
-std::vector<float> operator-(const std::vector<float>& u, const std::vector<float>& v);
-std::vector<float> operator*(const std::vector<float>& u, const std::vector<float>& v);
-std::vector<float> operator*(const std::vector<float>& u, const float& v);
-std::vector<float> operator*(const float& v, const std::vector<float>& u);
-float dot(const std::vector<float>& u, const std::vector<float>& v);
-std::vector<float> cross(const std::vector<float>& u, const std::vector<float>& v);
-float magnitude(std::vector<float>& u);
-void normalise(std::vector<float>& u);
-inline void debug(std::vector<float>* u) { std::cout << "["; std::cout << u->at(0) << ","; std::cout
+void operator+=(std::vector<double>& u, const std::vector<double>& v);
+void operator-=(std::vector<double>& u, const std::vector<double>& v);
+void operator*=(std::vector<double>& u, const std::vector<double>& v);
+void operator*=(std::vector<double>& u, const double& v);
+void operator*=(const double& v, std::vector<double>& u);
+std::vector<double> operator+(const std::vector<double>& u, const std::vector<double>& v);
+std::vector<double> operator-(const std::vector<double>& u, const std::vector<double>& v);
+std::vector<double> operator*(const std::vector<double>& u, const std::vector<double>& v);
+std::vector<double> operator*(const std::vector<double>& u, const double& v);
+std::vector<double> operator*(const double& v, const std::vector<double>& u);
+double dot(const std::vector<double>& u, const std::vector<double>& v);
+std::vector<double> cross(const std::vector<double>& u, const std::vector<double>& v);
+double magnitude(std::vector<double>& u);
+void normalise(std::vector<double>& u);
+inline void debug(std::vector<double>* u) { std::cout << "["; std::cout << u->at(0) << ","; std::cout
 		                                << u->at(1) << ","; std::cout << u->at(2) << "]" << std::endl; }
 
 #endif

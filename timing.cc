@@ -35,20 +35,20 @@ uint64 GetTimeMs64()
 #endif
 }
 
-float average_historic_time(float _history_times[], int _history_count) {
+double average_historic_time(double _history_times[], int _history_count) {
 	if (_history_count < 1) {
 		std::cerr << "Asked for time based on empty history." << std::endl;
 		throw;
 	}
 	size_t i;
-	float a = 0.0;
+	double a = 0.0;
 	for (i=0; i < _history_count; ++i) {
 		a += _history_times[i];
 	}
 	return a/_history_count;
 }
 
-std::string format_time(float time) {
+std::string format_time(double time) {
 
 	int reductions = 0;
 	// time is submitted in seconds

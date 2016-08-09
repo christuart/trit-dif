@@ -14,12 +14,12 @@ conversion::conversion(std::string _units_file):units_file_(_units_file) {
 void conversion::initialise() {
 	std::ifstream units_file_stream (units_file().c_str());
 	std::string line;
-	length_units_ = std::map<std::string,float>();
-	time_units_ = std::map<std::string,float>();
-	density_units_ = std::map<std::string,float>();
-	diffusion_constant_units_ = std::map<std::string,float>();
-	volume_units_ = std::map<std::string,float>();
-	area_units_ = std::map<std::string,float>();
+	length_units_ = std::map<std::string,double>();
+	time_units_ = std::map<std::string,double>();
+	density_units_ = std::map<std::string,double>();
+	diffusion_constant_units_ = std::map<std::string,double>();
+	volume_units_ = std::map<std::string,double>();
+	area_units_ = std::map<std::string,double>();
 	while (std::getline(units_file_stream, line)) {
 		std::istringstream iss(line);
 		std::string _dimension, _unit;
@@ -67,56 +67,56 @@ void conversion::initialise() {
 	
 }
 
-float conversion::convert_density_from(std::string _unit, float _density) {
+double conversion::convert_density_from(std::string _unit, double _density) {
 	if (density_units_.count(_unit) == 0) {
 		std::cerr << "No density unit '" << _unit << "' was found." << std::endl;
 		return _density;
 	}
 	return _density * density_units_[_unit];
 }
-float conversion::convert_density_to(std::string _unit, float _density) {
+double conversion::convert_density_to(std::string _unit, double _density) {
 	if (density_units_.count(_unit) == 0) {
 		std::cerr << "No density unit '" << _unit << "' was found." << std::endl;
 		return _density;
 	}
 	return _density / density_units_[_unit];
 }
-float conversion::convert_diffusion_constant_from(std::string _unit, float _diffusion_constant) {
+double conversion::convert_diffusion_constant_from(std::string _unit, double _diffusion_constant) {
 	if (diffusion_constant_units_.count(_unit) == 0) {
 		std::cerr << "No diffusion constant unit '" << _unit << "' was found." << std::endl;
 		return _diffusion_constant;
 	}
 	return _diffusion_constant * diffusion_constant_units_[_unit];
 }
-float conversion::convert_diffusion_constant_to(std::string _unit, float _diffusion_constant) {
+double conversion::convert_diffusion_constant_to(std::string _unit, double _diffusion_constant) {
 	if (diffusion_constant_units_.count(_unit) == 0) {
 		std::cerr << "No diffusion_constant unit '" << _unit << "' was found." << std::endl;
 		return _diffusion_constant;
 	}
 	return _diffusion_constant / diffusion_constant_units_[_unit];
 }
-float conversion::convert_time_from(std::string _unit, float _time) {
+double conversion::convert_time_from(std::string _unit, double _time) {
 	if (time_units_.count(_unit) == 0) {
 		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
 		return _time;
 	}
 	return _time * time_units_[_unit];
 }
-float conversion::convert_time_to(std::string _unit, float _time) {
+double conversion::convert_time_to(std::string _unit, double _time) {
 	if (time_units_.count(_unit) == 0) {
 		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
 		return _time;
 	}
 	return _time / time_units_[_unit];
 }
-float conversion::convert_contamination_from(std::string _unit, float _contamination) {
+double conversion::convert_contamination_from(std::string _unit, double _contamination) {
 	if (contamination_units_.count(_unit) == 0) {
 		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
 		return _contamination;
 	}
 	return _contamination * contamination_units_[_unit];
 }
-float conversion::convert_contamination_to(std::string _unit, float _contamination) {
+double conversion::convert_contamination_to(std::string _unit, double _contamination) {
 	if (contamination_units_.count(_unit) == 0) {
 		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
 		return _contamination;
