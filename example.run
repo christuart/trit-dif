@@ -8,7 +8,7 @@ model-name			finetest2d
 config-name			simple
 output-name			fine2d
 delta-t				60 seconds
-tracking-interval		1 year
+tracking-interval		1 years
 simulation-length		40 years
 contamination-mode-time 	constant
 contamination-mode-space	constant

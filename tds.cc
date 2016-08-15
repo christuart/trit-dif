@@ -223,7 +223,7 @@ void tds_run::make_analysis() {
 	}
 	//for (int i=0; i < n_elements(); ++i)
 	//	element(i).debug_contamination();
-	double time = 0.0;
+	double time = 0.0f;
 	double next_time_recording = tracking_interval();
 	
 	trackingfile_.open(tracking_file_address());
@@ -320,7 +320,7 @@ void tds_run::make_analysis() {
 			          << std::endl;
 
 			// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
-			double r = (now - last_checkmark)/2000.0;
+			double r = (now - last_checkmark)/2000.0f;
 			r -= 1;
 			r /= history_count*2;
 			r += 1;

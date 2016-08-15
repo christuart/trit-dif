@@ -130,10 +130,14 @@ void tds_element::update(double delta_t) {//method to update parameters
 		total_flow += neighbour(i).flow_rate(this->flagAB()) * neighbour(i).positive_flow(this);
 		//std::cout << "Flow is now " << total_flow << std::endl;
 	}
-	// std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
-	// std::cout << "Takes contamination from " << contamination();
-	transfer_contaminant(total_flow * delta_t);
-	// std::cout << " to " << contamination() << std::endl;
+	if (this->node(0).position(0) < 0.00001f) {
+		std::cout << "Flow rate into " << this << " is " << total_flow << std::endl;
+		std::cout << "Takes contamination from " << contamination();
+		transfer_contaminant(total_flow * delta_t);
+		std::cout << " to " << contamination() << std::endl;
+		int a;
+		std::cin >> a;
+	}
 }
 void tds_element::propogate_into_nodes() {
 	//std::cout << "Propogating at element " << this << " i.e. through " << n_nodes() << " nodes." << std::endl;
@@ -354,14 +358,17 @@ void tds_element_link::initialise() {
 	
 	// calculate the geometry multiplier to turn D * (diff in contamination) into flow rate
 	a_n_dot_eMN_over_modMN(interface_area() * dot(norm_vector(),flux_vector())/(modMN()*modMN()) );
+	// a_n_dot_eMN_over_modMN(interface_area());
 }
 double tds_element_link::flow_rate(bool _AB) {
 	// AB flag system used because the same flow needn't be calculated twice for M->N and N->M
 	// instead we calculate it and store it, and only recalculate when the flag switches
 	if (_AB != flagAB()) {
-		// std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
-		//            << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
-		//            << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
+		if (elementM().node(0).position(0) < 0.01f) {
+			std::cout << "From " << elementN_ << " (cont " << elementN().contamination(_AB)
+			          << ") to " << elementM_ << " (cont " << elementM().contamination(_AB)
+			          << ") with andotemnovermodmn = " << a_n_dot_eMN_over_modMN() << " amd D = " << diffusion_constant() << std::endl;
+		}
 		flow_rate_ = ( a_n_dot_eMN_over_modMN() *
 		               (elementN().contamination(_AB) - elementM().contamination(_AB)) *
 		               diffusion_constant() );

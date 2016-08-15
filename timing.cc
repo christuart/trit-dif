@@ -41,7 +41,7 @@ double average_historic_time(double _history_times[], int _history_count) {
 		throw;
 	}
 	size_t i;
-	double a = 0.0;
+	double a = 0.0f;
 	for (i=0; i < _history_count; ++i) {
 		a += _history_times[i];
 	}
