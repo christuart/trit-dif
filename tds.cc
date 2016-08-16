@@ -1,4 +1,5 @@
 #include "tds.hh"
+#include "plugins.hh"
 /******************** TDS METHODS ********************/
 
 
