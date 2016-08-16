@@ -4,6 +4,7 @@
 #include "tds.hh"
 
 enum plugin {
+	PUndefined,
 	POutgassing,
 	PDecay
 };
@@ -33,7 +34,7 @@ struct element_link_identifier {
 class IPlugin {
 
 private:
-	tds_run* tds_run_;
+	static tds_run* tds_run_;
 public:
 	IPlugin();
 	virtual ~IPlugin();
