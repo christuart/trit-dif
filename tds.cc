@@ -1,5 +1,6 @@
 #include "tds.hh"
 #include "plugins.hh"
+
 /******************** TDS METHODS ********************/
 
 
@@ -19,22 +20,26 @@ tds::~tds(){
 	clean_sections();
 }
 
-void tds::add_section(tds_section* new_section){
+int tds::add_section(tds_section* new_section){
 	std::cout<<"adding a new section"<<std::endl;
 	sections_.push_back(new_section);
+	return sections_.size()-1;
 }
-void tds::add_material(tds_material* new_material){
+int tds::add_material(tds_material* new_material){
 	std::cout << "adding a new material: " << (*new_material).name() << std::endl;
 	material_map_[(*new_material).name()] = new_material;
 	materials_.push_back(new_material);
+	return materials_.size()-1;
 }
-void tds::add_node(tds_node* new_node){
+int tds::add_node(tds_node* new_node){
 	// std::cout<<"adding a new node"<<std::endl;
 	nodes_.push_back(new_node);
+	return nodes_.size()-1;
 }
-void tds::add_element(tds_element* new_element){
+int tds::add_element(tds_element* new_element){
 	// std::cout<<"adding a new element"<<std::endl;
 	elements_.push_back(new_element);
+	return elements_.size()-1;
 }
 
 void tds::clean_sections(){
@@ -410,7 +415,11 @@ void tds_run::initialise() {
 			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
 		
 			tds_material* _m = new tds_material(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
-			add_material(_m);
+			material_identifier _id;
+			_id.material_id = add_material(_m);
+			_id.material = _m;
+			interrupt_material(_id);
+			
 		}
 	} else {
 		std::cerr << "No materials found? Is the config name good?" << std::endl;
@@ -718,6 +727,43 @@ void tds_run::initialise() {
 	}
 }
 
+void tds_run::process_plugins() {
+	
+	IPlugin::set_run(this);
+
+	// Define a map of the strings that can be placed after 'activate-plugin' in
+	// the .run file. Note that multiple strings could point to the same plugin
+	// e.g. for Am.E. vs Br.E. spellings
+	std::map<std::string,plugin> plugin_strings;
+	plugin_strings["outgassing"] = POutgassing;
+	plugin_strings["decay"] = PDecay;
+	
+	// Check for known conflicts from the combinations of plugins
+	// (none known at this time - code written before any plugins existed!)
+
+
+	// Start adding plugins to the map in IPlugin and initialising them.
+	for (int i=0; i < settings.activated_plugins.size(); ++i) {
+		std::string plugin_text = settings.activated_plugins.at(i);
+		if (plugin_strings.count(plugin_text) == 0) {
+			std::cerr << "No known plugin '" << plugin_text << "'." << std::endl;
+			continue;
+		}
+		switch (plugin_strings[plugin_text]) {
+		case POutgassing:
+			
+			IPlugin::store_plugin(new Outgassing()); break;
+		default:
+			std::cerr << "Plugin not yet implemented: " << plugin_text << std::endl;
+			throw;
+		}
+	}
+	for (std::map<plugin,IPlugin*>::iterator it = IPlugin::get_plugin_iterator();
+	     it!=IPlugin::get_plugin_iterator_end();
+	     ++it)
+		it->second->load_plugin();
+}
+
 void tds_run::read_run_file(std::string run_file_name) {
 
 	uint64 checkmark = GetTimeMs64();
@@ -919,6 +965,10 @@ void tds_run::read_run_file(std::string run_file_name) {
 		}
                 line_processing.clear();
 	}
+
+	// Process the plugins, which have been stored as a list of string plugin names and file names
+	process_plugins();
+	
 	// Set the number of simulation steps from the step size and simulation length
 	steps(ceil(settings.simulation_length/settings.delta_t));
 	// Now get the simulation to initialise using the data we have brought in
@@ -935,6 +985,20 @@ void tds_run::read_run_file(std::string run_file_name) {
 	
 
 	
+}
+
+void tds_run::add_material_interrupt(IPlugin* _interrupter) {
+	material_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_section_interrupt(IPlugin* _interrupter) {
+	section_interrupts_.push_back(_interrupter);
+}
+
+void tds_run::interrupt_material(material_identifier _new_material) {
+	for (int i=0; i < material_interrupts_.size(); ++i)
+		material_interrupts_.at(i)->interrupt_material_creation(_new_material);
+}
+void tds_run::interrupt_section(section_identifier _new_section) {
 }
 
 

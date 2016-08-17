@@ -9,32 +9,11 @@ enum plugin {
 	PDecay
 };
 
-struct material_identifier {
-	int material_id;
-	tds_material* material;
-};
-struct section_identifier {
-	int section_id;
-	tds_section* section;
-};
-struct node_identifier {
-	int node_id;
-	tds_node* node;
-};
-struct element_identifier {
-	int element_id;
-	int section_id;
-	int section_element_id;
-	tds_element* element;
-};
-struct element_link_identifier {
-	tds_element_link* element_link;
-};
-
 class IPlugin {
 
 private:
 	static tds_run* tds_run_;
+	static std::map<plugin,IPlugin*> plugin_map_;
 public:
 	IPlugin();
 	virtual ~IPlugin();
@@ -42,8 +21,8 @@ public:
 	virtual plugin plugin_identifier();
 
 	virtual void load_plugin();
-	virtual void interrupt_material_creation(material_identifier new_material_);
-	virtual void interrupt_section_creation(int section_id_, tds_section* new_section_);
+	virtual void interrupt_material_creation(material_identifier& _new_material);
+	virtual void interrupt_section_creation(section_identifier& _new_section);
 	virtual void interrupt_node_creation(int node_id_, tds_node* new_node_);
 	virtual void interrupt_element_creation(int element_id_, int section_id_, int section_element_id_, tds_element* new_element_);
 	virtual void interrupt_element_link_creation(tds_element_link* new_element_link_);
@@ -57,7 +36,17 @@ public:
 	static void replace_node(node_identifier old_node_, tds_node* new_node_);
 	static void replace_element(element_identifier old_element_, tds_element* new_element_);
 	static void replace_element_link(element_link_identifier old_element_link_, tds_element_link* new_element_link_);
+
+	static void store_plugin(IPlugin* _plugin);
+	static IPlugin* get_plugin(plugin _plugin_type);
+	static std::map<plugin,IPlugin*>::iterator get_plugin_iterator();
+	static std::map<plugin,IPlugin*>::iterator get_plugin_iterator_end();
+	static bool plugin_loaded(plugin _plugin_type);
+	static void set_run(tds_run* _tds_run);
+	static tds_run* get_run();
 	
 };
+
+#include "plugin-outgassing.hh"
 
 #endif

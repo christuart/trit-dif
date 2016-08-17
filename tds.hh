@@ -24,6 +24,8 @@
 #include "tds_parts.hh"
 #include "vector_ops.hh"
 #include "timing.hh"
+#include "identifiers.hh"
+#include "pluginfwd.hh"
 
 
 class tds;
@@ -58,10 +60,10 @@ public:
 	virtual ~tds();
 	
 	//adders
-	void add_section(tds_section* new_section);
-	void add_material(tds_material* new_material);
-	void add_node(tds_node* new_node);
-	void add_element(tds_element* new_element);
+	int add_section(tds_section* new_section);
+	int add_material(tds_material* new_material);
+	int add_node(tds_node* new_node);
+	int add_element(tds_element* new_element);
 	//cleaners
 	void clean_sections();
 	void clean_materials();
@@ -132,6 +134,8 @@ private:
 	std::string basename_;
 	std::string configname_;
 	std::string outputname_;
+	std::vector<IPlugin*> material_interrupts_;
+	std::vector<IPlugin*> section_interrupts_;
 	bool units_set_;
 	double initial_contamination;
 	double delta_t_;
@@ -181,10 +185,17 @@ protected:
 public:
 	tds_run();
 	virtual ~tds_run();
+	
 	void check_coincidence();
 	void make_analysis();
 	void set_units_from_file(const char* units_file_address_);
 	void initialise();
+	void read_run_file(std::string run_file_name);
+	void process_plugins();
+	
+	void add_material_interrupt(IPlugin* _interrupter);
+	void add_section_interrupt(IPlugin* _interrupter);
+	
 	//setters
 	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.model_directory,"",_basename); basename_ = settings.model_directory + settings.model_name; };
 	inline void configname(std::string _configname) { settings.config_name = std::string(find_replace(settings.config_directory,"",_configname)); configname_ = settings.config_directory + settings.config_name; };
@@ -212,8 +223,9 @@ public:
 	inline std::string contaminations_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; return temp.c_str(); }
 	inline std::string tracking_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return temp.c_str(); }
 
-
-	void read_run_file(std::string run_file_name);
+private:
+	void interrupt_material(material_identifier _new_material);
+	void interrupt_section(section_identifier _new_section);
 };
 
 class tds_display: public tds_run {
