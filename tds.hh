@@ -136,6 +136,13 @@ private:
 	std::string outputname_;
 	std::vector<IPlugin*> material_interrupts_;
 	std::vector<IPlugin*> section_interrupts_;
+	std::vector<IPlugin*> node_interrupts_;
+	std::vector<IPlugin*> element_interrupts_;
+	std::vector<IPlugin*> element_link_interrupts_;
+	std::vector<IPlugin*> pre_simulation_interrupts_;
+	std::vector<IPlugin*> step_start_interrupts_;
+	std::vector<IPlugin*> step_end_interrupts_;
+	std::vector<IPlugin*> post_simulation_interrupts_;
 	bool units_set_;
 	double initial_contamination;
 	double delta_t_;
@@ -195,6 +202,13 @@ public:
 	
 	void add_material_interrupt(IPlugin* _interrupter);
 	void add_section_interrupt(IPlugin* _interrupter);
+	void add_node_interrupt(IPlugin* _interrupter);
+	void add_element_interrupt(IPlugin* _interrupter);
+	void add_element_link_interrupt(IPlugin* _interrupter);
+	void add_pre_simulation_interrupt(IPlugin* _interrupter);
+	void add_start_step_interrupt(IPlugin* _interrupter);
+	void add_end_step_interrupt(IPlugin* _interrupter);
+	void add_post_simulation_interrupt(IPlugin* _interrupter);
 	
 	//setters
 	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.model_directory,"",_basename); basename_ = settings.model_directory + settings.model_name; };
@@ -224,8 +238,15 @@ public:
 	inline std::string tracking_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return temp.c_str(); }
 
 private:
-	void interrupt_material(material_identifier _new_material);
-	void interrupt_section(section_identifier _new_section);
+	void interrupt_material(material_identifier& _new_material);
+	void interrupt_section(section_identifier& _new_section);
+	void interrupt_node(node_identifier& _new_node);
+	void interrupt_element(element_identifier& _new_element);
+	void interrupt_element_link(element_link_identifier& _new_element_link);
+	void interrupt_pre_simulation();
+	void interrupt_start_step(int _step, double _time);
+	void interrupt_end_step(int _step, double _time);
+	void interrupt_post_simulation();
 };
 
 class tds_display: public tds_run {

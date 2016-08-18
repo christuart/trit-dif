@@ -8,12 +8,12 @@ model-name			fine1D
 config-name			simple
 output-name			plugin-test
 delta-t				1 seconds
-tracking-interval		5 hours
-simulation-length		50 hours
+tracking-interval		1 hours
+simulation-length		5 hours
 contamination-mode-time 	constant
 contamination-mode-space	constant
 contamination 			1 au
 tracking-mode			all
 track				5
 activate-plugin			defaults
-activate-plugin			outgassing
+activate-plugin			example

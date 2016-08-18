@@ -255,9 +255,10 @@ tds_section::~tds_section() {
 	clean_elements();
 }
 
-void tds_section::add_element(tds_element* new_element) {
+int tds_section::add_element(tds_element* new_element) {
 	// std::cout<<"adding new element"<<std::endl;
 	elements_.push_back(new_element);
+	return elements_.size() - 1;
 }
 
 void tds_section::clean_elements() {

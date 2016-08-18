@@ -1,10 +1,15 @@
-#ifndef OUTGASSING_HH
-#define OUTGASSING_HH
+#ifndef EXAMPLE_HH
+#define EXAMPLE_HH
 #include "plugins.hh"
 
-class Outgassing : public IPlugin {
+class Example : public IPlugin {
 public:
-	inline plugin plugin_identifier() { return POutgassing; }
+	// The plugin_identifier() override must be implemented
+	// the 'plugin' enumeration should be extended with a
+	// new entry for your plugin
+	inline plugin plugin_identifier() { return PExample; }
+
+	// The following methods are all optionally overriden.
 	void load_plugin();
 	void interrupt_material_creation(material_identifier& _new_material);
 	void interrupt_section_creation(section_identifier& _new_section);
@@ -17,11 +22,11 @@ public:
 	void interrupt_post_simulation();
 };
 
-class tds_outgassing_element_link : public tds_element_link {
+// As an example, you may create a derived class from the
+// element links, which has 0 flow rate always.
+class tds_example_element_link : public tds_element_link {
 
 public:
-	tds_outgassing_element_link(tds_element* _M, tds_element* _N);
-	
 	double flow_rate(bool _AB);
 	
 };

@@ -137,7 +137,7 @@ public:
 	tds_section(tds_material* _material);
 	virtual ~tds_section();
 	//adders
-	void add_element(tds_element* new_element);
+	int add_element(tds_element* new_element);
 	//cleaners
 	void clean_elements();
 	//setters

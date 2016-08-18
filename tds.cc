@@ -227,8 +227,12 @@ void tds_run::make_analysis() {
 			}
 		}
 	}
-	//for (int i=0; i < n_elements(); ++i)
-	//	element(i).debug_contamination();
+
+	// The next step is to let plug-ins change the setup. This happens
+	// here, before the timing code, because timing code would otherwise
+	// be badly calculated.
+	interrupt_pre_simulation();
+	
 	double time = 0.0;
 	double next_time_recording = tracking_interval();
 	
@@ -255,13 +259,18 @@ void tds_run::make_analysis() {
 	for (int step = 0; step < steps(); ++step) {
 		
 		// Every step we need to:
+		// 0.5) Let plug-ins take any required start-step actions
 		// 1) Update every element (each element decides what it needs to do to consitute an update)
+		// 1.5) Let plug-ins take any required end-step actions
 		// 2) Switch all of the flags in the elements (BUT NOT IN THE LINKS!)
 		// 3a) Output any outputs that have been requested and any warnings to std::cout
 		// 3b) Output any outputs that have been requested to the output file
 		// It may be necessary for speed's sake to put these outputs into arrays or buffers
 		// and output only at the end of simulation.
 
+		// 0.5) Plug-in start-step
+		interrupt_start_step(step,time);
+		
 		// 1) Update elements
 		for (int i=0; i < n_sections(); ++i) {
 			// Note simple model with constant source so no need to update them
@@ -271,6 +280,9 @@ void tds_run::make_analysis() {
 				}
 			}
 		}
+		// 1.5) Plug-in end-step
+		interrupt_end_step(step,time);
+		
 		time += delta_t();
 		
 		// 2) Switch flags in elements
@@ -336,6 +348,11 @@ void tds_run::make_analysis() {
 						
 		}
 	}
+	// Out of the element-for-loops and the time-for-loops, allow plug-ins
+	// to take the post simulation actions
+	interrupt_post_simulation();
+
+	// Show how long the entire simulation took
 	double elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
 	std::cout << "Total elapsed time: " << format_time(elapsed_time) << std::endl;
 	
@@ -464,7 +481,12 @@ void tds_run::initialise() {
 				continue;
 			}
 			std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
-			add_section(new tds_section(&material(_name)));
+			tds_section* _s = new tds_section(&material(_name));
+			section_identifier _s_id;
+			_s_id.section_id = add_section(_s);
+			_s_id.section = _s;
+			interrupt_section(_s_id);
+			
 			std::cout << "Now " << n_sections() << " sections." << std::endl;
 		}
 	} else {
@@ -498,7 +520,11 @@ void tds_run::initialise() {
 				std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
 				continue;
 			}
-			add_node(new tds_node(_x,_y,_z));
+			tds_node* _n = new tds_node(_x,_y,_z);
+			node_identifier _n_id;
+			_n_id.node_id = add_node(_n);
+			_n_id.node = _n;
+			interrupt_node(_n_id);
 		}
 	} else {
 		std::cerr << "No nodes found? Is the model name good?" << std::endl;
@@ -542,15 +568,21 @@ void tds_run::initialise() {
 				//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
 				_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
 			}
-			//std::cout << "all nodes ready to place into the element" << std::endl;
 			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1).material()),0.0);
-			//std::cout << "element created, with nodes" << std::endl;
-			add_element(new_element);
-			//std::cout << "element stored, referencing it in its nodes" << std::endl;
+			element_identifier _e_id;
+			_e_id.element_id = add_element(new_element);
+			_e_id.section_id = section_id-1;
+			_e_id.section_element_id = section(section_id-1).add_element(new_element);
+			_e_id.element = new_element;
+			interrupt_element(_e_id);
+			
+			// the interruption could change the element pointer e.g. if it
+			// replaces the element with a derived class, so we should read
+			// it back again:
+			new_element = _e_id.element;
+
+			// Once the element has been created, and plugins have had a chance to play around with it, it should be placed in the nodes that form it
 			(*new_element).propogate_into_nodes();
-			//std::cout << "element also stored in section" << std::endl;
-			section(section_id-1).add_element(new_element);
-			//std::cout << "all done!" << std::endl;
 
 			//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
 		}
@@ -603,6 +635,11 @@ void tds_run::initialise() {
 								                                                  &(section(s).element(i).node(j).element(k-1)));
 								element_link_count++;
 								// std::cout << "Made link" << std::endl;
+								element_link_identifier _el_id;
+								_el_id.element_link = new_link;
+								interrupt_element_link(_el_id);
+								// Reread pointer in case changed by interruption:
+								new_link = _el_id.element_link;
 								section(s).element(i).add_element_link(new_link);
 								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
 							}
@@ -628,6 +665,11 @@ void tds_run::initialise() {
 								                                                  &(section(s).element(i).node(j).element(k-1)));
 								element_link_count++;
 								// std::cout << "Made link" << std::endl;
+								element_link_identifier _el_id;
+								_el_id.element_link = new_link;
+								interrupt_element_link(_el_id);
+								// Reread pointer in case changed by interruption:
+								new_link = _el_id.element_link;
 								section(s).element(i).add_element_link(new_link);
 								section(s).element(i).node(j).element(k-1).add_element_link(new_link);
 							}
@@ -737,6 +779,7 @@ void tds_run::process_plugins() {
 	std::map<std::string,plugin> plugin_strings;
 	plugin_strings["outgassing"] = POutgassing;
 	plugin_strings["decay"] = PDecay;
+	plugin_strings["example"] = PExample;
 	
 	// Check for known conflicts from the combinations of plugins
 	// (none known at this time - code written before any plugins existed!)
@@ -750,8 +793,9 @@ void tds_run::process_plugins() {
 			continue;
 		}
 		switch (plugin_strings[plugin_text]) {
+		case PExample:
+			IPlugin::store_plugin(new Example()); break;
 		case POutgassing:
-			
 			IPlugin::store_plugin(new Outgassing()); break;
 		default:
 			std::cerr << "Plugin not yet implemented: " << plugin_text << std::endl;
@@ -993,12 +1037,63 @@ void tds_run::add_material_interrupt(IPlugin* _interrupter) {
 void tds_run::add_section_interrupt(IPlugin* _interrupter) {
 	section_interrupts_.push_back(_interrupter);
 }
+void tds_run::add_node_interrupt(IPlugin* _interrupter) {
+	node_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_element_interrupt(IPlugin* _interrupter) {
+	element_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_element_link_interrupt(IPlugin* _interrupter) {
+	element_link_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_pre_simulation_interrupt(IPlugin* _interrupter) {
+	pre_simulation_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_start_step_interrupt(IPlugin* _interrupter) {
+	step_start_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_end_step_interrupt(IPlugin* _interrupter) {
+	step_end_interrupts_.push_back(_interrupter);
+}
+void tds_run::add_post_simulation_interrupt(IPlugin* _interrupter) {
+	post_simulation_interrupts_.push_back(_interrupter);
+}
 
-void tds_run::interrupt_material(material_identifier _new_material) {
+void tds_run::interrupt_material(material_identifier& _new_material) {
 	for (int i=0; i < material_interrupts_.size(); ++i)
 		material_interrupts_.at(i)->interrupt_material_creation(_new_material);
 }
-void tds_run::interrupt_section(section_identifier _new_section) {
+void tds_run::interrupt_section(section_identifier& _new_section) {
+	for (int i=0; i < section_interrupts_.size(); ++i)
+		section_interrupts_.at(i)->interrupt_section_creation(_new_section);
+}
+void tds_run::interrupt_node(node_identifier& _new_node) {
+	for (int i=0; i < node_interrupts_.size(); ++i)
+		node_interrupts_.at(i)->interrupt_node_creation(_new_node);
+}
+void tds_run::interrupt_element(element_identifier& _new_element) {
+	for (int i=0; i < element_interrupts_.size(); ++i)
+		element_interrupts_.at(i)->interrupt_element_creation(_new_element);
+}
+void tds_run::interrupt_element_link(element_link_identifier& _new_element_link) {
+	for (int i=0; i < element_link_interrupts_.size(); ++i)
+		element_link_interrupts_.at(i)->interrupt_element_link_creation(_new_element_link);
+}
+void tds_run::interrupt_pre_simulation() {
+	for (int i=0; i < pre_simulation_interrupts_.size(); ++i)
+		pre_simulation_interrupts_.at(i)->interrupt_pre_simulation();
+}
+void tds_run::interrupt_start_step(int _step, double _time) {
+	for (int i=0; i < step_start_interrupts_.size(); ++i)
+		step_start_interrupts_.at(i)->interrupt_start_step(_step,_time);
+}
+void tds_run::interrupt_end_step(int _step, double _time) {
+	for (int i=0; i < step_end_interrupts_.size(); ++i)
+		step_end_interrupts_.at(i)->interrupt_end_step(_step,_time);
+}
+void tds_run::interrupt_post_simulation() {
+	for (int i=0; i < post_simulation_interrupts_.size(); ++i)
+		post_simulation_interrupts_.at(i)->interrupt_post_simulation();
 }
 
 

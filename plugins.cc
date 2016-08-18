@@ -10,13 +10,20 @@ plugin IPlugin::plugin_identifier() { return PUndefined; }
 void IPlugin::load_plugin() {}
 void IPlugin::interrupt_material_creation(material_identifier&) {}
 void IPlugin::interrupt_section_creation(section_identifier&) {}
-void IPlugin::interrupt_node_creation(int, tds_node*) {}
-void IPlugin::interrupt_element_creation(int, int, int, tds_element*) {}
-void IPlugin::interrupt_element_link_creation(tds_element_link*) {}
+void IPlugin::interrupt_node_creation(node_identifier&) {}
+void IPlugin::interrupt_element_creation(element_identifier&) {}
+void IPlugin::interrupt_element_link_creation(element_link_identifier&) {}
 void IPlugin::interrupt_pre_simulation() {}
-void IPlugin::interrupt_start_step() {}
-void IPlugin::interrupt_end_step() {}
+void IPlugin::interrupt_start_step(int _step, double _time) {}
+void IPlugin::interrupt_end_step(int _step, double _time) {}
 void IPlugin::interrupt_post_simulation() {}
+
+/*
+  This code was started, and then I remembered I needed to commit and upload yesterday's work...
+void replace_material(material_identifier& _old_material, tds_material* _new_material) {
+	for (int i=0; i < get_run()->n_sections(); ++i) {
+		if get_run()->section(i)
+}*/
 
 void IPlugin::store_plugin(IPlugin* _plugin) {
 	plugin plugin_type = _plugin->plugin_identifier();
