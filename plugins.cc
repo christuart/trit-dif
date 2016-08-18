@@ -18,12 +18,56 @@ void IPlugin::interrupt_start_step(int _step, double _time) {}
 void IPlugin::interrupt_end_step(int _step, double _time) {}
 void IPlugin::interrupt_post_simulation() {}
 
-/*
-  This code was started, and then I remembered I needed to commit and upload yesterday's work...
-void replace_material(material_identifier& _old_material, tds_material* _new_material) {
+
+void IPlugin::replace_material(material_identifier& _old_material, tds_material* _new_material) {
 	for (int i=0; i < get_run()->n_sections(); ++i) {
-		if get_run()->section(i)
-}*/
+		if (&(get_run()->section(i).material()) == _old_material.material)
+			get_run()->section(i).material(_new_material);
+	}
+	get_run()->change_material_pointer(_old_material.material_id,_new_material);
+	delete _old_material.material;
+	_old_material.material = _new_material;
+}
+void IPlugin::replace_section(section_identifier& _old_section, tds_section* _new_section) {
+	get_run()->change_section_pointer(_old_section.section_id,_new_section);
+	delete _old_section.section;
+	_old_section.section = _new_section;
+}
+void IPlugin::replace_node(node_identifier& _old_node, tds_node* _new_node) {
+	for (int i=0; i < get_run()->n_elements(); ++i) {
+		for (int j=0; j < get_run()->element(i).n_nodes(); ++j) {
+			if (&(get_run()->element(i).node(j)) == _old_node.node)
+				get_run()->element(i).node(j,_new_node);
+		}
+	}
+	get_run()->change_node_pointer(_old_node.node_id,_new_node);
+	delete _old_node.node;
+	_old_node.node = _new_node;
+}
+void IPlugin::replace_element(element_identifier& _old_element, tds_element* _new_element) {
+	for (int i=0; i < get_run()->n_nodes(); ++i) {
+		for (int j=0; j < get_run()->node(i).n_elements(); ++j) {
+			if (&(get_run()->node(i).element(j)) == _old_element.element)
+				get_run()->node(i).element(j,_new_element);
+		}
+	}
+	get_run()->section(_old_element.section_id).element(_old_element.section_element_id, _new_element);
+	get_run()->change_element_pointer(_old_element.element_id,_new_element);
+	delete _old_element.element;
+	_old_element.element = _new_element;
+}
+void IPlugin::replace_element_link(element_link_identifier& _old_element_link, tds_element_link* _new_element_link) {
+	for (int i=0; i < _old_element_link.element_link->elementM().n_neighbours(); ++i) {
+		if (&(_old_element_link.element_link->elementM().neighbour(i)) == _old_element_link.element_link)
+			_old_element_link.element_link->elementM().neighbour(i, _new_element_link);
+	}
+	for (int i=0; i < _old_element_link.element_link->elementN().n_neighbours(); ++i) {
+		if (&(_old_element_link.element_link->elementN().neighbour(i)) == _old_element_link.element_link)
+			_old_element_link.element_link->elementN().neighbour(i, _new_element_link);
+	}
+	delete _old_element_link.element_link;
+	_old_element_link.element_link = _new_element_link;
+}
 
 void IPlugin::store_plugin(IPlugin* _plugin) {
 	plugin plugin_type = _plugin->plugin_identifier();

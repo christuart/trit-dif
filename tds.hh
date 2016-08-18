@@ -39,8 +39,9 @@ const int three_d = 2;
 const int second_order_or_worse = 3;
 
 class tds {
-public: 
+public:
 private:
+protected:
 	tds_sections sections_;
 	tds_materials materials_;
 	tds_nodes nodes_;
@@ -54,7 +55,6 @@ private:
 	double size_,size_x_,size_y_,size_z_;
 	int dimensions;
 
-protected:
 public:
 	tds();
 	virtual ~tds();
@@ -209,6 +209,12 @@ public:
 	void add_start_step_interrupt(IPlugin* _interrupter);
 	void add_end_step_interrupt(IPlugin* _interrupter);
 	void add_post_simulation_interrupt(IPlugin* _interrupter);
+
+	// Methods for altering the pointers in each vector of tds_<part>s
+	void change_section_pointer(int _i, tds_section* _new_section);
+	void change_material_pointer(int _i, tds_material* _new_material);
+	void change_node_pointer(int _i, tds_node* _new_node);
+	void change_element_pointer(int _i, tds_element* _new_element);
 	
 	//setters
 	inline void basename(std::string _basename) { settings.model_name = find_replace(settings.model_directory,"",_basename); basename_ = settings.model_directory + settings.model_name; };

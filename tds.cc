@@ -996,6 +996,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                std::cout << "\tSetting the config name: " << value << std::endl;
 	                interpreter.str(value);
 	                if (settings.tracking_mode == "ids") {
+		                delete settings.tracking_list;
 		                settings.tracking_list = new std::vector<int>();
 		                int id;
 		                while (interpreter >> id)
@@ -1057,6 +1058,19 @@ void tds_run::add_end_step_interrupt(IPlugin* _interrupter) {
 }
 void tds_run::add_post_simulation_interrupt(IPlugin* _interrupter) {
 	post_simulation_interrupts_.push_back(_interrupter);
+}
+
+void tds_run::change_section_pointer(int _i, tds_section* _new_section) {
+	sections_[_i] = _new_section;
+}
+void tds_run::change_material_pointer(int _i, tds_material* _new_material) {
+	materials_[_i] = _new_material;
+}
+void tds_run::change_node_pointer(int _i, tds_node* _new_node) {
+	nodes_[_i] = _new_node;
+}
+void tds_run::change_element_pointer(int _i, tds_element* _new_element) {
+	elements_[_i] = _new_element;
 }
 
 void tds_run::interrupt_material(material_identifier& _new_material) {

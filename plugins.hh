@@ -5,8 +5,8 @@
 
 enum plugin {
 	PUndefined,
-	POutgassing,
 	PExample,
+	POutgassing,
 	PDecay
 };
 

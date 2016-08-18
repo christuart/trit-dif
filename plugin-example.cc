@@ -30,7 +30,16 @@ void Example::interrupt_element_creation(element_identifier& _new_element) {
 }
 void Example::interrupt_element_link_creation(element_link_identifier& _new_element_link) {
 	std::cout << "Example plug-in was given the opportunity to interrupt the creation of the link between '"
-	          << &(_new_element_link.element_link->elementM()) << "' and '" << &(_new_element_link.element_link->elementN()) << "'." << std::endl; 
+	          << &(_new_element_link.element_link->elementM()) << "' and '" << &(_new_element_link.element_link->elementN()) << "'." << std::endl;
+	// In this method, we will do some replacing, as an example.
+	// Instead of leaving the link between two elements in place, we will create our own derived link object.
+	// This has its own constructor, but the constructor only calls the base constructor (see further down
+	// this file). We then use 'replace_element_link(..)' which handles the updating of all the internal
+	// references to links. Now, instead of the base flow_rate(...) being called, we get our overridden
+	// version, which returns a flow rate of 0; observe no diffusion takes place with this plug-in enabled.
+	tds_example_element_link* replacement_link = new tds_example_element_link(&(_new_element_link.element_link->elementM()),
+		                                                                  &(_new_element_link.element_link->elementN()));
+	IPlugin::replace_element_link(_new_element_link, replacement_link);
 }
 void Example::interrupt_pre_simulation() {
 	std::cout << "Pre-simulation, Example plug-in can interrupt." << std::endl;
@@ -45,6 +54,7 @@ void Example::interrupt_post_simulation() {
 	std::cout << "Post-simulation, Example plug-in can interrupt." << std::endl;
 }
 
+tds_example_element_link::tds_example_element_link(tds_element* _M, tds_element* _N):tds_element_link(_M,_N) {}
 double tds_example_element_link::flow_rate(bool _AB) {
 	return 0.0f;
 }

@@ -37,6 +37,7 @@ public:
 	inline std::vector<double> position() { return position_; }
 	inline double position(int i) { return position_[i]; }
 	inline tds_element& element(int i) { return *elements_[i]; }
+	inline void element(int i, tds_element* _new_element) { elements_[i] = _new_element; }
 	inline bool elements_empty() { return elements_.empty(); }
 	inline int n_elements() { return elements_.size(); }
 	void clean_elements();
@@ -76,8 +77,10 @@ public:
 	inline std::vector<double>& origin() { return origin_; }
 	inline tds_material& material() { return *material_; }
 	inline tds_node& node(int i) { return *nodes_[i]; }
+	inline void node(int i, tds_node* _node) { nodes_[i] = _node; }
 	inline int n_nodes() { return nodes_.size(); }
 	inline tds_element_link& neighbour(int i) { return *neighbours_[i]; }
+	inline void neighbour(int i, tds_element_link* _element_link) { neighbours_[i] = _element_link; }
 	inline int n_neighbours() { return neighbours_.size(); }
 
 	// Will add the correct quantity to contamination and switch flag
@@ -145,6 +148,7 @@ public:
 	//getters
 	inline tds_material& material() { return *material_; }
 	inline tds_element& element(int i) { return *elements_[i]; }
+	inline void element(int i, tds_element* _new_element) { elements_[i] = _new_element; }
 	inline int n_elements() { return elements_.size(); }
 };
 

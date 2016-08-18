@@ -27,6 +27,7 @@ public:
 class tds_example_element_link : public tds_element_link {
 
 public:
+	tds_example_element_link(tds_element* _M, tds_element* _N);
 	double flow_rate(bool _AB);
 	
 };
