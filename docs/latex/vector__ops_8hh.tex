@@ -1,0 +1,159 @@
+\hypertarget{vector__ops_8hh}{\section{vector\-\_\-ops.\-hh File Reference}
+\label{vector__ops_8hh}\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}}
+}
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{vector__ops_8hh_adbc42bb6b72e7c57f961c77a042a9bff}{operator+=} (std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+void \hyperlink{vector__ops_8hh_a6576381ebb1e650c757cee7003ec0468}{operator-\/=} (std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+void \hyperlink{vector__ops_8hh_a13f188d3447fc14483c89d2e06f42593}{operator$\ast$=} (std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+void \hyperlink{vector__ops_8hh_a7021d82502a83b43c2f507a185140c73}{operator$\ast$=} (std\-::vector$<$ double $>$ \&u, const double \&v)
+\item 
+void \hyperlink{vector__ops_8hh_ae5b19f02d09ffff2d2946aef833a7e5b}{operator$\ast$=} (const double \&v, std\-::vector$<$ double $>$ \&u)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_adf96f73578c30d6bac57c6d86e7b1228}{operator+} (const std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_af711199d09ab5891151290b824e3e967}{operator-\/} (const std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_aa44eb5f612712ab822ca4c9dd6651430}{operator$\ast$} (const std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_a5beadfe391c5fd61691c3903a72c10e7}{operator$\ast$} (const std\-::vector$<$ double $>$ \&u, const double \&v)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_a3e45857d78b90e93c15744ad8798e156}{operator$\ast$} (const double \&v, const std\-::vector$<$ double $>$ \&u)
+\item 
+double \hyperlink{vector__ops_8hh_aea2ad4f8bf6995dcbfbf338f6c76c26a}{dot} (const std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+std\-::vector$<$ double $>$ \hyperlink{vector__ops_8hh_a53272d0abcdabcea632b33faff66f87e}{cross} (const std\-::vector$<$ double $>$ \&u, const std\-::vector$<$ double $>$ \&v)
+\item 
+double \hyperlink{vector__ops_8hh_a9922580c87b6082ce517d458c57e5b12}{magnitude} (std\-::vector$<$ double $>$ \&u)
+\item 
+void \hyperlink{vector__ops_8hh_a716a21c6612fb12f0e9ddc29568be9a8}{normalise} (std\-::vector$<$ double $>$ \&u)
+\item 
+void \hyperlink{vector__ops_8hh_ab6ebab8281b91e79e3fc11e125eec557}{debug} (std\-::vector$<$ double $>$ $\ast$u)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{vector__ops_8hh_a53272d0abcdabcea632b33faff66f87e}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!cross@{cross}}
+\index{cross@{cross}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{cross}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ cross (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a53272d0abcdabcea632b33faff66f87e}
+\hypertarget{vector__ops_8hh_ab6ebab8281b91e79e3fc11e125eec557}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!debug@{debug}}
+\index{debug@{debug}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{debug}]{\setlength{\rightskip}{0pt plus 5cm}void debug (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ $\ast$}]{u}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{vector__ops_8hh_ab6ebab8281b91e79e3fc11e125eec557}
+\hypertarget{vector__ops_8hh_aea2ad4f8bf6995dcbfbf338f6c76c26a}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!dot@{dot}}
+\index{dot@{dot}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{dot}]{\setlength{\rightskip}{0pt plus 5cm}double dot (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_aea2ad4f8bf6995dcbfbf338f6c76c26a}
+\hypertarget{vector__ops_8hh_a9922580c87b6082ce517d458c57e5b12}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!magnitude@{magnitude}}
+\index{magnitude@{magnitude}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{magnitude}]{\setlength{\rightskip}{0pt plus 5cm}double magnitude (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a9922580c87b6082ce517d458c57e5b12}
+\hypertarget{vector__ops_8hh_a716a21c6612fb12f0e9ddc29568be9a8}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!normalise@{normalise}}
+\index{normalise@{normalise}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{normalise}]{\setlength{\rightskip}{0pt plus 5cm}void normalise (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a716a21c6612fb12f0e9ddc29568be9a8}
+\hypertarget{vector__ops_8hh_aa44eb5f612712ab822ca4c9dd6651430}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_aa44eb5f612712ab822ca4c9dd6651430}
+\hypertarget{vector__ops_8hh_a5beadfe391c5fd61691c3903a72c10e7}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const double \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a5beadfe391c5fd61691c3903a72c10e7}
+\hypertarget{vector__ops_8hh_a3e45857d78b90e93c15744ad8798e156}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{v, }
+\item[{const std\-::vector$<$ double $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a3e45857d78b90e93c15744ad8798e156}
+\hypertarget{vector__ops_8hh_a13f188d3447fc14483c89d2e06f42593}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$=@{operator$\ast$=}}
+\index{operator$\ast$=@{operator$\ast$=}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$=}]{\setlength{\rightskip}{0pt plus 5cm}void operator$\ast$= (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a13f188d3447fc14483c89d2e06f42593}
+\hypertarget{vector__ops_8hh_a7021d82502a83b43c2f507a185140c73}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$=@{operator$\ast$=}}
+\index{operator$\ast$=@{operator$\ast$=}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$=}]{\setlength{\rightskip}{0pt plus 5cm}void operator$\ast$= (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const double \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a7021d82502a83b43c2f507a185140c73}
+\hypertarget{vector__ops_8hh_ae5b19f02d09ffff2d2946aef833a7e5b}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator$\ast$=@{operator$\ast$=}}
+\index{operator$\ast$=@{operator$\ast$=}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator$\ast$=}]{\setlength{\rightskip}{0pt plus 5cm}void operator$\ast$= (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{v, }
+\item[{std\-::vector$<$ double $>$ \&}]{u}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_ae5b19f02d09ffff2d2946aef833a7e5b}
+\hypertarget{vector__ops_8hh_adf96f73578c30d6bac57c6d86e7b1228}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator+@{operator+}}
+\index{operator+@{operator+}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator+}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ operator+ (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_adf96f73578c30d6bac57c6d86e7b1228}
+\hypertarget{vector__ops_8hh_adbc42bb6b72e7c57f961c77a042a9bff}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator+=}]{\setlength{\rightskip}{0pt plus 5cm}void operator+= (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_adbc42bb6b72e7c57f961c77a042a9bff}
+\hypertarget{vector__ops_8hh_af711199d09ab5891151290b824e3e967}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator-\/}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$ operator-\/ (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_af711199d09ab5891151290b824e3e967}
+\hypertarget{vector__ops_8hh_a6576381ebb1e650c757cee7003ec0468}{\index{vector\-\_\-ops.\-hh@{vector\-\_\-ops.\-hh}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!vector_ops.hh@{vector\-\_\-ops.\-hh}}
+\subsubsection[{operator-\/=}]{\setlength{\rightskip}{0pt plus 5cm}void operator-\/= (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ double $>$ \&}]{u, }
+\item[{const std\-::vector$<$ double $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{vector__ops_8hh_a6576381ebb1e650c757cee7003ec0468}

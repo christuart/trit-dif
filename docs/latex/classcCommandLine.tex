@@ -1,0 +1,155 @@
+\hypertarget{classcCommandLine}{\section{c\-Command\-Line Class Reference}
+\label{classcCommandLine}\index{c\-Command\-Line@{c\-Command\-Line}}
+}
+
+
+{\ttfamily \#include $<$utilities.\-hh$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structcCommandLine_1_1clParameter}{cl\-Parameter}
+\end{DoxyCompactItemize}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classcCommandLine_a81ec4892969530bbd91486e6cb872054}{cl\-Type} \{ \hyperlink{classcCommandLine_a81ec4892969530bbd91486e6cb872054ae373dbf7e049b7d7fdbe75c4f91696cd}{clt\-Flag} =0, 
+\hyperlink{classcCommandLine_a81ec4892969530bbd91486e6cb872054abf74da44500e2e049b5e00063306ee2e}{clt\-Argument} =1
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classcCommandLine_a70d7d8db2e25e26954221680f4f81bbd}{c\-Command\-Line} (std\-::string line)
+\item 
+\hyperlink{classcCommandLine_adef219a87317597446f866f7a1eaffe3}{c\-Command\-Line} (int n\-Arg, char $\ast$$\ast$v\-Arg)
+\item 
+unsigned \hyperlink{classcCommandLine_a80abb1b2a58d6d5488cda091914e9df6}{size} ()
+\item 
+\hyperlink{structcCommandLine_1_1clParameter}{cl\-Parameter} \& \hyperlink{classcCommandLine_acad9f993c21ecb3482c75f90c5135af4}{operator\mbox{[}$\,$\mbox{]}} (unsigned i)
+\item 
+unsigned \hyperlink{classcCommandLine_a11eca9b05e112b94f4414e89e85923f9}{n\-Args} ()
+\item 
+int \hyperlink{classcCommandLine_a60f9b1445b6bc0a18bcf360be2b9fa36}{arg} (unsigned count, unsigned start=0)
+\item 
+unsigned \hyperlink{classcCommandLine_a9ae109a4421ca07494fae4a62fb65961}{n\-Flags} ()
+\item 
+int \hyperlink{classcCommandLine_aaf01c0441e4aec3cb5d0590051265fce}{flag} (unsigned count, unsigned start=0)
+\item 
+int \hyperlink{classcCommandLine_aaa0c5f1a6c7e7bf2db5525595c78a38f}{flag} (std\-::string name, unsigned start=0)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classcCommandLine_a5eb5fa00de9315e96d44adaa5f2fb219}{add\-Arg} (std\-::string name)
+\item 
+void \hyperlink{classcCommandLine_a56d73201382df496e68984f2bdc4847b}{add\-Flag} (std\-::string name)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classcCommandLine_a81ec4892969530bbd91486e6cb872054}{\index{c\-Command\-Line@{c\-Command\-Line}!cl\-Type@{cl\-Type}}
+\index{cl\-Type@{cl\-Type}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{cl\-Type}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf c\-Command\-Line\-::cl\-Type}}}\label{classcCommandLine_a81ec4892969530bbd91486e6cb872054}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{clt\-Flag@{clt\-Flag}!c\-Command\-Line@{c\-Command\-Line}}\index{c\-Command\-Line@{c\-Command\-Line}!clt\-Flag@{clt\-Flag}}\item[{\em 
+\hypertarget{classcCommandLine_a81ec4892969530bbd91486e6cb872054ae373dbf7e049b7d7fdbe75c4f91696cd}{clt\-Flag}\label{classcCommandLine_a81ec4892969530bbd91486e6cb872054ae373dbf7e049b7d7fdbe75c4f91696cd}
+}]\index{clt\-Argument@{clt\-Argument}!c\-Command\-Line@{c\-Command\-Line}}\index{c\-Command\-Line@{c\-Command\-Line}!clt\-Argument@{clt\-Argument}}\item[{\em 
+\hypertarget{classcCommandLine_a81ec4892969530bbd91486e6cb872054abf74da44500e2e049b5e00063306ee2e}{clt\-Argument}\label{classcCommandLine_a81ec4892969530bbd91486e6cb872054abf74da44500e2e049b5e00063306ee2e}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcCommandLine_a70d7d8db2e25e26954221680f4f81bbd}{\index{c\-Command\-Line@{c\-Command\-Line}!c\-Command\-Line@{c\-Command\-Line}}
+\index{c\-Command\-Line@{c\-Command\-Line}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{c\-Command\-Line}]{\setlength{\rightskip}{0pt plus 5cm}c\-Command\-Line\-::c\-Command\-Line (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{line}
+\end{DoxyParamCaption}
+)}}\label{classcCommandLine_a70d7d8db2e25e26954221680f4f81bbd}
+\hypertarget{classcCommandLine_adef219a87317597446f866f7a1eaffe3}{\index{c\-Command\-Line@{c\-Command\-Line}!c\-Command\-Line@{c\-Command\-Line}}
+\index{c\-Command\-Line@{c\-Command\-Line}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{c\-Command\-Line}]{\setlength{\rightskip}{0pt plus 5cm}c\-Command\-Line\-::c\-Command\-Line (
+\begin{DoxyParamCaption}
+\item[{int}]{n\-Arg, }
+\item[{char $\ast$$\ast$}]{v\-Arg}
+\end{DoxyParamCaption}
+)}}\label{classcCommandLine_adef219a87317597446f866f7a1eaffe3}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcCommandLine_a5eb5fa00de9315e96d44adaa5f2fb219}{\index{c\-Command\-Line@{c\-Command\-Line}!add\-Arg@{add\-Arg}}
+\index{add\-Arg@{add\-Arg}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{add\-Arg}]{\setlength{\rightskip}{0pt plus 5cm}void c\-Command\-Line\-::add\-Arg (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classcCommandLine_a5eb5fa00de9315e96d44adaa5f2fb219}
+\hypertarget{classcCommandLine_a56d73201382df496e68984f2bdc4847b}{\index{c\-Command\-Line@{c\-Command\-Line}!add\-Flag@{add\-Flag}}
+\index{add\-Flag@{add\-Flag}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{add\-Flag}]{\setlength{\rightskip}{0pt plus 5cm}void c\-Command\-Line\-::add\-Flag (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classcCommandLine_a56d73201382df496e68984f2bdc4847b}
+\hypertarget{classcCommandLine_a60f9b1445b6bc0a18bcf360be2b9fa36}{\index{c\-Command\-Line@{c\-Command\-Line}!arg@{arg}}
+\index{arg@{arg}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{arg}]{\setlength{\rightskip}{0pt plus 5cm}int c\-Command\-Line\-::arg (
+\begin{DoxyParamCaption}
+\item[{unsigned}]{count, }
+\item[{unsigned}]{start = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classcCommandLine_a60f9b1445b6bc0a18bcf360be2b9fa36}
+\hypertarget{classcCommandLine_aaf01c0441e4aec3cb5d0590051265fce}{\index{c\-Command\-Line@{c\-Command\-Line}!flag@{flag}}
+\index{flag@{flag}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{flag}]{\setlength{\rightskip}{0pt plus 5cm}int c\-Command\-Line\-::flag (
+\begin{DoxyParamCaption}
+\item[{unsigned}]{count, }
+\item[{unsigned}]{start = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classcCommandLine_aaf01c0441e4aec3cb5d0590051265fce}
+\hypertarget{classcCommandLine_aaa0c5f1a6c7e7bf2db5525595c78a38f}{\index{c\-Command\-Line@{c\-Command\-Line}!flag@{flag}}
+\index{flag@{flag}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{flag}]{\setlength{\rightskip}{0pt plus 5cm}int c\-Command\-Line\-::flag (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{name, }
+\item[{unsigned}]{start = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classcCommandLine_aaa0c5f1a6c7e7bf2db5525595c78a38f}
+\hypertarget{classcCommandLine_a11eca9b05e112b94f4414e89e85923f9}{\index{c\-Command\-Line@{c\-Command\-Line}!n\-Args@{n\-Args}}
+\index{n\-Args@{n\-Args}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{n\-Args}]{\setlength{\rightskip}{0pt plus 5cm}unsigned c\-Command\-Line\-::n\-Args (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classcCommandLine_a11eca9b05e112b94f4414e89e85923f9}
+\hypertarget{classcCommandLine_a9ae109a4421ca07494fae4a62fb65961}{\index{c\-Command\-Line@{c\-Command\-Line}!n\-Flags@{n\-Flags}}
+\index{n\-Flags@{n\-Flags}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{n\-Flags}]{\setlength{\rightskip}{0pt plus 5cm}unsigned c\-Command\-Line\-::n\-Flags (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classcCommandLine_a9ae109a4421ca07494fae4a62fb65961}
+\hypertarget{classcCommandLine_acad9f993c21ecb3482c75f90c5135af4}{\index{c\-Command\-Line@{c\-Command\-Line}!operator\mbox{[}$\,$\mbox{]}@{operator[]}}
+\index{operator\mbox{[}$\,$\mbox{]}@{operator[]}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cl\-Parameter}\& c\-Command\-Line\-::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{unsigned}]{i}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classcCommandLine_acad9f993c21ecb3482c75f90c5135af4}
+\hypertarget{classcCommandLine_a80abb1b2a58d6d5488cda091914e9df6}{\index{c\-Command\-Line@{c\-Command\-Line}!size@{size}}
+\index{size@{size}!cCommandLine@{c\-Command\-Line}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}unsigned c\-Command\-Line\-::size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classcCommandLine_a80abb1b2a58d6d5488cda091914e9df6}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{utilities_8hh}{utilities.\-hh}\item 
+\hyperlink{utilities_8cc}{utilities.\-cc}\end{DoxyCompactItemize}

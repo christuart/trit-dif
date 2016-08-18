@@ -1,0 +1,430 @@
+\hypertarget{classtds__run}{\section{tds\-\_\-run Class Reference}
+\label{classtds__run}\index{tds\-\_\-run@{tds\-\_\-run}}
+}
+
+
+{\ttfamily \#include $<$tds.\-hh$>$}
+
+Inheritance diagram for tds\-\_\-run\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classtds__run}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtds__run_a0ba74f360c64a7e2f3f8959dc1fed2df}{tds\-\_\-run} ()
+\item 
+virtual \hyperlink{classtds__run_aa2b9a0552e50ff324d03c3d420fff38c}{$\sim$tds\-\_\-run} ()
+\item 
+void \hyperlink{classtds__run_a9abb2736c161cf2156e3e163a04a0cd4}{check\-\_\-coincidence} ()
+\item 
+void \hyperlink{classtds__run_a35a3ff44173673f3128e3ef53f2ed88d}{make\-\_\-analysis} ()
+\item 
+void \hyperlink{classtds__run_abd30ce52c369e4df8604e572d6927284}{set\-\_\-units\-\_\-from\-\_\-file} (const char $\ast$units\-\_\-file\-\_\-address\-\_\-)
+\item 
+void \hyperlink{classtds__run_ae1603d896969d71fa6547abe35223f61}{initialise} ()
+\item 
+void \hyperlink{classtds__run_ad032df448d1a63322c2bf79f5a0096b2}{read\-\_\-run\-\_\-file} (std\-::string run\-\_\-file\-\_\-name)
+\item 
+void \hyperlink{classtds__run_adff2cb3deec1b483622a7dda413dda31}{process\-\_\-plugins} ()
+\item 
+void \hyperlink{classtds__run_a362d316bd24de6cbf82d5d3da5d4f2c0}{add\-\_\-material\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_a3839266313d0fc9e3413c28dda530482}{add\-\_\-section\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_ab6675a0bebfd5bed698acd4dea878d41}{add\-\_\-node\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_a312b07f0d3efffd1642dfa87895ff4cc}{add\-\_\-element\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_ac40a3ad881c24c25897bd1b09d78a078}{add\-\_\-element\-\_\-link\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_ab4ec00a4d9f22819365b66477c10ae91}{add\-\_\-pre\-\_\-simulation\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_a53af820867a6889a0f992747b025e960}{add\-\_\-start\-\_\-step\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_ac0c00ed2b05ebefed18ffd4d1df9d939}{add\-\_\-end\-\_\-step\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_ab00abee313469532a8ab080aca7bd646}{add\-\_\-post\-\_\-simulation\-\_\-interrupt} (\hyperlink{classIPlugin}{I\-Plugin} $\ast$\-\_\-interrupter)
+\item 
+void \hyperlink{classtds__run_a9374772ea6de814d7dfded259832f6b6}{change\-\_\-section\-\_\-pointer} (int \-\_\-i, \hyperlink{classtds__section}{tds\-\_\-section} $\ast$\-\_\-new\-\_\-section)
+\item 
+void \hyperlink{classtds__run_a03691796a9eebdfbf5bc65e5b705254c}{change\-\_\-material\-\_\-pointer} (int \-\_\-i, \hyperlink{classtds__material}{tds\-\_\-material} $\ast$\-\_\-new\-\_\-material)
+\item 
+void \hyperlink{classtds__run_a682cac3d47e4b6ed3e005d37041db08b}{change\-\_\-node\-\_\-pointer} (int \-\_\-i, \hyperlink{classtds__node}{tds\-\_\-node} $\ast$\-\_\-new\-\_\-node)
+\item 
+void \hyperlink{classtds__run_adfce89e41fb6ffe66fbbcb3dadcf101a}{change\-\_\-element\-\_\-pointer} (int \-\_\-i, \hyperlink{classtds__element}{tds\-\_\-element} $\ast$\-\_\-new\-\_\-element)
+\item 
+void \hyperlink{classtds__run_a43fa7246bfeda6b5e30e7064c798ce44}{basename} (std\-::string \-\_\-basename)
+\item 
+void \hyperlink{classtds__run_af835c5821513196c95ea1aa8843b7c4d}{configname} (std\-::string \-\_\-configname)
+\item 
+void \hyperlink{classtds__run_ab915e669b626f046e452bc8986dc2745}{outputname} (std\-::string \-\_\-outputname)
+\item 
+void \hyperlink{classtds__run_a3c6f314b5abe50031704b3993624ac98}{delta\-\_\-t} (double \-\_\-delta\-\_\-t)
+\item 
+void \hyperlink{classtds__run_a3ef12a27264daabbce95d66a05a1783f}{steps} (int \-\_\-steps)
+\item 
+void \hyperlink{classtds__run_af6c0667d9868be944a1d3e5880609f8a}{tracking\-\_\-interval} (double \-\_\-tracking\-\_\-interval)
+\item 
+void \hyperlink{classtds__run_a555ffb37cdd6f1a9b877ae4b3be32acb}{tracked\-\_\-elements} (std\-::vector$<$ int $>$ \&\-\_\-tracked\-\_\-elements)
+\item 
+void \hyperlink{classtds__run_a992893887cdbc12a5169ddb4433ed2fc}{tracked\-\_\-element} (int i, int \hyperlink{classtds_aec8ca7ac2f04016feeac7bb3f06da314}{element})
+\item 
+std\-::string \hyperlink{classtds__run_a137f612e6b407e454bccad95afbb21a9}{basename} ()
+\item 
+std\-::string \hyperlink{classtds__run_a9e8f81d142ee0b76bfd6e9e28d2b63f3}{configname} ()
+\item 
+std\-::string \hyperlink{classtds__run_a1d9a5d498afe05b982a0a7f748eb8210}{outputname} ()
+\item 
+double \hyperlink{classtds__run_a5e48a031180b7523e53378f5174d79a3}{delta\-\_\-t} ()
+\item 
+int \hyperlink{classtds__run_a62c2082354b12fb78a2888ab719c1ad9}{steps} ()
+\item 
+double \hyperlink{classtds__run_a55ac0838be1171fc81aa8c029c582074}{tracking\-\_\-interval} ()
+\item 
+int \hyperlink{classtds__run_a163561d49e453bae8832cea7330f2e6f}{tracked\-\_\-element} (int i)
+\item 
+std\-::vector$<$ int $>$ $\ast$ \hyperlink{classtds__run_aba189393afcc21e3320bef781ddbe67d}{tracked\-\_\-elements} ()
+\item 
+const char $\ast$ \hyperlink{classtds__run_a4d3f91ec85fde67fca2be01c65c9e055}{units\-\_\-file\-\_\-address} ()
+\item 
+const char $\ast$ \hyperlink{classtds__run_af89342b9231d4b99a83ff55d1ca5b969}{materials\-\_\-file\-\_\-address} ()
+\item 
+std\-::string \hyperlink{classtds__run_af40ce5e25f42be9e10b5477c0608f165}{sections\-\_\-file\-\_\-address} ()
+\item 
+std\-::string \hyperlink{classtds__run_abbf40891531e0cf9fd4c7900332fe36e}{nodes\-\_\-file\-\_\-address} ()
+\item 
+std\-::string \hyperlink{classtds__run_a89253a539c775d4b68c539b428127d36}{elements\-\_\-file\-\_\-address} ()
+\item 
+std\-::string \hyperlink{classtds__run_a8ff6cd6b421f73c0d77add4dd27e204e}{contaminations\-\_\-file\-\_\-address} ()
+\item 
+std\-::string \hyperlink{classtds__run_a5e46adee5b685171212fb294c282c27d}{tracking\-\_\-file\-\_\-address} ()
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtds__run_a0ba74f360c64a7e2f3f8959dc1fed2df}{\index{tds\-\_\-run@{tds\-\_\-run}!tds\-\_\-run@{tds\-\_\-run}}
+\index{tds\-\_\-run@{tds\-\_\-run}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tds\-\_\-run}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-run\-::tds\-\_\-run (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a0ba74f360c64a7e2f3f8959dc1fed2df}
+\hypertarget{classtds__run_aa2b9a0552e50ff324d03c3d420fff38c}{\index{tds\-\_\-run@{tds\-\_\-run}!$\sim$tds\-\_\-run@{$\sim$tds\-\_\-run}}
+\index{$\sim$tds\-\_\-run@{$\sim$tds\-\_\-run}!tds_run@{tds\-\_\-run}}
+\subsubsection[{$\sim$tds\-\_\-run}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-run\-::$\sim$tds\-\_\-run (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtds__run_aa2b9a0552e50ff324d03c3d420fff38c}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtds__run_a312b07f0d3efffd1642dfa87895ff4cc}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-element\-\_\-interrupt@{add\-\_\-element\-\_\-interrupt}}
+\index{add\-\_\-element\-\_\-interrupt@{add\-\_\-element\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-element\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-element\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a312b07f0d3efffd1642dfa87895ff4cc}
+\hypertarget{classtds__run_ac40a3ad881c24c25897bd1b09d78a078}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-element\-\_\-link\-\_\-interrupt@{add\-\_\-element\-\_\-link\-\_\-interrupt}}
+\index{add\-\_\-element\-\_\-link\-\_\-interrupt@{add\-\_\-element\-\_\-link\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-element\-\_\-link\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-element\-\_\-link\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ac40a3ad881c24c25897bd1b09d78a078}
+\hypertarget{classtds__run_ac0c00ed2b05ebefed18ffd4d1df9d939}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-end\-\_\-step\-\_\-interrupt@{add\-\_\-end\-\_\-step\-\_\-interrupt}}
+\index{add\-\_\-end\-\_\-step\-\_\-interrupt@{add\-\_\-end\-\_\-step\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-end\-\_\-step\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-end\-\_\-step\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ac0c00ed2b05ebefed18ffd4d1df9d939}
+\hypertarget{classtds__run_a362d316bd24de6cbf82d5d3da5d4f2c0}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-material\-\_\-interrupt@{add\-\_\-material\-\_\-interrupt}}
+\index{add\-\_\-material\-\_\-interrupt@{add\-\_\-material\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-material\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-material\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a362d316bd24de6cbf82d5d3da5d4f2c0}
+\hypertarget{classtds__run_ab6675a0bebfd5bed698acd4dea878d41}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-node\-\_\-interrupt@{add\-\_\-node\-\_\-interrupt}}
+\index{add\-\_\-node\-\_\-interrupt@{add\-\_\-node\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-node\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-node\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ab6675a0bebfd5bed698acd4dea878d41}
+\hypertarget{classtds__run_ab00abee313469532a8ab080aca7bd646}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-post\-\_\-simulation\-\_\-interrupt@{add\-\_\-post\-\_\-simulation\-\_\-interrupt}}
+\index{add\-\_\-post\-\_\-simulation\-\_\-interrupt@{add\-\_\-post\-\_\-simulation\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-post\-\_\-simulation\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-post\-\_\-simulation\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ab00abee313469532a8ab080aca7bd646}
+\hypertarget{classtds__run_ab4ec00a4d9f22819365b66477c10ae91}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-pre\-\_\-simulation\-\_\-interrupt@{add\-\_\-pre\-\_\-simulation\-\_\-interrupt}}
+\index{add\-\_\-pre\-\_\-simulation\-\_\-interrupt@{add\-\_\-pre\-\_\-simulation\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-pre\-\_\-simulation\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-pre\-\_\-simulation\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ab4ec00a4d9f22819365b66477c10ae91}
+\hypertarget{classtds__run_a3839266313d0fc9e3413c28dda530482}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-section\-\_\-interrupt@{add\-\_\-section\-\_\-interrupt}}
+\index{add\-\_\-section\-\_\-interrupt@{add\-\_\-section\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-section\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-section\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a3839266313d0fc9e3413c28dda530482}
+\hypertarget{classtds__run_a53af820867a6889a0f992747b025e960}{\index{tds\-\_\-run@{tds\-\_\-run}!add\-\_\-start\-\_\-step\-\_\-interrupt@{add\-\_\-start\-\_\-step\-\_\-interrupt}}
+\index{add\-\_\-start\-\_\-step\-\_\-interrupt@{add\-\_\-start\-\_\-step\-\_\-interrupt}!tds_run@{tds\-\_\-run}}
+\subsubsection[{add\-\_\-start\-\_\-step\-\_\-interrupt}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::add\-\_\-start\-\_\-step\-\_\-interrupt (
+\begin{DoxyParamCaption}
+\item[{{\bf I\-Plugin} $\ast$}]{\-\_\-interrupter}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a53af820867a6889a0f992747b025e960}
+\hypertarget{classtds__run_a43fa7246bfeda6b5e30e7064c798ce44}{\index{tds\-\_\-run@{tds\-\_\-run}!basename@{basename}}
+\index{basename@{basename}!tds_run@{tds\-\_\-run}}
+\subsubsection[{basename}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::basename (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{\-\_\-basename}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a43fa7246bfeda6b5e30e7064c798ce44}
+\hypertarget{classtds__run_a137f612e6b407e454bccad95afbb21a9}{\index{tds\-\_\-run@{tds\-\_\-run}!basename@{basename}}
+\index{basename@{basename}!tds_run@{tds\-\_\-run}}
+\subsubsection[{basename}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::basename (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a137f612e6b407e454bccad95afbb21a9}
+\hypertarget{classtds__run_adfce89e41fb6ffe66fbbcb3dadcf101a}{\index{tds\-\_\-run@{tds\-\_\-run}!change\-\_\-element\-\_\-pointer@{change\-\_\-element\-\_\-pointer}}
+\index{change\-\_\-element\-\_\-pointer@{change\-\_\-element\-\_\-pointer}!tds_run@{tds\-\_\-run}}
+\subsubsection[{change\-\_\-element\-\_\-pointer}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::change\-\_\-element\-\_\-pointer (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-i, }
+\item[{{\bf tds\-\_\-element} $\ast$}]{\-\_\-new\-\_\-element}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_adfce89e41fb6ffe66fbbcb3dadcf101a}
+\hypertarget{classtds__run_a03691796a9eebdfbf5bc65e5b705254c}{\index{tds\-\_\-run@{tds\-\_\-run}!change\-\_\-material\-\_\-pointer@{change\-\_\-material\-\_\-pointer}}
+\index{change\-\_\-material\-\_\-pointer@{change\-\_\-material\-\_\-pointer}!tds_run@{tds\-\_\-run}}
+\subsubsection[{change\-\_\-material\-\_\-pointer}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::change\-\_\-material\-\_\-pointer (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-i, }
+\item[{{\bf tds\-\_\-material} $\ast$}]{\-\_\-new\-\_\-material}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a03691796a9eebdfbf5bc65e5b705254c}
+\hypertarget{classtds__run_a682cac3d47e4b6ed3e005d37041db08b}{\index{tds\-\_\-run@{tds\-\_\-run}!change\-\_\-node\-\_\-pointer@{change\-\_\-node\-\_\-pointer}}
+\index{change\-\_\-node\-\_\-pointer@{change\-\_\-node\-\_\-pointer}!tds_run@{tds\-\_\-run}}
+\subsubsection[{change\-\_\-node\-\_\-pointer}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::change\-\_\-node\-\_\-pointer (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-i, }
+\item[{{\bf tds\-\_\-node} $\ast$}]{\-\_\-new\-\_\-node}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a682cac3d47e4b6ed3e005d37041db08b}
+\hypertarget{classtds__run_a9374772ea6de814d7dfded259832f6b6}{\index{tds\-\_\-run@{tds\-\_\-run}!change\-\_\-section\-\_\-pointer@{change\-\_\-section\-\_\-pointer}}
+\index{change\-\_\-section\-\_\-pointer@{change\-\_\-section\-\_\-pointer}!tds_run@{tds\-\_\-run}}
+\subsubsection[{change\-\_\-section\-\_\-pointer}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::change\-\_\-section\-\_\-pointer (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-i, }
+\item[{{\bf tds\-\_\-section} $\ast$}]{\-\_\-new\-\_\-section}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a9374772ea6de814d7dfded259832f6b6}
+\hypertarget{classtds__run_a9abb2736c161cf2156e3e163a04a0cd4}{\index{tds\-\_\-run@{tds\-\_\-run}!check\-\_\-coincidence@{check\-\_\-coincidence}}
+\index{check\-\_\-coincidence@{check\-\_\-coincidence}!tds_run@{tds\-\_\-run}}
+\subsubsection[{check\-\_\-coincidence}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::check\-\_\-coincidence (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a9abb2736c161cf2156e3e163a04a0cd4}
+\hypertarget{classtds__run_af835c5821513196c95ea1aa8843b7c4d}{\index{tds\-\_\-run@{tds\-\_\-run}!configname@{configname}}
+\index{configname@{configname}!tds_run@{tds\-\_\-run}}
+\subsubsection[{configname}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::configname (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{\-\_\-configname}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_af835c5821513196c95ea1aa8843b7c4d}
+\hypertarget{classtds__run_a9e8f81d142ee0b76bfd6e9e28d2b63f3}{\index{tds\-\_\-run@{tds\-\_\-run}!configname@{configname}}
+\index{configname@{configname}!tds_run@{tds\-\_\-run}}
+\subsubsection[{configname}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::configname (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a9e8f81d142ee0b76bfd6e9e28d2b63f3}
+\hypertarget{classtds__run_a8ff6cd6b421f73c0d77add4dd27e204e}{\index{tds\-\_\-run@{tds\-\_\-run}!contaminations\-\_\-file\-\_\-address@{contaminations\-\_\-file\-\_\-address}}
+\index{contaminations\-\_\-file\-\_\-address@{contaminations\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{contaminations\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::contaminations\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a8ff6cd6b421f73c0d77add4dd27e204e}
+\hypertarget{classtds__run_a3c6f314b5abe50031704b3993624ac98}{\index{tds\-\_\-run@{tds\-\_\-run}!delta\-\_\-t@{delta\-\_\-t}}
+\index{delta\-\_\-t@{delta\-\_\-t}!tds_run@{tds\-\_\-run}}
+\subsubsection[{delta\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::delta\-\_\-t (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-delta\-\_\-t}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a3c6f314b5abe50031704b3993624ac98}
+\hypertarget{classtds__run_a5e48a031180b7523e53378f5174d79a3}{\index{tds\-\_\-run@{tds\-\_\-run}!delta\-\_\-t@{delta\-\_\-t}}
+\index{delta\-\_\-t@{delta\-\_\-t}!tds_run@{tds\-\_\-run}}
+\subsubsection[{delta\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}double tds\-\_\-run\-::delta\-\_\-t (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a5e48a031180b7523e53378f5174d79a3}
+\hypertarget{classtds__run_a89253a539c775d4b68c539b428127d36}{\index{tds\-\_\-run@{tds\-\_\-run}!elements\-\_\-file\-\_\-address@{elements\-\_\-file\-\_\-address}}
+\index{elements\-\_\-file\-\_\-address@{elements\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{elements\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::elements\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a89253a539c775d4b68c539b428127d36}
+\hypertarget{classtds__run_ae1603d896969d71fa6547abe35223f61}{\index{tds\-\_\-run@{tds\-\_\-run}!initialise@{initialise}}
+\index{initialise@{initialise}!tds_run@{tds\-\_\-run}}
+\subsubsection[{initialise}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::initialise (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ae1603d896969d71fa6547abe35223f61}
+\hypertarget{classtds__run_a35a3ff44173673f3128e3ef53f2ed88d}{\index{tds\-\_\-run@{tds\-\_\-run}!make\-\_\-analysis@{make\-\_\-analysis}}
+\index{make\-\_\-analysis@{make\-\_\-analysis}!tds_run@{tds\-\_\-run}}
+\subsubsection[{make\-\_\-analysis}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::make\-\_\-analysis (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_a35a3ff44173673f3128e3ef53f2ed88d}
+\hypertarget{classtds__run_af89342b9231d4b99a83ff55d1ca5b969}{\index{tds\-\_\-run@{tds\-\_\-run}!materials\-\_\-file\-\_\-address@{materials\-\_\-file\-\_\-address}}
+\index{materials\-\_\-file\-\_\-address@{materials\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{materials\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ tds\-\_\-run\-::materials\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_af89342b9231d4b99a83ff55d1ca5b969}
+\hypertarget{classtds__run_abbf40891531e0cf9fd4c7900332fe36e}{\index{tds\-\_\-run@{tds\-\_\-run}!nodes\-\_\-file\-\_\-address@{nodes\-\_\-file\-\_\-address}}
+\index{nodes\-\_\-file\-\_\-address@{nodes\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{nodes\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::nodes\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_abbf40891531e0cf9fd4c7900332fe36e}
+\hypertarget{classtds__run_ab915e669b626f046e452bc8986dc2745}{\index{tds\-\_\-run@{tds\-\_\-run}!outputname@{outputname}}
+\index{outputname@{outputname}!tds_run@{tds\-\_\-run}}
+\subsubsection[{outputname}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::outputname (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{\-\_\-outputname}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_ab915e669b626f046e452bc8986dc2745}
+\hypertarget{classtds__run_a1d9a5d498afe05b982a0a7f748eb8210}{\index{tds\-\_\-run@{tds\-\_\-run}!outputname@{outputname}}
+\index{outputname@{outputname}!tds_run@{tds\-\_\-run}}
+\subsubsection[{outputname}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::outputname (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a1d9a5d498afe05b982a0a7f748eb8210}
+\hypertarget{classtds__run_adff2cb3deec1b483622a7dda413dda31}{\index{tds\-\_\-run@{tds\-\_\-run}!process\-\_\-plugins@{process\-\_\-plugins}}
+\index{process\-\_\-plugins@{process\-\_\-plugins}!tds_run@{tds\-\_\-run}}
+\subsubsection[{process\-\_\-plugins}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::process\-\_\-plugins (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_adff2cb3deec1b483622a7dda413dda31}
+\hypertarget{classtds__run_ad032df448d1a63322c2bf79f5a0096b2}{\index{tds\-\_\-run@{tds\-\_\-run}!read\-\_\-run\-\_\-file@{read\-\_\-run\-\_\-file}}
+\index{read\-\_\-run\-\_\-file@{read\-\_\-run\-\_\-file}!tds_run@{tds\-\_\-run}}
+\subsubsection[{read\-\_\-run\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::read\-\_\-run\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{std\-::string}]{run\-\_\-file\-\_\-name}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_ad032df448d1a63322c2bf79f5a0096b2}
+\hypertarget{classtds__run_af40ce5e25f42be9e10b5477c0608f165}{\index{tds\-\_\-run@{tds\-\_\-run}!sections\-\_\-file\-\_\-address@{sections\-\_\-file\-\_\-address}}
+\index{sections\-\_\-file\-\_\-address@{sections\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{sections\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::sections\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_af40ce5e25f42be9e10b5477c0608f165}
+\hypertarget{classtds__run_abd30ce52c369e4df8604e572d6927284}{\index{tds\-\_\-run@{tds\-\_\-run}!set\-\_\-units\-\_\-from\-\_\-file@{set\-\_\-units\-\_\-from\-\_\-file}}
+\index{set\-\_\-units\-\_\-from\-\_\-file@{set\-\_\-units\-\_\-from\-\_\-file}!tds_run@{tds\-\_\-run}}
+\subsubsection[{set\-\_\-units\-\_\-from\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::set\-\_\-units\-\_\-from\-\_\-file (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{units\-\_\-file\-\_\-address\-\_\-}
+\end{DoxyParamCaption}
+)}}\label{classtds__run_abd30ce52c369e4df8604e572d6927284}
+\hypertarget{classtds__run_a3ef12a27264daabbce95d66a05a1783f}{\index{tds\-\_\-run@{tds\-\_\-run}!steps@{steps}}
+\index{steps@{steps}!tds_run@{tds\-\_\-run}}
+\subsubsection[{steps}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::steps (
+\begin{DoxyParamCaption}
+\item[{int}]{\-\_\-steps}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a3ef12a27264daabbce95d66a05a1783f}
+\hypertarget{classtds__run_a62c2082354b12fb78a2888ab719c1ad9}{\index{tds\-\_\-run@{tds\-\_\-run}!steps@{steps}}
+\index{steps@{steps}!tds_run@{tds\-\_\-run}}
+\subsubsection[{steps}]{\setlength{\rightskip}{0pt plus 5cm}int tds\-\_\-run\-::steps (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a62c2082354b12fb78a2888ab719c1ad9}
+\hypertarget{classtds__run_a992893887cdbc12a5169ddb4433ed2fc}{\index{tds\-\_\-run@{tds\-\_\-run}!tracked\-\_\-element@{tracked\-\_\-element}}
+\index{tracked\-\_\-element@{tracked\-\_\-element}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracked\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::tracked\-\_\-element (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{int}]{element}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a992893887cdbc12a5169ddb4433ed2fc}
+\hypertarget{classtds__run_a163561d49e453bae8832cea7330f2e6f}{\index{tds\-\_\-run@{tds\-\_\-run}!tracked\-\_\-element@{tracked\-\_\-element}}
+\index{tracked\-\_\-element@{tracked\-\_\-element}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracked\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}int tds\-\_\-run\-::tracked\-\_\-element (
+\begin{DoxyParamCaption}
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a163561d49e453bae8832cea7330f2e6f}
+\hypertarget{classtds__run_a555ffb37cdd6f1a9b877ae4b3be32acb}{\index{tds\-\_\-run@{tds\-\_\-run}!tracked\-\_\-elements@{tracked\-\_\-elements}}
+\index{tracked\-\_\-elements@{tracked\-\_\-elements}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracked\-\_\-elements}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::tracked\-\_\-elements (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ int $>$ \&}]{\-\_\-tracked\-\_\-elements}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a555ffb37cdd6f1a9b877ae4b3be32acb}
+\hypertarget{classtds__run_aba189393afcc21e3320bef781ddbe67d}{\index{tds\-\_\-run@{tds\-\_\-run}!tracked\-\_\-elements@{tracked\-\_\-elements}}
+\index{tracked\-\_\-elements@{tracked\-\_\-elements}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracked\-\_\-elements}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$int$>$$\ast$ tds\-\_\-run\-::tracked\-\_\-elements (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_aba189393afcc21e3320bef781ddbe67d}
+\hypertarget{classtds__run_a5e46adee5b685171212fb294c282c27d}{\index{tds\-\_\-run@{tds\-\_\-run}!tracking\-\_\-file\-\_\-address@{tracking\-\_\-file\-\_\-address}}
+\index{tracking\-\_\-file\-\_\-address@{tracking\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracking\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string tds\-\_\-run\-::tracking\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a5e46adee5b685171212fb294c282c27d}
+\hypertarget{classtds__run_af6c0667d9868be944a1d3e5880609f8a}{\index{tds\-\_\-run@{tds\-\_\-run}!tracking\-\_\-interval@{tracking\-\_\-interval}}
+\index{tracking\-\_\-interval@{tracking\-\_\-interval}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracking\-\_\-interval}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-run\-::tracking\-\_\-interval (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-tracking\-\_\-interval}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_af6c0667d9868be944a1d3e5880609f8a}
+\hypertarget{classtds__run_a55ac0838be1171fc81aa8c029c582074}{\index{tds\-\_\-run@{tds\-\_\-run}!tracking\-\_\-interval@{tracking\-\_\-interval}}
+\index{tracking\-\_\-interval@{tracking\-\_\-interval}!tds_run@{tds\-\_\-run}}
+\subsubsection[{tracking\-\_\-interval}]{\setlength{\rightskip}{0pt plus 5cm}double tds\-\_\-run\-::tracking\-\_\-interval (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a55ac0838be1171fc81aa8c029c582074}
+\hypertarget{classtds__run_a4d3f91ec85fde67fca2be01c65c9e055}{\index{tds\-\_\-run@{tds\-\_\-run}!units\-\_\-file\-\_\-address@{units\-\_\-file\-\_\-address}}
+\index{units\-\_\-file\-\_\-address@{units\-\_\-file\-\_\-address}!tds_run@{tds\-\_\-run}}
+\subsubsection[{units\-\_\-file\-\_\-address}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ tds\-\_\-run\-::units\-\_\-file\-\_\-address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__run_a4d3f91ec85fde67fca2be01c65c9e055}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tds_8hh}{tds.\-hh}\item 
+\hyperlink{tds_8cc}{tds.\-cc}\end{DoxyCompactItemize}

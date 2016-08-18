@@ -1,0 +1,297 @@
+\hypertarget{classtds__element}{\section{tds\-\_\-element Class Reference}
+\label{classtds__element}\index{tds\-\_\-element@{tds\-\_\-element}}
+}
+
+
+{\ttfamily \#include $<$tds\-\_\-parts.\-hh$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classtds__element_abcecf7331b6e9eb8901abef93626573d}{tds\-\_\-element} (\hyperlink{tds__parts_8hh_ad445cf91d41fc0e37fcaf259adec00ef}{tds\-\_\-nodes} \-\_\-nodes, \hyperlink{classtds__material}{tds\-\_\-material} $\ast$\-\_\-material, double \-\_\-contamination)
+\item 
+\hyperlink{classtds__element_aa29190be28bc10a7cc057707532bca21}{tds\-\_\-element} (\hyperlink{tds__parts_8hh_ad445cf91d41fc0e37fcaf259adec00ef}{tds\-\_\-nodes} \-\_\-nodes, \hyperlink{classtds__material}{tds\-\_\-material} $\ast$\-\_\-material, std\-::vector$<$ double $>$ \-\_\-origin, double \-\_\-contamination)
+\item 
+\hyperlink{classtds__element_acc981290ffd87bad402d32c4508dc5f4}{tds\-\_\-element} (\hyperlink{tds__parts_8hh_ad445cf91d41fc0e37fcaf259adec00ef}{tds\-\_\-nodes} \-\_\-nodes, \hyperlink{classtds__material}{tds\-\_\-material} $\ast$\-\_\-material, double \-\_\-origin\-\_\-x, double \-\_\-origin\-\_\-y, double \-\_\-origin\-\_\-z, double \-\_\-contamination)
+\item 
+virtual \hyperlink{classtds__element_a209f4917125e72c36d3285980d983892}{$\sim$tds\-\_\-element} ()
+\item 
+void \hyperlink{classtds__element_a9b3c0e1088fb7ae6da03e8fc1bf9c383}{add\-\_\-element\-\_\-link} (\hyperlink{classtds__element__link}{tds\-\_\-element\-\_\-link} $\ast$new\-\_\-element\-\_\-link)
+\item 
+void \hyperlink{classtds__element_ab8eb795822ab7e1ea47b703e4f5f473a}{flag\-A\-B} (bool \-\_\-\-A\-B)
+\item 
+void \hyperlink{classtds__element_adb36fa3ae80584e3a4fe12cfdedf6db6}{size} (double \-\_\-size)
+\item 
+void \hyperlink{classtds__element_a2b3e86e827be59f63cb8d561a73d6983}{contamination} (double \-\_\-contamination)
+\item 
+void \hyperlink{classtds__element_ae2355a832ead2e50c17a8782ad8d1496}{origin} (double \-\_\-x, double \-\_\-y, double \-\_\-z)
+\item 
+bool \hyperlink{classtds__element_a44d414a3db34a21320fb70f86f401734}{flag\-A\-B} ()
+\item 
+double \hyperlink{classtds__element_a670d658914fce47e7312a170634c47ea}{size} ()
+\item 
+virtual double \hyperlink{classtds__element_a7dcc7e1ad86d6c64368d1e6215cb662a}{contamination} ()
+\item 
+virtual double \hyperlink{classtds__element_a5467abfd0fc166336152a668f0f9b67e}{contamination} (bool \-\_\-\-A\-B)
+\item 
+double \hyperlink{classtds__element_a737aecedf7dbb0016d0863878f36ca95}{origin} (int i)
+\item 
+std\-::vector$<$ double $>$ \& \hyperlink{classtds__element_adf1bf79b2b09a06dd6a050cbb90512ce}{origin} ()
+\item 
+\hyperlink{classtds__material}{tds\-\_\-material} \& \hyperlink{classtds__element_ac06226815fbc171b44a45ef854fe4afd}{material} ()
+\item 
+\hyperlink{classtds__node}{tds\-\_\-node} \& \hyperlink{classtds__element_a66d829f294782942cf58f6b296f0c3c7}{node} (int i)
+\item 
+void \hyperlink{classtds__element_a48384c3ca84b54177be7cd67bbc2a5d6}{node} (int i, \hyperlink{classtds__node}{tds\-\_\-node} $\ast$\-\_\-node)
+\item 
+int \hyperlink{classtds__element_ab79398ce1ba6a67ac5510e44d51b6418}{n\-\_\-nodes} ()
+\item 
+\hyperlink{classtds__element__link}{tds\-\_\-element\-\_\-link} \& \hyperlink{classtds__element_a83225c7ac9e0577fe9725945319e8783}{neighbour} (int i)
+\item 
+void \hyperlink{classtds__element_aa14cf978563685ebbf877f6f7518bcb9}{neighbour} (int i, \hyperlink{classtds__element__link}{tds\-\_\-element\-\_\-link} $\ast$\-\_\-element\-\_\-link)
+\item 
+int \hyperlink{classtds__element_ac41dd60ba9599e0277fe3438f4a2aad0}{n\-\_\-neighbours} ()
+\item 
+void \hyperlink{classtds__element_ab100134034c37c8c7f6872333cd619f5}{transfer\-\_\-contaminant} (double \-\_\-quantity)
+\item 
+void \hyperlink{classtds__element_a365817d60d2da273a512db3c8a3a1617}{set\-\_\-origin\-\_\-from\-\_\-nodes} ()
+\item 
+virtual void \hyperlink{classtds__element_a6c57194ca7f1a73a4bf24e20ba6e56d9}{update} (double delta\-\_\-t)
+\item 
+void \hyperlink{classtds__element_ae8715ae989c40f56da5fb248afd0e64d}{propogate\-\_\-into\-\_\-nodes} ()
+\item 
+void \hyperlink{classtds__element_a49f3346e369223a98e405d9dd05569ec}{calculate\-\_\-size} ()
+\item 
+void \hyperlink{classtds__element_a01868f53394f42b9e437ca6c6a435981}{debug\-\_\-contamination} ()
+\item 
+bool \hyperlink{classtds__element_a90f1602876bff04b1e3693ebde4ea0a4}{is\-\_\-linked\-\_\-to} (\hyperlink{classtds__element}{tds\-\_\-element} $\ast$\-\_\-element)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classtds__element_abcecf7331b6e9eb8901abef93626573d}{\index{tds\-\_\-element@{tds\-\_\-element}!tds\-\_\-element@{tds\-\_\-element}}
+\index{tds\-\_\-element@{tds\-\_\-element}!tds_element@{tds\-\_\-element}}
+\subsubsection[{tds\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-element\-::tds\-\_\-element (
+\begin{DoxyParamCaption}
+\item[{{\bf tds\-\_\-nodes}}]{\-\_\-nodes, }
+\item[{{\bf tds\-\_\-material} $\ast$}]{\-\_\-material, }
+\item[{double}]{\-\_\-contamination}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_abcecf7331b6e9eb8901abef93626573d}
+\hypertarget{classtds__element_aa29190be28bc10a7cc057707532bca21}{\index{tds\-\_\-element@{tds\-\_\-element}!tds\-\_\-element@{tds\-\_\-element}}
+\index{tds\-\_\-element@{tds\-\_\-element}!tds_element@{tds\-\_\-element}}
+\subsubsection[{tds\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-element\-::tds\-\_\-element (
+\begin{DoxyParamCaption}
+\item[{{\bf tds\-\_\-nodes}}]{\-\_\-nodes, }
+\item[{{\bf tds\-\_\-material} $\ast$}]{\-\_\-material, }
+\item[{std\-::vector$<$ double $>$}]{\-\_\-origin, }
+\item[{double}]{\-\_\-contamination}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_aa29190be28bc10a7cc057707532bca21}
+\hypertarget{classtds__element_acc981290ffd87bad402d32c4508dc5f4}{\index{tds\-\_\-element@{tds\-\_\-element}!tds\-\_\-element@{tds\-\_\-element}}
+\index{tds\-\_\-element@{tds\-\_\-element}!tds_element@{tds\-\_\-element}}
+\subsubsection[{tds\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-element\-::tds\-\_\-element (
+\begin{DoxyParamCaption}
+\item[{{\bf tds\-\_\-nodes}}]{\-\_\-nodes, }
+\item[{{\bf tds\-\_\-material} $\ast$}]{\-\_\-material, }
+\item[{double}]{\-\_\-origin\-\_\-x, }
+\item[{double}]{\-\_\-origin\-\_\-y, }
+\item[{double}]{\-\_\-origin\-\_\-z, }
+\item[{double}]{\-\_\-contamination}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_acc981290ffd87bad402d32c4508dc5f4}
+\hypertarget{classtds__element_a209f4917125e72c36d3285980d983892}{\index{tds\-\_\-element@{tds\-\_\-element}!$\sim$tds\-\_\-element@{$\sim$tds\-\_\-element}}
+\index{$\sim$tds\-\_\-element@{$\sim$tds\-\_\-element}!tds_element@{tds\-\_\-element}}
+\subsubsection[{$\sim$tds\-\_\-element}]{\setlength{\rightskip}{0pt plus 5cm}tds\-\_\-element\-::$\sim$tds\-\_\-element (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtds__element_a209f4917125e72c36d3285980d983892}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classtds__element_a9b3c0e1088fb7ae6da03e8fc1bf9c383}{\index{tds\-\_\-element@{tds\-\_\-element}!add\-\_\-element\-\_\-link@{add\-\_\-element\-\_\-link}}
+\index{add\-\_\-element\-\_\-link@{add\-\_\-element\-\_\-link}!tds_element@{tds\-\_\-element}}
+\subsubsection[{add\-\_\-element\-\_\-link}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::add\-\_\-element\-\_\-link (
+\begin{DoxyParamCaption}
+\item[{{\bf tds\-\_\-element\-\_\-link} $\ast$}]{new\-\_\-element\-\_\-link}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_a9b3c0e1088fb7ae6da03e8fc1bf9c383}
+\hypertarget{classtds__element_a49f3346e369223a98e405d9dd05569ec}{\index{tds\-\_\-element@{tds\-\_\-element}!calculate\-\_\-size@{calculate\-\_\-size}}
+\index{calculate\-\_\-size@{calculate\-\_\-size}!tds_element@{tds\-\_\-element}}
+\subsubsection[{calculate\-\_\-size}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::calculate\-\_\-size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_a49f3346e369223a98e405d9dd05569ec}
+\hypertarget{classtds__element_a2b3e86e827be59f63cb8d561a73d6983}{\index{tds\-\_\-element@{tds\-\_\-element}!contamination@{contamination}}
+\index{contamination@{contamination}!tds_element@{tds\-\_\-element}}
+\subsubsection[{contamination}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::contamination (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-contamination}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a2b3e86e827be59f63cb8d561a73d6983}
+\hypertarget{classtds__element_a7dcc7e1ad86d6c64368d1e6215cb662a}{\index{tds\-\_\-element@{tds\-\_\-element}!contamination@{contamination}}
+\index{contamination@{contamination}!tds_element@{tds\-\_\-element}}
+\subsubsection[{contamination}]{\setlength{\rightskip}{0pt plus 5cm}virtual double tds\-\_\-element\-::contamination (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtds__element_a7dcc7e1ad86d6c64368d1e6215cb662a}
+\hypertarget{classtds__element_a5467abfd0fc166336152a668f0f9b67e}{\index{tds\-\_\-element@{tds\-\_\-element}!contamination@{contamination}}
+\index{contamination@{contamination}!tds_element@{tds\-\_\-element}}
+\subsubsection[{contamination}]{\setlength{\rightskip}{0pt plus 5cm}virtual double tds\-\_\-element\-::contamination (
+\begin{DoxyParamCaption}
+\item[{bool}]{\-\_\-\-A\-B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classtds__element_a5467abfd0fc166336152a668f0f9b67e}
+\hypertarget{classtds__element_a01868f53394f42b9e437ca6c6a435981}{\index{tds\-\_\-element@{tds\-\_\-element}!debug\-\_\-contamination@{debug\-\_\-contamination}}
+\index{debug\-\_\-contamination@{debug\-\_\-contamination}!tds_element@{tds\-\_\-element}}
+\subsubsection[{debug\-\_\-contamination}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::debug\-\_\-contamination (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_a01868f53394f42b9e437ca6c6a435981}
+\hypertarget{classtds__element_ab8eb795822ab7e1ea47b703e4f5f473a}{\index{tds\-\_\-element@{tds\-\_\-element}!flag\-A\-B@{flag\-A\-B}}
+\index{flag\-A\-B@{flag\-A\-B}!tds_element@{tds\-\_\-element}}
+\subsubsection[{flag\-A\-B}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::flag\-A\-B (
+\begin{DoxyParamCaption}
+\item[{bool}]{\-\_\-\-A\-B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_ab8eb795822ab7e1ea47b703e4f5f473a}
+\hypertarget{classtds__element_a44d414a3db34a21320fb70f86f401734}{\index{tds\-\_\-element@{tds\-\_\-element}!flag\-A\-B@{flag\-A\-B}}
+\index{flag\-A\-B@{flag\-A\-B}!tds_element@{tds\-\_\-element}}
+\subsubsection[{flag\-A\-B}]{\setlength{\rightskip}{0pt plus 5cm}bool tds\-\_\-element\-::flag\-A\-B (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a44d414a3db34a21320fb70f86f401734}
+\hypertarget{classtds__element_a90f1602876bff04b1e3693ebde4ea0a4}{\index{tds\-\_\-element@{tds\-\_\-element}!is\-\_\-linked\-\_\-to@{is\-\_\-linked\-\_\-to}}
+\index{is\-\_\-linked\-\_\-to@{is\-\_\-linked\-\_\-to}!tds_element@{tds\-\_\-element}}
+\subsubsection[{is\-\_\-linked\-\_\-to}]{\setlength{\rightskip}{0pt plus 5cm}bool tds\-\_\-element\-::is\-\_\-linked\-\_\-to (
+\begin{DoxyParamCaption}
+\item[{{\bf tds\-\_\-element} $\ast$}]{\-\_\-element}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_a90f1602876bff04b1e3693ebde4ea0a4}
+\hypertarget{classtds__element_ac06226815fbc171b44a45ef854fe4afd}{\index{tds\-\_\-element@{tds\-\_\-element}!material@{material}}
+\index{material@{material}!tds_element@{tds\-\_\-element}}
+\subsubsection[{material}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tds\-\_\-material}\& tds\-\_\-element\-::material (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_ac06226815fbc171b44a45ef854fe4afd}
+\hypertarget{classtds__element_ac41dd60ba9599e0277fe3438f4a2aad0}{\index{tds\-\_\-element@{tds\-\_\-element}!n\-\_\-neighbours@{n\-\_\-neighbours}}
+\index{n\-\_\-neighbours@{n\-\_\-neighbours}!tds_element@{tds\-\_\-element}}
+\subsubsection[{n\-\_\-neighbours}]{\setlength{\rightskip}{0pt plus 5cm}int tds\-\_\-element\-::n\-\_\-neighbours (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_ac41dd60ba9599e0277fe3438f4a2aad0}
+\hypertarget{classtds__element_ab79398ce1ba6a67ac5510e44d51b6418}{\index{tds\-\_\-element@{tds\-\_\-element}!n\-\_\-nodes@{n\-\_\-nodes}}
+\index{n\-\_\-nodes@{n\-\_\-nodes}!tds_element@{tds\-\_\-element}}
+\subsubsection[{n\-\_\-nodes}]{\setlength{\rightskip}{0pt plus 5cm}int tds\-\_\-element\-::n\-\_\-nodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_ab79398ce1ba6a67ac5510e44d51b6418}
+\hypertarget{classtds__element_a83225c7ac9e0577fe9725945319e8783}{\index{tds\-\_\-element@{tds\-\_\-element}!neighbour@{neighbour}}
+\index{neighbour@{neighbour}!tds_element@{tds\-\_\-element}}
+\subsubsection[{neighbour}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tds\-\_\-element\-\_\-link}\& tds\-\_\-element\-::neighbour (
+\begin{DoxyParamCaption}
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a83225c7ac9e0577fe9725945319e8783}
+\hypertarget{classtds__element_aa14cf978563685ebbf877f6f7518bcb9}{\index{tds\-\_\-element@{tds\-\_\-element}!neighbour@{neighbour}}
+\index{neighbour@{neighbour}!tds_element@{tds\-\_\-element}}
+\subsubsection[{neighbour}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::neighbour (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{{\bf tds\-\_\-element\-\_\-link} $\ast$}]{\-\_\-element\-\_\-link}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_aa14cf978563685ebbf877f6f7518bcb9}
+\hypertarget{classtds__element_a66d829f294782942cf58f6b296f0c3c7}{\index{tds\-\_\-element@{tds\-\_\-element}!node@{node}}
+\index{node@{node}!tds_element@{tds\-\_\-element}}
+\subsubsection[{node}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tds\-\_\-node}\& tds\-\_\-element\-::node (
+\begin{DoxyParamCaption}
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a66d829f294782942cf58f6b296f0c3c7}
+\hypertarget{classtds__element_a48384c3ca84b54177be7cd67bbc2a5d6}{\index{tds\-\_\-element@{tds\-\_\-element}!node@{node}}
+\index{node@{node}!tds_element@{tds\-\_\-element}}
+\subsubsection[{node}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::node (
+\begin{DoxyParamCaption}
+\item[{int}]{i, }
+\item[{{\bf tds\-\_\-node} $\ast$}]{\-\_\-node}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a48384c3ca84b54177be7cd67bbc2a5d6}
+\hypertarget{classtds__element_ae2355a832ead2e50c17a8782ad8d1496}{\index{tds\-\_\-element@{tds\-\_\-element}!origin@{origin}}
+\index{origin@{origin}!tds_element@{tds\-\_\-element}}
+\subsubsection[{origin}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::origin (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-x, }
+\item[{double}]{\-\_\-y, }
+\item[{double}]{\-\_\-z}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_ae2355a832ead2e50c17a8782ad8d1496}
+\hypertarget{classtds__element_a737aecedf7dbb0016d0863878f36ca95}{\index{tds\-\_\-element@{tds\-\_\-element}!origin@{origin}}
+\index{origin@{origin}!tds_element@{tds\-\_\-element}}
+\subsubsection[{origin}]{\setlength{\rightskip}{0pt plus 5cm}double tds\-\_\-element\-::origin (
+\begin{DoxyParamCaption}
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a737aecedf7dbb0016d0863878f36ca95}
+\hypertarget{classtds__element_adf1bf79b2b09a06dd6a050cbb90512ce}{\index{tds\-\_\-element@{tds\-\_\-element}!origin@{origin}}
+\index{origin@{origin}!tds_element@{tds\-\_\-element}}
+\subsubsection[{origin}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$double$>$\& tds\-\_\-element\-::origin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_adf1bf79b2b09a06dd6a050cbb90512ce}
+\hypertarget{classtds__element_ae8715ae989c40f56da5fb248afd0e64d}{\index{tds\-\_\-element@{tds\-\_\-element}!propogate\-\_\-into\-\_\-nodes@{propogate\-\_\-into\-\_\-nodes}}
+\index{propogate\-\_\-into\-\_\-nodes@{propogate\-\_\-into\-\_\-nodes}!tds_element@{tds\-\_\-element}}
+\subsubsection[{propogate\-\_\-into\-\_\-nodes}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::propogate\-\_\-into\-\_\-nodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_ae8715ae989c40f56da5fb248afd0e64d}
+\hypertarget{classtds__element_a365817d60d2da273a512db3c8a3a1617}{\index{tds\-\_\-element@{tds\-\_\-element}!set\-\_\-origin\-\_\-from\-\_\-nodes@{set\-\_\-origin\-\_\-from\-\_\-nodes}}
+\index{set\-\_\-origin\-\_\-from\-\_\-nodes@{set\-\_\-origin\-\_\-from\-\_\-nodes}!tds_element@{tds\-\_\-element}}
+\subsubsection[{set\-\_\-origin\-\_\-from\-\_\-nodes}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::set\-\_\-origin\-\_\-from\-\_\-nodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_a365817d60d2da273a512db3c8a3a1617}
+\hypertarget{classtds__element_adb36fa3ae80584e3a4fe12cfdedf6db6}{\index{tds\-\_\-element@{tds\-\_\-element}!size@{size}}
+\index{size@{size}!tds_element@{tds\-\_\-element}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::size (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-size}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_adb36fa3ae80584e3a4fe12cfdedf6db6}
+\hypertarget{classtds__element_a670d658914fce47e7312a170634c47ea}{\index{tds\-\_\-element@{tds\-\_\-element}!size@{size}}
+\index{size@{size}!tds_element@{tds\-\_\-element}}
+\subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}double tds\-\_\-element\-::size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classtds__element_a670d658914fce47e7312a170634c47ea}
+\hypertarget{classtds__element_ab100134034c37c8c7f6872333cd619f5}{\index{tds\-\_\-element@{tds\-\_\-element}!transfer\-\_\-contaminant@{transfer\-\_\-contaminant}}
+\index{transfer\-\_\-contaminant@{transfer\-\_\-contaminant}!tds_element@{tds\-\_\-element}}
+\subsubsection[{transfer\-\_\-contaminant}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::transfer\-\_\-contaminant (
+\begin{DoxyParamCaption}
+\item[{double}]{\-\_\-quantity}
+\end{DoxyParamCaption}
+)}}\label{classtds__element_ab100134034c37c8c7f6872333cd619f5}
+\hypertarget{classtds__element_a6c57194ca7f1a73a4bf24e20ba6e56d9}{\index{tds\-\_\-element@{tds\-\_\-element}!update@{update}}
+\index{update@{update}!tds_element@{tds\-\_\-element}}
+\subsubsection[{update}]{\setlength{\rightskip}{0pt plus 5cm}void tds\-\_\-element\-::update (
+\begin{DoxyParamCaption}
+\item[{double}]{delta\-\_\-t}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classtds__element_a6c57194ca7f1a73a4bf24e20ba6e56d9}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tds__parts_8hh}{tds\-\_\-parts.\-hh}\item 
+\hyperlink{tds__parts_8cc}{tds\-\_\-parts.\-cc}\end{DoxyCompactItemize}
