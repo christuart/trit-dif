@@ -1,5 +1,11 @@
 #ifndef IDENTIFIERS_HH
 #define IDENTIFIERS_HH
+class tds_material;
+class tds_section;
+class tds_node;
+class tds_element;
+class tds_element_link;
+
 struct material_identifier {
 	int material_id;
 	tds_material* material;

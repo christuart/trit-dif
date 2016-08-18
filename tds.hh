@@ -1,6 +1,10 @@
 #ifndef TDS_HH
 #define TDS_HH
 
+namespace std { class type_info; }
+#include <typeinfo>
+#include <exception>
+
 #include <list>
 #include <iostream>
 #include "utilities.hh"

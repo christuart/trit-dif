@@ -3,17 +3,21 @@
 #include "plugins.hh"
 
 class Outgassing : public IPlugin {
+	
+private:
+	tds_material* outgassing_material_;
+	std::vector<double> outgassing_totals;
+	std::vector<tds_section*> outgassing_sections; // contains all the outgassing sections found
+	std::map<int,tds_section*> labelled_outgassing_sections; // contains only the outgassing sections labelled with numbers
+
+	bool outgassing_section_found;
+	
 public:
 	inline plugin plugin_identifier() { return POutgassing; }
 	void load_plugin();
-	void interrupt_material_creation(material_identifier& _new_material);
 	void interrupt_section_creation(section_identifier& _new_section);
-	void interrupt_node_creation(node_identifier& _new_node);
-	void interrupt_element_creation(element_identifier& _new_element);
 	void interrupt_element_link_creation(element_link_identifier& _new_element_link);
 	void interrupt_pre_simulation();
-	void interrupt_start_step(int _step, double);
-	void interrupt_end_step(int _step, double);
 	void interrupt_post_simulation();
 };
 

@@ -248,7 +248,7 @@ tds_material::~tds_material() {
 
 
 
-tds_section::tds_section(tds_material* _material):elements_(),material_(_material) {	
+tds_section::tds_section(std::string _name, tds_material* _material):elements_(),name_(_name),material_(_material) {	
 }
 
 tds_section::~tds_section() {

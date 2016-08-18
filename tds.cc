@@ -469,6 +469,12 @@ void tds_run::initialise() {
 				std::cerr << "Invalid line, skipping. (section)\n";
 				continue;
 			}
+			{
+				std::string _extra;
+				while (iss >> _extra) {
+					_name += " " + _extra;
+				}
+			}
 
 			//std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
 		
@@ -481,7 +487,7 @@ void tds_run::initialise() {
 				continue;
 			}
 			std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
-			tds_section* _s = new tds_section(&material(_name));
+			tds_section* _s = new tds_section(_name, &material(_name));
 			section_identifier _s_id;
 			_s_id.section_id = add_section(_s);
 			_s_id.section = _s;

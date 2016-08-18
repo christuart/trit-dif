@@ -5,8 +5,8 @@ FLTKINC = $(shell fltk-config --cxxflags)
 FLTKLIB = $(shell fltk-config --libs --ldflags)
 CPPFLAGS += $(ROOTINC)
 CPPFLAGS +=$(FLTKINC)
-PACKAGE = AH_viewer_gui
-VERSION = 0.3
+PACKAGE = christuart_trit_diff
+VERSION = 0.1
 DATE := $(shell date +%y%m%d-%H%:%M)
 DEFS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" -DDATE=\"$(DATE)\"
 CPPFLAGS += $(DEFS)
@@ -15,7 +15,7 @@ guiinc:= -I/usr/include
 #guilibs:= -L/usr/lib -lfltk -lfltk_images
 x11libs:= -L/usr/X11R6/lib -lX11 -lXext
 
-raVen:
+default:
 	g++ -c -O3 -Wno-deprecated -std=c++0x -m32 -g \
 	-I/usr/include \
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
@@ -44,3 +44,7 @@ clean:
 	rm -f *.o trit-dif
 rm:
 	rm *.txt *.root
+
+docs:
+	~/.local/bin/cldoc generate -O3 -Wno-deprecated -std=c++0x -m32 -g $(CPPFLAGS) $(guiinc) -- --output docstest/ *.hh
+

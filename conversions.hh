@@ -1,6 +1,8 @@
 #ifndef CONVERSION_HH
 #define CONVERSION_HH
 
+namespace std { class type_info; }
+
 #include <map>
 #include <string>
 #include <fstream>

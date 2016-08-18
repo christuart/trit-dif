@@ -133,19 +133,22 @@ public:
 class tds_section {
 public: 
 private:
+	std::string name_;
 	tds_elements elements_;
 	tds_material* material_;
 protected:
 public:
-	tds_section(tds_material* _material);
+	tds_section(std::string _name, tds_material* _material);
 	virtual ~tds_section();
 	//adders
 	int add_element(tds_element* new_element);
 	//cleaners
 	void clean_elements();
 	//setters
+	inline void name(std::string _name) { name_ = _name; }
 	inline void material(tds_material* _material) { material_ = _material; }
 	//getters
+	inline std::string name() { return name_; }
 	inline tds_material& material() { return *material_; }
 	inline tds_element& element(int i) { return *elements_[i]; }
 	inline void element(int i, tds_element* _new_element) { elements_[i] = _new_element; }
