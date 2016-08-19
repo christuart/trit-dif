@@ -94,6 +94,7 @@ double Outgassing::get_total_outgassed_from_section(tds_section* _outgassed_sect
 	return outgassed_quantities_by_section.at(_outgassed_section);
 }
 void Outgassing::summarise_outgassing() {
+	std::cout << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
 	std::cout << "***" << std::endl;
@@ -118,6 +119,8 @@ void Outgassing::summarise_outgassing() {
 	std::cout << "***  Total quantity outgassed: " << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
+	std::cout << "***" << std::endl;
+	std::cout << std::endl;
 }
 
 tds_outgassing_element_link::tds_outgassing_element_link(tds_element* _M, tds_element* _N, tds_section* _outgassing_section, bool _M_is_outgassing):tds_element_link(_M,_N),outgassing_section_(_outgassing_section) {

@@ -216,6 +216,7 @@ int main(int nArg, char** vArg){
 
 void show_preamble() {
 	
+	std::cout << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
 	std::cout << "***" << std::endl;
@@ -228,6 +229,7 @@ void show_preamble() {
 	std::cout << "***  http://github.com/christuart/trit-dif/" << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
+	std::cout << "***" << std::endl;
 	std::cout << std::endl;
 
 }
