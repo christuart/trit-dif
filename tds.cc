@@ -444,10 +444,10 @@ void tds_run::initialise() {
 	}
 	// we'll add an error material for when a bad name is given
 	// and source/outgassings materials for the regions which will
-	// behave in a special manner!
+	// behave in a special manner. UPDATE: these last two are
+	// being moved to the plug-ins which will use them.
 	add_material(new tds_material("error", 1.0, 0.0));
 	add_material(new tds_material("source", 1.0, 0.0));
-	add_material(new tds_material("outgassing", 1.0, 0.0));
 	
 	//Now we've got materials, let's get the physical sections which use them
 	if (std::getline(sectionsfile_, line)) {
@@ -741,6 +741,11 @@ void tds_run::initialise() {
 									                                                  &(section(s).element(i).node(j).element(k)));
 									element_link_count++;
 									// std::cout << "Made link" << std::endl;
+									element_link_identifier _el_id;
+									_el_id.element_link = new_link;
+									interrupt_element_link(_el_id);
+									// Reread pointer in case changed by interruption:
+									new_link = _el_id.element_link;
 									section(s).element(i).add_element_link(new_link);
 									section(s).element(i).node(j).element(k).add_element_link(new_link);
 								}									

@@ -8,6 +8,8 @@ void Outgassing::load_plugin() {
 	IPlugin::get_run()->add_start_step_interrupt(this);
 	IPlugin::get_run()->add_end_step_interrupt(this);
 	IPlugin::get_run()->add_post_simulation_interrupt(this);
+	outgassing_material = new tds_material("outgassing", 1.0, 0.0);
+	IPlugin::get_run()->add_material(outgassing_material);
 }
 void Outgassing::interrupt_section_creation(section_identifier& _new_section) {
 	std::cout << "Outgassing was given the opportunity to interrupt the creation of section '"
@@ -23,6 +25,7 @@ void Outgassing::interrupt_section_creation(section_identifier& _new_section) {
 		_new_section.section->material(&(get_run()->material("outgassing")));
 		outgassing_section_found = true;
 		outgassing_sections.push_back(_new_section.section);
+		outgassed_quantities_by_section[_new_section.section] = 0.0f;
 		std::string name_body;
 		if (iss >> name_body) {
 			iss.clear();
@@ -65,23 +68,83 @@ void Outgassing::interrupt_element_link_creation(element_link_identifier& _new_e
 			                                                false
 			          );
 		IPlugin::replace_element_link(_new_element_link, replacement_link);
-		
 	}
 }
 void Outgassing::interrupt_pre_simulation() {
 	// Outgassing needs to verify that there were some outgassing sections found.
+	if (!outgassing_section_found) {
+		std::cerr << "No outgassing sections were found. If outgassing is not required, please disable the outgassing plug-in." << std::endl;
+		throw;
+	}
 }
 void Outgassing::interrupt_post_simulation() {
-	std::cout << "Post-simulation Outgassing plug-in can interrupt." << std::endl;
+	summarise_outgassing();
+}
+
+bool Outgassing::is_outgassing_section(tds_section* _outgassing_section) {
+	return (std::find(outgassing_sections.begin(), outgassing_sections.end(), _outgassing_section) != outgassing_sections.end());
+}
+void Outgassing::store_outgassing_quantity(tds_section* _outgassing_section, double _outgassed_quantity) {
+	outgassed_quantities_by_section[_outgassing_section] += _outgassed_quantity;
+}
+double Outgassing::get_total_outgassed_from_section(tds_section* _outgassed_section) {
+	if (!is_outgassing_section(_outgassed_section)) {
+		return 0.0f;
+	}
+	return outgassed_quantities_by_section.at(_outgassed_section);
+}
+void Outgassing::summarise_outgassing() {
+	std::cout << "***" << std::endl;
+	std::cout << "************************************************************" << std::endl;
+	std::cout << "***" << std::endl;
+	std::cout << "***  Outgassing Output" << std::endl;
+	std::cout << "***" << std::endl;
+	// First, go through the numbered sections
+	typedef std::map<int,tds_section*>::iterator los_it_type;
+	for(los_it_type it = labelled_outgassing_sections.begin(); it != labelled_outgassing_sections.end(); it++) {
+		std::ostringstream oss;
+		oss << "outgassing section " << it->first;
+		std::cout << "***  Total released from " << std::right << std::setw(22) << oss.str() << ": " << std::setw(12) << get_total_outgassed_from_section(it->second) << std:: endl;
+		// iterator->first = key
+		// iterator->second = value
+		// Repeat if you also want to iterate through the second map.
+	}
+	std::cout << "***" << std::endl;
+	// Then, go through the unnumbered sections
+	std::cout << "***  Total from unnumbered sections: " << std::endl;
+
+	std::cout << "***" << std::endl;
+	// Then show total
+	std::cout << "***  Total quantity outgassed: " << std::endl;
+	std::cout << "***" << std::endl;
+	std::cout << "************************************************************" << std::endl;
 }
 
 tds_outgassing_element_link::tds_outgassing_element_link(tds_element* _M, tds_element* _N, tds_section* _outgassing_section, bool _M_is_outgassing):tds_element_link(_M,_N),outgassing_section_(_outgassing_section) {
 	_M_is_outgassing ? outgassing_element_ = _M : outgassing_element_ = _N;
+	outgassing_plugin_ = dynamic_cast<Outgassing*>(IPlugin::get_plugin(POutgassing));
 }
 tds_outgassing_element_link::~tds_outgassing_element_link() {};
 
+/// Stores locally and globally the outgassing of a given quantity (not a flow rate!)
+/** This method is usually called by the derived <flow_rate> method, which will find the flow rate
+    and multiply it by <tds_run::delta_t>. It adds the quantity to both a local (for this element
+    link) outgassing tracker and a global (in the <Outgassing> object) tracker for this outgassing
+    section
+*/
+void tds_outgassing_element_link::outgass_quantity(double _outgassing_quantity) {
+	outgassed_quantity_ += _outgassing_quantity;
+	outgassing_plugin().store_outgassing_quantity(outgassing_section_pointer(),_outgassing_quantity);
+}
 double tds_outgassing_element_link::flow_rate(bool _AB) {
-	return 0.0f;
+	// Make sure to only ever store the outgassing quantity when the
+	// flag changes, i.e. once per timestep - per element.
+	if (_AB != flagAB()) {
+		flow_rate_ = 1e-10; // placeholder for calculating flow rate
+		outgass_quantity(flow_rate_ * IPlugin::get_run()->delta_t());
+		flagAB(_AB);
+	}
+	return flow_rate_;
 }
 short tds_outgassing_element_link::positive_flow(tds_element* whoami) {
 	if (whoami != outgassing_element_) {
