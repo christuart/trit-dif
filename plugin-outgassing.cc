@@ -78,6 +78,7 @@ void Outgassing::interrupt_post_simulation() {
 tds_outgassing_element_link::tds_outgassing_element_link(tds_element* _M, tds_element* _N, tds_section* _outgassing_section, bool _M_is_outgassing):tds_element_link(_M,_N),outgassing_section_(_outgassing_section) {
 	_M_is_outgassing ? outgassing_element_ = _M : outgassing_element_ = _N;
 }
+tds_outgassing_element_link::~tds_outgassing_element_link() {};
 
 double tds_outgassing_element_link::flow_rate(bool _AB) {
 	return 0.0f;
