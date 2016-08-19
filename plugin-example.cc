@@ -18,7 +18,7 @@ void Example::interrupt_material_creation(material_identifier& _new_material) {
 }
 void Example::interrupt_section_creation(section_identifier& _new_section) {
 	std::cout << "Example Plug-In was given the opportunity to interrupt the creation of section '"
-	          << IPlugin::get_run()->section(_new_section.section_id).material().name() << "'." << std::endl; 
+	          << IPlugin::get_run()->section(_new_section.section_id).name() << "'." << std::endl; 
 }
 void Example::interrupt_node_creation(node_identifier& _new_node) {
 	std::cout << "Example Plug-In was given the opportunity to interrupt the creation of node '"

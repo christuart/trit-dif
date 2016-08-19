@@ -486,7 +486,7 @@ void tds_run::initialise() {
 				std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
 				continue;
 			}
-			std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
+			// std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
 			tds_section* _s = new tds_section(_name, &material(_name));
 			section_identifier _s_id;
 			_s_id.section_id = add_section(_s);
@@ -574,7 +574,7 @@ void tds_run::initialise() {
 				//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
 				_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
 			}
-			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1).material()),0.0);
+			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1)),0.0);
 			element_identifier _e_id;
 			_e_id.element_id = add_element(new_element);
 			_e_id.section_id = section_id-1;

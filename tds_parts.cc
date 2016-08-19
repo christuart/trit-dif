@@ -1,5 +1,9 @@
 #include "tds_parts.hh"
 
+tds_part::tds_part() {}
+tds_part::~tds_part() {}
+bool tds_part::is_base() { return true; }
+
 
 
 
@@ -57,23 +61,26 @@ void tds_node::remove_last_element() {
 
 
 
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, double _contamination):nodes_(_nodes),material_(_material),contaminationA_(_contamination),contaminationB_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_section* _section, double _contamination):nodes_(_nodes),section_(_section),contaminationA_(_contamination),contaminationB_(_contamination) {
 	// no specific centre point has been provided, so use COM for the element type
 	// e.g. triangular element r_COM = r_A + (2/3) * (r_AB + 0.5 * r_BC)
 	origin_.reserve(3);
 	set_origin_from_nodes();
 	calculate_size();
+	material_ = &(_section->material());
 	flagAB(false);
 }
 
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, std::vector<double> _origin, double _contamination):nodes_(_nodes),material_(_material),origin_(_origin),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_section* _section, std::vector<double> _origin, double _contamination):nodes_(_nodes),section_(_section),origin_(_origin),contaminationA_(_contamination) {
 	calculate_size();
+	material_ = &(_section->material());
 	flagAB(false);
 }
-tds_element::tds_element(tds_nodes _nodes, tds_material* _material, double _origin_x, double _origin_y, double _origin_z, double _contamination):nodes_(_nodes),contaminationA_(_contamination) {
+tds_element::tds_element(tds_nodes _nodes, tds_section* _section, double _origin_x, double _origin_y, double _origin_z, double _contamination):nodes_(_nodes),contaminationA_(_contamination) {
 	origin_.reserve(3);
 	origin(_origin_x, _origin_y, _origin_z);
 	calculate_size();
+	material_ = &(_section->material());
 	flagAB(false);
 }
 
@@ -369,6 +376,13 @@ double tds_element_link::flow_rate(bool _AB) {
 		flagAB(_AB);
 	}
 	return flow_rate_;
+}
+short tds_element_link::positive_flow(tds_element* whoami) {
+	if (elementM_ == whoami) {
+		return 1;
+	} else {
+		return -1;
+	}
 }
 double tds_element_link::diffusion_constant() {
 	double D1 = elementM().material().diffusion_constant();

@@ -3,6 +3,7 @@
 
 #include "vector_ops.hh"
 
+class tds_part;
 class tds_node;
 class tds_element;
 class tds_material;
@@ -15,7 +16,14 @@ typedef std::vector<tds_element*> tds_elements;
 typedef std::vector<tds_node*> tds_nodes;
 typedef std::vector<tds_element_link*> tds_links;
 
-class tds_node {
+class tds_part {
+public:
+	tds_part();
+	virtual ~tds_part();
+	virtual bool is_base();
+};
+
+class tds_node : public tds_part {
 public:
 private:
 	std::vector<double> position_;
@@ -27,7 +35,7 @@ protected:
 public:
 	tds_node(double _x, double _y, double _z);
 	tds_node(std::vector<double> _position);
-	~tds_node();
+	virtual ~tds_node();
 	//adders
 	void add_element(tds_element* new_element);
 	//setters
@@ -44,21 +52,22 @@ public:
 	void remove_last_element();
 };
 
-class tds_element {
+class tds_element : public tds_part {
 public:
 private:
 	// size_ may be a length, area or volume depending on what dimension mode we are in
 	double size_,contaminationA_,contaminationB_;
 	bool flagAB_;
+	tds_section* section_;
 	tds_material* material_;
 	tds_nodes nodes_;
 	tds_links neighbours_;
 	std::vector<double> origin_;
 protected:
 public:
-	tds_element(tds_nodes _nodes, tds_material* _material, double _contamination);
-	tds_element(tds_nodes _nodes, tds_material* _material, std::vector<double> _origin, double _contamination);
-	tds_element(tds_nodes _nodes, tds_material* _material, double _origin_x, double _origin_y, double _origin_z, double _contamination);
+	tds_element(tds_nodes _nodes, tds_section* _section, double _contamination);
+	tds_element(tds_nodes _nodes, tds_section* _section, std::vector<double> _origin, double _contamination);
+	tds_element(tds_nodes _nodes, tds_section* _section, double _origin_x, double _origin_y, double _origin_z, double _contamination);
 	virtual ~tds_element();
 	//adders
 	void add_element_link(tds_element_link* new_element_link);
@@ -68,6 +77,7 @@ public:
 	inline void contamination(double _contamination) { if(flagAB()) contaminationA_=_contamination; else contaminationB_=_contamination;}
 	inline void origin(double _x, double _y, double _z) { origin_.clear(); origin_.push_back(_x);
 		                                           origin_.push_back(_y); origin_.push_back(_z);  }
+	inline void section(tds_section* _section) { section_=_section; }
 	//getters
 	inline bool flagAB() { return flagAB_; }
 	inline double size() { return size_; }
@@ -75,6 +85,7 @@ public:
 	virtual inline double contamination(bool _AB) { if (_AB) return contaminationB_; else return contaminationA_; }
 	inline double origin(int i) { return origin_[i]; }
 	inline std::vector<double>& origin() { return origin_; }
+	inline tds_section& section() { return *section_; }
 	inline tds_material& material() { return *material_; }
 	inline tds_node& node(int i) { return *nodes_[i]; }
 	inline void node(int i, tds_node* _node) { nodes_[i] = _node; }
@@ -108,7 +119,7 @@ public:
 	bool is_linked_to(tds_element* _element);
 };
 
-class tds_material {
+class tds_material : public tds_part {
 public:
 private:
 	std::string material_name_, material_density_unit_, material_diffusion_constant_unit_;
@@ -130,7 +141,7 @@ public:
 	inline std::string name() { return material_name_; }
 	inline bool is_source() { return material_name_=="source"; }
 };
-class tds_section {
+class tds_section : public tds_part {
 public: 
 private:
 	std::string name_;
@@ -161,9 +172,10 @@ public:
 // you halve the number of link instances, but need to check whether the updating element is
 // stored as M or N with the method "bool positive_flow(tds_element* whoami);"
 
-class tds_element_link {
+class tds_element_link : public tds_part {
 public:
 private:
+protected:
 	tds_element *elementM_, *elementN_; // note that each pointer needs its own asterisk!
 	tds_nodes shared_nodes_;
 	std::vector<double> norm_vector_, flux_vector_;
@@ -209,7 +221,7 @@ public:
 	virtual double flow_rate(bool _AB); // virtual: may well want to do some kind of convection-analogue at the surfaces or something
 	inline bool flagAB() { return flagAB_; }
 	// positive flow is defined as from N to M, so M's contamination rises
-	inline short positive_flow(tds_element* whoami) { if (elementM_ == whoami) return 1; else return -1; }
+	virtual short positive_flow(tds_element* whoami);
 	inline tds_element* element(bool m_or_n) { if (m_or_n) return elementN_; else return elementM_; }
 	inline tds_element* neighbour_of(tds_element* whoami) { if (elementM_ == whoami) return elementN_; else return elementM_; }
 	

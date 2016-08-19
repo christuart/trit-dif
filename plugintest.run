@@ -16,4 +16,4 @@ contamination 			1 au
 tracking-mode			all
 track				5
 activate-plugin			defaults
-activate-plugin			example
+activate-plugin			outgassing
