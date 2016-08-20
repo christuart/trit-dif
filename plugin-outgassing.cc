@@ -94,6 +94,10 @@ double Outgassing::get_total_outgassed_from_section(tds_section* _outgassed_sect
 	return outgassed_quantities_by_section.at(_outgassed_section);
 }
 void Outgassing::summarise_outgassing() {
+        
+        double unlabelled_sum = 0.0f;
+        double total_sum = 0.0f;
+        
 	std::cout << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
@@ -103,24 +107,34 @@ void Outgassing::summarise_outgassing() {
 	// First, go through the numbered sections
 	typedef std::map<int,tds_section*>::iterator los_it_type;
 	for(los_it_type it = labelled_outgassing_sections.begin(); it != labelled_outgassing_sections.end(); it++) {
+                total_sum += get_total_outgassed_from_section(it->second);
 		std::ostringstream oss;
 		oss << "outgassing section " << it->first;
 		std::cout << "***  Total released from " << std::right << std::setw(22) << oss.str() << ": " << std::setw(12) << get_total_outgassed_from_section(it->second) << std:: endl;
 		// iterator->first = key
 		// iterator->second = value
-		// Repeat if you also want to iterate through the second map.
 	}
 	std::cout << "***" << std::endl;
 	// Then, go through the unnumbered sections
-	std::cout << "***  Total from unnumbered sections: " << std::endl;
-
+	typedef std::vector<tds_section*>::iterator uos_it_type;
+	for(uos_it_type it = outgassing_sections.begin(); it != outgassing_sections.end(); it++) {
+                unlabelled_sum += get_total_outgassed_from_section((*it));
+	}
+        {
+                total_sum += unlabelled_sum;
+		std::ostringstream oss;
+		oss << "unlabelled sections";
+		std::cout << "***  Total released from " << std::right << std::setw(22) << oss.str() << ": " << std::setw(12) << unlabelled_sum << std:: endl;
+        }
+        
 	std::cout << "***" << std::endl;
 	// Then show total
-	std::cout << "***  Total quantity outgassed: " << std::endl;
+	std::cout << "***  Total quantity outgassed: " << std::setw(12) << total_sum << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "************************************************************" << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << std::endl;
+
 }
 
 tds_outgassing_element_link::tds_outgassing_element_link(tds_element* _M, tds_element* _N, tds_section* _outgassing_section, bool _M_is_outgassing):tds_element_link(_M,_N),outgassing_section_(_outgassing_section) {
