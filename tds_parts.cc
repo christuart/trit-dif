@@ -195,9 +195,22 @@ void tds_element::calculate_size() {
 		break;
 	case 4:
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF QUADRANGLES OR TETRAHEDRA YET!" << std::endl;
+		// for quadrangles, use this: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
+		// (link from http://stackoverflow.com/a/717367)
+		// look at the 3-D polygon area using projection onto 2D - really clever!
+		throw;
+		break;
+	case 5:
+		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF PYRAMIDAL ELEMENTS YET!" << std::endl;
+		// This will involve a 1/3 * base * height method
+		// The most difficult part will be identifying the base nodes vs point node
+		// This will be done by checking parallelism WHICH mustn't be too sensitive
+		// floating point error!
+		throw;
 		break;
 	default:
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF THIS ELEMENT SHAPE YET!" << std::endl;
+		throw;
 	}
 }
 void tds_element::debug_contamination() {

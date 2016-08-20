@@ -72,6 +72,7 @@ public:
 	void clean_materials();
 	void clean_nodes();
 	void clean_elements();
+	void clean_inactive_elements();
 	
 	//setters
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }
