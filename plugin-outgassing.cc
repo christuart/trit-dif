@@ -157,9 +157,23 @@ double tds_outgassing_element_link::flow_rate(bool _AB) {
 	// Make sure to only ever store the outgassing quantity when the
 	// flag changes, i.e. once per timestep - per element.
 	if (_AB != flagAB()) {
-		flow_rate_ = 1e-10; // placeholder for calculating flow rate
-		outgass_quantity(flow_rate_ * IPlugin::get_run()->delta_t());
+
+                // Here we will use a worst-case scenario, with the maximal amount of
+                // outgassing possible: all the contaminant in the external elements
+                double total_outgassable_quantity
+                        = (elementN().contamination(_AB) - elementM().contamination(_AB))
+                        * ((&elementM() != outgassing_element_) ? elementM().size() : elementN().size());
+                // This calculation works on the basis of the outgassing element having
+                // contamination of zero, so N.cont() - M.cont() will equal either
+                // N.cont() or -M.cont(), with the sign matching what is needed for a
+                // flow_rate() return value.
+                
+                flow_rate_ = total_outgassable_quantity / IPlugin::get_run()->delta_t();
+                
+                // make sure to store the correct direction of outgassing being positive!
+		outgass_quantity(fabs(total_outgassable_quantity));
 		flagAB(_AB);
+                
 	}
 	return flow_rate_;
 }

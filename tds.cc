@@ -250,12 +250,19 @@ void tds_run::make_analysis() {
 	uint64 start_checkmark = GetTimeMs64();
 	uint64 last_checkmark = start_checkmark;
 	
-	int reporting_interval = ceil(steps()/100);
+	int reporting_interval = ceil(steps()/100.0f);
 	reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
 	// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
 	// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
 	// there should be no problem.
 	
+        // std::cout << "rasegaerhershsdtyui" << std::endl;
+        // std::cout << steps() << std::endl;
+        // std::cout << reporting_interval << std::endl;
+        // std::cout << reporting_interval << std::endl;
+        // std::cout << (1) % reporting_interval<< std::endl;
+        // std::cout << "ok" << std::endl;
+                
 	for (int step = 0; step < steps(); ++step) {
 		
 		// Every step we need to:
