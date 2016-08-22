@@ -53,10 +53,10 @@ double dot(const std::vector<double>& u, const std::vector<double>& v) {
 }
 std::vector<double> cross(const std::vector<double>& u, const std::vector<double>& v) {
 	std::vector<double> w;
-	w.reserve(3);
-	for (int i = 0; i < u.size() && i < v.size(); i++) {
-		
-	}
+	w.resize(3);
+	w.at(0) = u.at(1) * v.at(2) - u.at(2) * v.at(1);
+	w.at(1) = u.at(2) * v.at(0) - u.at(0) * v.at(2);
+	w.at(2) = u.at(0) * v.at(1) - u.at(1) * v.at(0);
 	return w;
 }
 double magnitude(std::vector<double>& u) {
@@ -70,4 +70,10 @@ double magnitude(std::vector<double>& u) {
 void normalise(std::vector<double>& u) {
 	double m = magnitude(u);
 	u *= (1/m);
+}
+
+ordering4 make_order(int _p1, int _p2, int _p3, int _p4) {
+	ordering4 o;
+	o.p1 = _p1; o.p2 = _p2; o.p3 = _p3; o.p4 = _p4;
+	return o;
 }

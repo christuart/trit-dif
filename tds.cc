@@ -69,10 +69,17 @@ void tds::clean_inactive_elements() {
 		// and need to access 5 using index 3, not index 5.
 		// So whilst looking for how many to delete, i doesn't change,
 		// and j does.
-		while (element(j).n_neighbours() == 0 && j < elements_.size())
+		// std::cout << i << std::flush;
+		while (j < elements_.size() && element(j).n_neighbours() == 0) {
 			++j;
-		if (j > i)
+			// std::cout << ", " << j << std::flush;
+		}
+		if (j > i) {
+			// std::cout << " bad " << std::flush;
 			elements_.erase(elements_.begin()+i,elements_.begin()+j); // start inclusive end exclusive
+		} else {
+			// std::cout << " good " << std::flush;
+		}
 	}
 }
 void tds::expected_materials(int _n) { materials_.reserve(_n); }
@@ -148,7 +155,6 @@ void tds::register_element_type(int element_type) {
 	case 6: // 6 node prism
 	case 7: // 5 node pyramid
 		element_dimensions_.set(three_d);
-		std::cerr << "Detected 3-D stuff. This hasn't necessarily been programmed for yet." << std::endl;
 		break;
 	case 15: // 1 node point
 		std::cerr << "Detected a single node point 'element' :/" << std::endl;
@@ -205,7 +211,14 @@ tds_run::~tds_run(){
 // }
 
 void tds_run::make_analysis() {
-
+	
+	std::cout << std::endl;
+	std::cout << "Checking the model..." << std::endl;
+	if ((n_sections() == 0) || (n_elements() == 0) || (n_nodes() == 0)) {
+		std::cerr << "Model is incomplete. Simulation cancelled!" << std::endl;
+		throw;
+	}
+	
 	std::cout << "Running the model..." << std::endl;
 
 	// This is a very basic implementation of 'make_analysis' which has constant
@@ -256,6 +269,7 @@ void tds_run::make_analysis() {
 	trackingfile_.open(tracking_file_address());
 	trackingfile_ << "element, time, contamination" << std::endl;
 	trackingfile_ << std::scientific;
+	std::cout << tracked_elements()->size() << std::flush;
 	for (int i=0; i < tracked_elements()->size(); ++i)
 		trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
 
@@ -268,6 +282,7 @@ void tds_run::make_analysis() {
 	uint64 last_checkmark = start_checkmark;
 	
 	int reporting_interval = ceil(steps()/100.0f);
+	std::cout << "*" << std::flush;
 	reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
 	// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
 	// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
@@ -655,9 +670,9 @@ void tds_run::initialise() {
 						//           << o << " more elements." << std::endl;
 						for (int k=o; k > 0; k--) {
 							if (section(s).element(i).node(j).element(k-1).material().is_source()) {
-								//std::cout << "No need to give a link from source to source, skipping." << std::endl;
+								// std::cout << "No need to give a link from source to source, skipping." << std::endl;
 							} else if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
-								//std::cout << "Skipping - don't need to link to self!" << std::endl;
+								// std::cout << "Skipping - don't need to link to self!" << std::endl;
 							} else {
 								// std::cout << "Making link from " << &section(s).element(i) << " to "
 								//           << &(section(s).element(i).node(j).element(k-1)) << std::endl;
@@ -790,13 +805,13 @@ void tds_run::initialise() {
 			n = section(s).n_elements();
 			t += n;
 			for (int i=0; i < n; ++i) {
-				//std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
+				// std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
 				m = section(s).element(i).n_nodes();
 				for (int j=0; j < m; ++j) {
-					//std::cout << "\tStarting j: node " << j << std::endl;
+					// std::cout << "\tStarting j: node " << j << std::endl;
 					o = section(s).element(i).node(j).n_elements();
 					for (int k=0; k < o; ++k) {
-						//std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
+						// std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
 						// don't try and link to yourself, or to something already linked:
 						if (
 						    (&section(s).element(i) != &section(s).element(i).node(j).element(k)) &&
@@ -810,7 +825,7 @@ void tds_run::initialise() {
 							for (int l=0; (l < p); ++l) {
 								// ignore that one node
 								if (&section(s).element(i).node(j) != &section(s).element(i).node(j).element(k).node(l)) {
-									for (int q=0; (q < m && c < 2); ++q) {
+									for (int q=0; (q < m); ++q) {
 										if (&section(s).element(i).node(j).element(k).node(l) == &section(s).element(i).node(q)) {
 											++c;
 										}
@@ -819,7 +834,7 @@ void tds_run::initialise() {
 							}
 							if (c >= 3) {
 								// std::cout << "Making link from " << &section(s).element(i) << " to "
-								//           << &(section(s).element(i).node(j).element(k)) << std::endl;
+								//            << &(section(s).element(i).node(j).element(k)) << std::endl;
 								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
 														  &(section(s).element(i).node(j).element(k)));
 								element_link_count++;
@@ -831,9 +846,11 @@ void tds_run::initialise() {
 								new_link = _el_id.element_link;
 								section(s).element(i).add_element_link(new_link);
 								section(s).element(i).node(j).element(k).add_element_link(new_link);
-							}									
+							}
+							// std::cout << "found " << c << " nodes in common." << std::endl;
+						} else {
+							// std::cout << "skipped: k="<<k<<";j="<<j<<";i="<<i << std::endl;
 						}
-						// std::cout << "\t\tFinished with k of " << k << std::endl;
 					}
 				}
 			}

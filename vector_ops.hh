@@ -22,4 +22,13 @@ void normalise(std::vector<double>& u);
 inline void debug(std::vector<double>* u) { std::cout << "["; std::cout << u->at(0) << ","; std::cout
 		                                << u->at(1) << ","; std::cout << u->at(2) << "]" << std::endl; }
 
+
+struct ordering4 {
+	int p1;
+	int p2;
+	int p3;
+	int p4;
+};
+ordering4 make_order(int _p1, int _p2, int _p3, int _p4);
+
 #endif

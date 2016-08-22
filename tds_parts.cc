@@ -108,6 +108,9 @@ void tds_element::set_origin_from_nodes() {
 	case 2:
 	case 3:
 	case 4:
+	case 5:
+	case 6:
+	case 8:
 		// can use the mean of the vectors for basic elements
 		// might be able to for other elements, need to think
 		// about/do the integrations for these
@@ -149,7 +152,9 @@ void tds_element::propogate_into_nodes() {
 	}
 }
 void tds_element::calculate_size() {
-	std::vector<double> vecPQ, vecPR;
+	std::vector<double> vecPQ, vecPR, vecPS, c;
+	double d;
+	std::vector<ordering4> orders;
 	switch (n_nodes()) {
 	case 2:
 		vecPQ.resize(3);
@@ -194,11 +199,57 @@ void tds_element::calculate_size() {
 		}
 		break;
 	case 4:
-		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF QUADRANGLES OR TETRAHEDRA YET!" << std::endl;
-		// for quadrangles, use this: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
-		// (link from http://stackoverflow.com/a/717367)
-		// look at the 3-D polygon area using projection onto 2D - really clever!
-		throw;
+		//std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF QUADRANGLES OR TETRAHEDRA YET!" << std::endl;
+		vecPQ = node(1).position() - node(0).position();
+		vecPR = node(2).position() - node(0).position();
+		vecPS = node(3).position() - node(0).position();
+		// debug(&vecPQ);
+		// debug(&vecPR);
+		// debug(&vecPS);
+		// if quadrangle, all 3 vectors are planar, so PQ . PRxPS = 0. This happens to be part of the volume formula, so let's calculate that first
+		c.resize(3);
+		c = cross(vecPQ,vecPR);
+		// debug(&c);
+		d = dot(c,vecPS);
+		// std::cout << d << std::endl;
+		// std::cout << 0.00001f * magnitude(vecPQ) * magnitude(vecPR) * magnitude(vecPS) << std::endl;
+		if (d < 0.00001f * magnitude(vecPQ) * magnitude(vecPR) * magnitude(vecPS)) {
+			// for quadrangles, use this: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
+			// (link from http://stackoverflow.com/a/717367)
+			// formula for arbitary quadrilateral, but careful of intersections:
+			// 1/2 | ob x ac |
+			// find four areas from node ordering and pick the largest.
+			d =  0.0f;
+			orders.push_back(make_order(0, 1, 2, 3));
+			orders.push_back(make_order(0, 2, 1, 3));
+			orders.push_back(make_order(2, 0, 1, 3));
+			orders.push_back(make_order(1, 0, 2, 3));
+			orders.push_back(make_order(1, 2, 0, 3));
+			for (int i = 0; i < 5; ++i) {
+				// ignore that PQ, PR namings are off here, may as well reuse variables
+				// vecPQ =   node( (offset == 0) ? 3 : (0 - ((offset < 0) ? 1 : 0)) ).position()
+				// 	- node( (offset == 1) ? 3 : (1 - ((offset < 1) ? 1 : 0)) ).position();
+				// vecPR =   node( (offset == 2) ? 3 : (2 - ((offset < 2) ? 1 : 0)) ).position()
+				// 	- node( (offset == 3) ? 3 : (3 - ((offset < 3) ? 1 : 0)) ).position();
+				vecPQ =   node( orders.at(i).p1 ).position()
+					- node( orders.at(i).p2 ).position();
+				vecPR =   node( orders.at(i).p3 ).position()
+					- node( orders.at(i).p4 ).position();
+				c = cross(vecPQ,vecPR);
+				debug(&c);
+				d = std::max(d, magnitude(c));
+			}
+			size(d / 2.0f);
+			//std::cout << "element with 4 nodes, quad, size: " << size() << std::endl;
+			
+		} else {
+			// For tetrahedra:
+			// let's call the four vertices a, b, c and d.
+			// now let's set d as the origin, giving us vectors oa, ob, oc.
+			// the volume is equal to 1/6 | oa . (ob x oc) |
+			size(fabs(d / 6.0f));
+			//std::cout << "element with 4 nodes, tet, size: " << size() << std::endl;
+		}
 		break;
 	case 5:
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF PYRAMIDAL ELEMENTS YET!" << std::endl;
@@ -206,9 +257,14 @@ void tds_element::calculate_size() {
 		// The most difficult part will be identifying the base nodes vs point node
 		// This will be done by checking parallelism WHICH mustn't be too sensitive
 		// floating point error!
+		// 
+		// Logic behind finding the point node (non-base node):
+		// 
 		throw;
 		break;
 	default:
+		// then for 3-D planar polygons >4 look at the 3-D polygon area using projection
+		// onto 2D - really clever! http://geomalgorithms.com/a01-_area.html#2D%20Polygons
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF THIS ELEMENT SHAPE YET!" << std::endl;
 		throw;
 	}
