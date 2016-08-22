@@ -6,7 +6,7 @@ output-directory 		output/
 gmsh-bin-directory 		~/gmsh-2.12.0-Linux/bin/
 model-name			three-d
 config-name			simple
-output-name			plugin-test
+output-name			3d-test
 delta-t				1 seconds
 tracking-interval		1 hours
 simulation-length		5 hours

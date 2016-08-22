@@ -50,6 +50,8 @@ public:
 	inline int n_elements() { return elements_.size(); }
 	void clean_elements();
 	void remove_last_element();
+
+	static double get_3Dplanar_area(tds_nodes shared_nodes, std::vector<double> &e_n);
 };
 
 class tds_element : public tds_part {

@@ -42,6 +42,73 @@ void tds_node::clean_elements() {
 void tds_node::remove_last_element() {
 	elements_.pop_back();
 }
+double get_3Dplanar_area(tds_nodes shared_nodes, std::vector<double> &e_n) {
+	// Adapted from area3D_Polygon() by Dan Sunday
+	// Found at: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
+	int n = shared_nodes.size();
+	if (n < 3) {
+		std::cerr << "Trying to find area of 'surface' defined by too few nodes." << std::endl;
+		throw;
+	}
+
+	shared_nodes.push_back(shared_nodes.at(0));
+	shared_nodes.push_back(shared_nodes.at(1));
+	
+	double area = 0;
+	double an, ax, ay, az; // abs value of normal and its coords
+	int coord;           // coord to ignore: 1=x, 2=y, 3=z
+	int i, j, k;         // loop indices
+
+    // select largest abs coordinate to ignore for projection
+    ax = fabs(e_n.at(0));    // abs x-coord
+    ay = fabs(e_n.at(1));     // abs y-coord
+    az = fabs(e_n.at(2));     // abs z-coord
+
+    coord = 3;                    // ignore z-coord
+    if (ax > ay) {
+        if (ax > az) coord = 1;   // ignore x-coord
+    }
+    else if (ay > az) coord = 2;  // ignore y-coord
+
+    // compute area of the 2D projection
+    switch (coord) {
+      case 1:
+        for (i=1, j=2, k=0; i<n; i++, j++, k++)
+            area += (shared_nodes.at(i)->position(1) * (shared_nodes.at(j)->position(2) - shared_nodes.at(k)->position(2)));
+        break;
+      case 2:
+        for (i=1, j=2, k=0; i<n; i++, j++, k++)
+            area += (shared_nodes.at(i)->position(2) * (shared_nodes.at(j)->position(0) - shared_nodes.at(k)->position(0)));
+        break;
+      case 3:
+        for (i=1, j=2, k=0; i<n; i++, j++, k++)
+            area += (shared_nodes.at(i)->position(0) * (shared_nodes.at(j)->position(1) - shared_nodes.at(k)->position(1)));
+        break;
+    }
+    switch (coord) {    // wrap-around term
+      case 1:
+        area += (shared_nodes.at(n)->position(1) * (shared_nodes.at(1)->position(2) - shared_nodes.at(n-1)->position(2)));
+        break;
+      case 2:
+        area += (shared_nodes.at(n)->position(2) * (shared_nodes.at(1)->position(0) - shared_nodes.at(n-1)->position(0)));
+        break;
+      case 3:
+        area += (shared_nodes.at(n)->position(0) * (shared_nodes.at(1)->position(1) - shared_nodes.at(n-1)->position(1)));
+        break;
+    }
+
+    switch (coord) {
+      case 1:
+        area *= (1.0f / (2 * e_n.at(0)));
+        break;
+      case 2:
+        area *= (1.0f / (2 * e_n.at(1)));
+        break;
+      case 3:
+        area *= (1.0f / (2 * e_n.at(2)));
+    }
+    return area;
+}
 
 
 
@@ -375,6 +442,7 @@ void tds_element_link::initialise() {
 	flux_vector(elementN_->origin(0)-elementM_->origin(0),
 	            elementN_->origin(1)-elementM_->origin(1),
 	            elementN_->origin(2)-elementM_->origin(2));
+	modMN(magnitude(flux_vector()));
 
 	// find the common nodes between the two elements
 	shared_nodes_.clear();
@@ -389,18 +457,15 @@ void tds_element_link::initialise() {
 	// find the normal vector and area at the interface between them
 	// this is different depending on the dimensions of the problem
 	// different dimensioned problems have different numbers of shared nodes
-	switch (shared_nodes_.size()) {
-	case 1:
+	if (shared_nodes_.size() == 1) {
 		// norm_vector and flux_vector are always the same direction in 1-D
 		norm_vector(flux_vector());
-		modMN(magnitude(flux_vector()));
 		norm_vector_ *= (1.0f/modMN());
 		if (norm_vector(1) != 0.0f || norm_vector(2) != 0.0f) {
 			std::cout << "!!! non 1-D elements had a 1 node interface -- not physically accurate" << std::endl;
 		}
 		interface_area(1.0f);
-		break;
-	case 2:
+	} else if (shared_nodes_.size() == 2) {
 		// first get the vector along the edge, but rotated 90deg, i.e. [y; -x]
 		// std::cout << "Jamaica: finding interface area length from ("
 		//           << shared_node(0).position(0) << ","
@@ -416,17 +481,25 @@ void tds_element_link::initialise() {
 			std::cout << "!!! non 2-D elements had a 2 node interface -- not physically accurate" << std::endl;
 		}
 		// make use of this rotated vector as a measure of interface length, then normalise it
-		modMN(magnitude(flux_vector()));
 		// std::cout << "norm_vector().size() = " << norm_vector().size() << std::endl;
 		// std::cout << "Jamaica: " << magnitude(norm_vector()) << std::endl;
 		interface_area(magnitude(norm_vector()));
-		norm_vector_ *= (1/interface_area());
+		norm_vector_ *= (1.0f/interface_area());
 		// now make sure it is in the outward direction to follow standard conventions
 		if (dot(norm_vector(),flux_vector()) < 0.0f) norm_vector_ *= -1;
-		break;
-	case 3:
-		std::cerr << "!!! haven't implemented 3d element link initialisation" << std::endl;
-		break;
+	} else if (shared_nodes_.size() > 2) {
+		std::vector<double> a,b,c;
+		a = shared_node(1).position() - shared_node(0).position();
+		b = shared_node(2).position() - shared_node(0).position();
+		c = cross(a,b);
+		norm_vector_ = c * (1.0f/magnitude(c));
+		if (dot(flux_vector(),norm_vector()) < 0.0f)
+			norm_vector_ *= -1.0f;
+		interface_area(fabs(get_3Dplanar_area(shared_nodes_,norm_vector())));
+		// std::cerr << "!!! haven't implemented 3d element link initialisation" << std::endl;
+	} else {
+		std::cerr << "Trying to initialise element link between two elements with no known common nodes." << std::endl;
+		throw;
 	}
 	
 	// calculate the geometry multiplier to turn D * (diff in contamination) into flow rate
