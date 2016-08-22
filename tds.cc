@@ -269,7 +269,6 @@ void tds_run::make_analysis() {
 	trackingfile_.open(tracking_file_address());
 	trackingfile_ << "element, time, contamination" << std::endl;
 	trackingfile_ << std::scientific;
-	std::cout << tracked_elements()->size() << std::flush;
 	for (int i=0; i < tracked_elements()->size(); ++i)
 		trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
 
@@ -282,7 +281,6 @@ void tds_run::make_analysis() {
 	uint64 last_checkmark = start_checkmark;
 	
 	int reporting_interval = ceil(steps()/100.0f);
-	std::cout << "*" << std::flush;
 	reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
 	// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
 	// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
