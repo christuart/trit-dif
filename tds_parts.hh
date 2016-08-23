@@ -1,6 +1,7 @@
 #ifndef TDS_PARTS_HH
 #define TDS_PARTS_HH
 
+#include <algorithm>
 #include "vector_ops.hh"
 
 class tds_part;

@@ -1,5 +1,5 @@
 #include "tds_parts.hh"
-
+#define TOLERANCE 0.00001f
 tds_part::tds_part() {}
 tds_part::~tds_part() {}
 bool tds_part::is_base() { return true; }
@@ -222,8 +222,7 @@ void tds_element::calculate_size() {
 	std::vector<double> vecPQ, vecPR, vecPS, c;
 	double d;
 	std::vector<ordering4> orders;
-	switch (n_nodes()) {
-	case 2:
+	if (n_nodes() == 2) {
 		vecPQ.resize(3);
 		vecPQ = node(1).position() - node(0).position();
 		if (vecPQ.at(1) == 0.0 && vecPQ.at(2) == 0.0) {
@@ -232,8 +231,7 @@ void tds_element::calculate_size() {
 			vecPQ *= vecPQ;
 			size(sqrt(vecPQ.at(0)+vecPQ.at(1)+vecPQ.at(2)));
 		}
-		break;
-	case 3:
+	} else if (n_nodes() == 3) {
 		// triangle PQR, area is 1/2 mod(PQ x PR)
 		vecPQ.resize(3);
 		vecPQ = node(1).position() - node(0).position();
@@ -264,8 +262,7 @@ void tds_element::calculate_size() {
 			          )
 			     );
 		}
-		break;
-	case 4:
+	} else if (n_nodes() == 4) {
 		//std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF QUADRANGLES OR TETRAHEDRA YET!" << std::endl;
 		vecPQ = node(1).position() - node(0).position();
 		vecPR = node(2).position() - node(0).position();
@@ -280,7 +277,7 @@ void tds_element::calculate_size() {
 		d = dot(c,vecPS);
 		// std::cout << d << std::endl;
 		// std::cout << 0.00001f * magnitude(vecPQ) * magnitude(vecPR) * magnitude(vecPS) << std::endl;
-		if (d < 0.00001f * magnitude(vecPQ) * magnitude(vecPR) * magnitude(vecPS)) {
+		if (d < TOLERANCE * magnitude(vecPQ) * magnitude(vecPR) * magnitude(vecPS)) {
 			// for quadrangles, use this: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
 			// (link from http://stackoverflow.com/a/717367)
 			// formula for arbitary quadrilateral, but careful of intersections:
@@ -317,19 +314,201 @@ void tds_element::calculate_size() {
 			size(fabs(d / 6.0f));
 			//std::cout << "element with 4 nodes, tet, size: " << size() << std::endl;
 		}
-		break;
-	case 5:
+	} else if (n_nodes() == 5) {
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF PYRAMIDAL ELEMENTS YET!" << std::endl;
 		// This will involve a 1/3 * base * height method
 		// The most difficult part will be identifying the base nodes vs point node
 		// This will be done by checking parallelism WHICH mustn't be too sensitive
-		// floating point error!
+		// to floating point error!
 		// 
 		// Logic behind finding the point node (non-base node):
 		// 
 		throw;
-		break;
-	default:
+	} else if (n_nodes() == 8) {
+		double magPQ, magPR, magPS;
+		// Start with 'edge' vector "01", which may not be an edge
+		int start_edge_candidate = 1;
+		vecPQ = node(start_edge_candidate).position() - node(0).position();
+		magPQ = magnitude(vecPQ);
+		// We want to start off by finding a pair of diagonal points
+		// We will look for the diagonal of node 0
+		int diagonal;
+		// Populate a list of ints with 1,2,3,4,5,6,7
+		std::vector<int> candidates;
+		for (int i = 1; i < 8; ++i) candidates.push_back(i);
+		std::cout << std::endl << "C: "; for (int iii = 0; iii < candidates.size(); ++iii) std::cout << candidates.at(iii) << ", " << std::flush;
+		for (int i = 0; i < 8; ++i)
+			std::cout << std::endl << "Node " << i << ": ["
+			          << node(i).position(0) << ", "
+			          << node(i).position(1) << ", "
+			          << node(i).position(2) << "]";
+		// Get ready to store the nodes which make edges from node 0 and
+		// the nodes which make diagonals
+		std::vector<int> edge_nodes;
+		std::vector<int> diagonal_nodes;
+		bool start_edge_candidate_is_edge = false;
+		// To do that we will have one or two more cross products
+		std::vector<double> c2,c3;
+		for (int i = 1; i < 7; ++i) {
+			if (i == start_edge_candidate) continue;
+			vecPR = node(i).position() - node(0).position();
+			magPR = magnitude(vecPR);
+			c = cross(vecPQ,vecPR);
+			for (int j=i+1; (j < 8 && i > 0); ++j) {
+				vecPS = node(j).position() - node(0).position();
+				magPS = magnitude(vecPS);
+				d = dot(vecPS,c);
+				if (fabs(d) < TOLERANCE * magPQ * magPR * magPS) {
+					// We have found three vectors through nodes leading from node 0 which are co-planar
+					// That means that none of the 3 nodes can be the node diagonally opposite to node 0
+					candidates.erase(std::remove(candidates.begin(), candidates.end(), start_edge_candidate), candidates.end());
+					candidates.erase(std::remove(candidates.begin(), candidates.end(), i), candidates.end());
+					candidates.erase(std::remove(candidates.begin(), candidates.end(), j), candidates.end());
+					std::cout << std::endl << "C: "; for (int iii = 0; iii < candidates.size(); ++iii) std::cout << candidates.at(iii) << ", " << std::flush;
+					// The three nodes and node 0 describe a quadrilateral face. We want to find which
+					// nodes 
+					// try to identify edges vs diagonals
+					// this is achieved by looking at the angles between them.
+					// we will always find an unintentional extra plane which includes an
+					// edge, a diagonal and the opposite diagonal, (draw it out to understand)
+					// with that diagonal being marked as an edge.
+					c2 = cross(vecPQ,vecPS);
+					if (dot(c,c2) < 0) {
+						// This means that cross 1 and cross 2 were in different directions, so PQ is the diag
+						// and our 'start_edge_candidate' is known not to be an edge. We therefore want to
+						// start the loop again, from i=1, with a new vecPQ that we know is an edge.
+						edge_nodes.clear();
+						diagonal_nodes.clear(); // If I understand correctly, this will already be empty.
+						start_edge_candidate = i;
+						vecPQ = node(start_edge_candidate).position() - node(0).position();
+						magPQ = magnitude(vecPQ);
+						i = 0; // ++i will happen before we start the loop again
+						continue;
+						// This continue is unnecessary, but it makes the point that the loop
+						// sequence is being broken; it will increment j, and then check that
+						// (j < 8 && i > 0) is still true. This will not be the case, so the j
+						// for loop finishes, and the i for loop "moves on". It in fact starts
+						// again, incrementing i to '1' and looping through i up to 6.
+					} else {
+						// we know that PQ is an edge
+						if (!start_edge_candidate_is_edge) {
+							start_edge_candidate_is_edge = true;
+							edge_nodes.push_back(start_edge_candidate);
+						}
+						// now we need to find the third cross product to work out which is the other edge
+						c3 = cross(vecPR,vecPS);
+						if (dot(c2,c3) > 0) {
+							// this means that PQ to PR, PQ to PS and PR to PS are all the same
+							// direction of rotation, so PR must be in the middle
+							edge_nodes.push_back(j);
+							diagonal_nodes.push_back(i);
+						} else {
+							// this means that PQ to PR and PQ to PS a rotation in one direction
+							// whilst PR to PS is rotation in the opposite; PS is in the middle
+							edge_nodes.push_back(i);
+							diagonal_nodes.push_back(j);
+						}
+					}
+				}
+			}
+			std::cout << std::endl << "Finishing the i of " << i << " and " << candidates.size() << " remaining candidates.";
+			if (i == 6 && candidates.size() > 1) {
+				std::cout << std::endl << "We've got to i=6 and not found opp diag yet.";
+				if (edge_nodes.empty()) {
+					std::cout << std::endl << "In fact, we haven't found anything yet!.";
+					// We have accidentally started with the start_edge_candidate node being the
+					// node which is diagonally opposite to node 0. We wanted to find which node
+					// was opposite, but this isn't ideal as we now don't have any records of
+					// where the other nodes are in relation to node 0 and this opposite node.
+					// We will start again, with a new start_edge_candidate.
+					edge_nodes.clear(); // If I understand correctly, these will already be empty.
+					diagonal_nodes.clear(); // If I understand correctly, these will already be empty.
+					++start_edge_candidate;
+					if (start_edge_candidate > 7) {
+						std::cerr << "Hexahedron size algorithm failed. This code should not be reached, algorithm itself must be flawed." << std::endl;
+						throw;
+					}
+					vecPQ = node(start_edge_candidate).position() - node(0).position();
+					magPQ = magnitude(vecPQ);
+					i = 0; // ++i will happen before we start the loop again
+				} else {
+					std::cout << std::endl << "We've managed to find << " << edge_nodes.size() << "edges and " << diagonal_nodes.size() << " diagonals.";
+					// Great, we have started on an edge or a diagonal. We can't possibly find all
+					// the edges and diagonals from this the first time round, so we will go again
+					// if they aren't all found. Skip to the second edge. (If N_edges isn't 0 or 3
+					// then it must be 2, you can't find one edge on its own.)
+					if ((edge_nodes.size() != 3) || diagonal_nodes.size() != 3) {
+						start_edge_candidate = edge_nodes.at(1);
+						std::cout << std::endl << "We'll go around again, this time with start_edge_candidate of " << start_edge_candidate;
+						vecPQ = node(start_edge_candidate).position() - node(0).position();
+						magPQ = magnitude(vecPQ);
+						// If we have found edges, then there is no point in searching back
+						i = start_edge_candidate; // ++i will happen before we start the loop again
+					}
+				}
+			}
+		}
+		if (candidates.size() == 1) {
+			// We must have found the one 'edge' vector which isn't planar with two others i.e.
+			// we have the diagonally opposite node.
+			diagonal = candidates.back();
+		} else {
+			std::cerr << "Exited hexahedron node loop without finding the diagonally opposite node." << std::endl;
+			throw;
+		}
+		// Now that we have two diagonal corners, we will get 3 faces at each, using them to calculate
+		// the volume via the divergence rule (Nürnberg, 2013). This could have been done as a part of the
+		// previous loop, but the slight sacrifice in model initialisation speed is worth the extra clarity
+		// in the code, as why the algorithm works is not clear by looking at it - no point in making it
+		// difficult to tell what the algorithm is even doing too.
+		// 
+		// In the above algorithm, as well as the diagonal we should have identified 3 edges from node 0
+		// and 2 diagonals. We need to now find that third diagonal.
+		if (edge_nodes.size() != 3) {
+			std::cerr << "Didn't find three nodes that make edges from node 0." << std::endl;
+			throw;
+		}
+		if (diagonal_nodes.size() != 3) {
+			std::cerr << "Didn't find the three nodes that make diagonals from node 0." << std::endl;
+			throw;
+		}
+		// The third diagonal is clearly the last node
+		candidates.clear();
+		for (int i = 1; i < 8; ++i) candidates.push_back(i);
+		for (int i = 0; i < 2; ++i) {
+			candidates.erase(std::remove(candidates.begin(), candidates.end(), edge_nodes.at(i)), candidates.end());
+			candidates.erase(std::remove(candidates.begin(), candidates.end(), diagonal_nodes.at(i)), candidates.end());
+		}
+		candidates.erase(std::remove(candidates.begin(), candidates.end(), edge_nodes.at(2)), candidates.end());
+		candidates.erase(std::remove(candidates.begin(), candidates.end(), diagonal), candidates.end());
+		if (candidates.size() == 1) {
+			// We found the last diagonal.
+			diagonal_nodes.push_back(candidates.back());
+		} else {
+			std::cerr << "Failed to find the last diagonal node." << std::endl;
+			throw;
+		}
+		
+			
+		double vol_sum = 0.0f;
+		for (int i = 0; i < 3; ++i) {
+			vecPQ = node(edge_nodes.at(   i   )).position() - node(0).position();
+			vecPR = node(edge_nodes.at((i+1)%3)).position() - node(0).position();
+			c = cross(vecPQ,vecPR);
+			normalise(c); // this now makes it the n vec for that face
+			vol_sum += dot(c,node(0).position());
+			vecPQ = node(diagonal_nodes.at(   i   )).position() - node(diagonal).position();
+			vecPR = node(diagonal_nodes.at((i+1)%3)).position() - node(diagonal).position();
+			c = cross(vecPQ,vecPR);
+			normalise(c); // this now makes it the n vec for that face
+			vol_sum += dot(c,node(diagonal).position());
+		}
+		// The Nürnberg algorithm looks at triangular faces, so we would have to divide each quad face
+		// into two. It then divides the sum by 6. The terms in the sum for the two triangles would both
+		// equal the one term we have for each quad, so we need to multiply our answer by 2 at the end.
+		// We will instead divide by only 3 to achieve the same effect.
+		size(fabs(vol_sum/3.0f));
+	} else {
 		// then for 3-D planar polygons >4 look at the 3-D polygon area using projection
 		// onto 2D - really clever! http://geomalgorithms.com/a01-_area.html#2D%20Polygons
 		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF THIS ELEMENT SHAPE YET!" << std::endl;
