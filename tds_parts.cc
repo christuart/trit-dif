@@ -325,46 +325,97 @@ void tds_element::calculate_size() {
 		// 
 		throw;
 	} else if (n_nodes() == 8) {
+		// for (int i = 0; i < 8; ++i)
+		// 	std::cout << "Node " << i << ": ["
+		// 	          << node(i).position(0) << ", "
+		// 	          << node(i).position(1) << ", "
+		// 	          << node(i).position(2) << "]" << std::endl;
 		double magPQ, magPR, magPS;
-		// Start with 'edge' vector "01", which may not be an edge
-		int start_edge_candidate = 1;
+		std::vector<double> c2,c3;
+		int diagonal, times_found_self_diagonal;
+		int ii,jj,kk;
+		for (int i = 1; i < 8; ++i) { // which corner are we checking to see if it is diag opposite
+			ii = 1+((i-1)%7); // always = i because i < 8
+			// std::cout << "See if node " << ii << " is the diag opposite node to node 0." << std::endl;
+			vecPQ = node(ii).position() - node(0).position();
+			magPQ = magnitude(vecPQ);
+			times_found_self_diagonal = 0;
+			for (int j = i+1; j < i+6; ++j) {
+				jj = 1+((j-1)%7);
+				// std::cout << "\tUse node " << jj << std::endl;
+				vecPR = node(jj).position() - node(0).position();
+				magPR = magnitude(vecPR);
+				c = cross(vecPQ,vecPR);
+				for (int k = j+1; k < i+7; ++k) {
+					kk = 1+((k-1)%7);
+					// std::cout << "\t\tand node " << kk << " to try making a plane." << std::endl;
+					vecPS = node(kk).position() - node(0).position();
+					magPS = magnitude(vecPS);
+					d = dot(vecPS,c);
+					if (fabs(d) < TOLERANCE * magPQ * magPR * magPS) { // three vecs are planar
+						// std::cout << "\t\t\tThey make a plane..." << std::endl;
+						c2 = cross(vecPQ,vecPS);
+						if (dot(c,c2) < 0) { // PQ is in the middle, so diagonal
+							++times_found_self_diagonal;
+							// std::cout << "\t\t\t...and node " << ii << " was middle vector: " << times_found_self_diagonal << std::endl;
+							if (times_found_self_diagonal == 3) {
+								// This only happens when we find the diag opp node
+								diagonal = ii;
+								i = 8;
+								k = i+7;
+								j = i+6;
+							}
+						} else {
+							// std::cout << "\t\t\t...but node " << ii << " wasn't middle vector." << std::endl;
+							// node i is not the diagonally opposite node, so move on
+							k = i+7;
+							j = i+6;
+						}
+					} else {
+						// std::cout << "\t\t\tNope: " << fabs(d) << std::endl;
+					}
+				}
+			}		
+		}
+		// Two things may have happened by now:
+		//  -1 We found the diagonally opposite node, meaning that the element is a parallelipiped.
+		//     We can move directly to the edge finding algorithm, ignoring the diagonally opp node
+		//  -2 We didn't find a diagonally opposite node, so the element is not a parallelipiped.
+		//     We can move directly to the edge finding algorithm, because we won't stumble on
+		//     unexpected extra planes
+		if (times_found_self_diagonal != 3) {
+			diagonal = 8;
+			//std::cerr << "Didn't manage to find the diagonally opposite node." << std::endl;
+			//throw;
+		}
+		// Start with any vector which isn't the diagonally opposite node
+		int start_edge_candidate = 1+ (diagonal%7);
 		vecPQ = node(start_edge_candidate).position() - node(0).position();
 		magPQ = magnitude(vecPQ);
-		// We want to start off by finding a pair of diagonal points
-		// We will look for the diagonal of node 0
-		int diagonal;
-		// Populate a list of ints with 1,2,3,4,5,6,7
-		std::vector<int> candidates;
-		for (int i = 1; i < 8; ++i) candidates.push_back(i);
-		std::cout << std::endl << "C: "; for (int iii = 0; iii < candidates.size(); ++iii) std::cout << candidates.at(iii) << ", " << std::flush;
-		for (int i = 0; i < 8; ++i)
-			std::cout << std::endl << "Node " << i << ": ["
-			          << node(i).position(0) << ", "
-			          << node(i).position(1) << ", "
-			          << node(i).position(2) << "]";
 		// Get ready to store the nodes which make edges from node 0 and
 		// the nodes which make diagonals
 		std::vector<int> edge_nodes;
 		std::vector<int> diagonal_nodes;
-		bool start_edge_candidate_is_edge = false;
-		// To do that we will have one or two more cross products
-		std::vector<double> c2,c3;
-		for (int i = 1; i < 7; ++i) {
-			if (i == start_edge_candidate) continue;
-			vecPR = node(i).position() - node(0).position();
+		bool start_edge_candidate_is_edge = false; // we don't know yet
+		for (int i = 1; i < 6; ++i) {
+			int ii = 1+((start_edge_candidate+i-1) % 7);
+			if (ii == diagonal) continue;
+			vecPR = node(ii).position() - node(0).position();
 			magPR = magnitude(vecPR);
 			c = cross(vecPQ,vecPR);
-			for (int j=i+1; (j < 8 && i > 0); ++j) {
-				vecPS = node(j).position() - node(0).position();
+			for (int j=1; (i+j < 7 && i > 0); ++j) {
+				int jj = 1+((j + ii - 1) % 7);
+				if (jj == diagonal) continue;
+				vecPS = node(jj).position() - node(0).position();
 				magPS = magnitude(vecPS);
 				d = dot(vecPS,c);
 				if (fabs(d) < TOLERANCE * magPQ * magPR * magPS) {
 					// We have found three vectors through nodes leading from node 0 which are co-planar
 					// That means that none of the 3 nodes can be the node diagonally opposite to node 0
-					candidates.erase(std::remove(candidates.begin(), candidates.end(), start_edge_candidate), candidates.end());
+/*					candidates.erase(std::remove(candidates.begin(), candidates.end(), start_edge_candidate), candidates.end());
 					candidates.erase(std::remove(candidates.begin(), candidates.end(), i), candidates.end());
 					candidates.erase(std::remove(candidates.begin(), candidates.end(), j), candidates.end());
-					std::cout << std::endl << "C: "; for (int iii = 0; iii < candidates.size(); ++iii) std::cout << candidates.at(iii) << ", " << std::flush;
+					std::cout << std::endl << "C: "; for (int iii = 0; iii < candidates.size(); ++iii) std::cout << candidates.at(iii) << ", " << std::flush;*/
 					// The three nodes and node 0 describe a quadrilateral face. We want to find which
 					// nodes 
 					// try to identify edges vs diagonals
@@ -379,7 +430,7 @@ void tds_element::calculate_size() {
 						// start the loop again, from i=1, with a new vecPQ that we know is an edge.
 						edge_nodes.clear();
 						diagonal_nodes.clear(); // If I understand correctly, this will already be empty.
-						start_edge_candidate = i;
+						start_edge_candidate = ii;
 						vecPQ = node(start_edge_candidate).position() - node(0).position();
 						magPQ = magnitude(vecPQ);
 						i = 0; // ++i will happen before we start the loop again
@@ -400,61 +451,18 @@ void tds_element::calculate_size() {
 						if (dot(c2,c3) > 0) {
 							// this means that PQ to PR, PQ to PS and PR to PS are all the same
 							// direction of rotation, so PR must be in the middle
-							edge_nodes.push_back(j);
-							diagonal_nodes.push_back(i);
+							edge_nodes.push_back(jj);
+							diagonal_nodes.push_back(ii);
 						} else {
 							// this means that PQ to PR and PQ to PS a rotation in one direction
 							// whilst PR to PS is rotation in the opposite; PS is in the middle
-							edge_nodes.push_back(i);
-							diagonal_nodes.push_back(j);
+							edge_nodes.push_back(ii);
+							diagonal_nodes.push_back(jj);
 						}
 					}
 				}
 			}
-			std::cout << std::endl << "Finishing the i of " << i << " and " << candidates.size() << " remaining candidates.";
-			if (i == 6 && candidates.size() > 1) {
-				std::cout << std::endl << "We've got to i=6 and not found opp diag yet.";
-				if (edge_nodes.empty()) {
-					std::cout << std::endl << "In fact, we haven't found anything yet!.";
-					// We have accidentally started with the start_edge_candidate node being the
-					// node which is diagonally opposite to node 0. We wanted to find which node
-					// was opposite, but this isn't ideal as we now don't have any records of
-					// where the other nodes are in relation to node 0 and this opposite node.
-					// We will start again, with a new start_edge_candidate.
-					edge_nodes.clear(); // If I understand correctly, these will already be empty.
-					diagonal_nodes.clear(); // If I understand correctly, these will already be empty.
-					++start_edge_candidate;
-					if (start_edge_candidate > 7) {
-						std::cerr << "Hexahedron size algorithm failed. This code should not be reached, algorithm itself must be flawed." << std::endl;
-						throw;
-					}
-					vecPQ = node(start_edge_candidate).position() - node(0).position();
-					magPQ = magnitude(vecPQ);
-					i = 0; // ++i will happen before we start the loop again
-				} else {
-					std::cout << std::endl << "We've managed to find << " << edge_nodes.size() << "edges and " << diagonal_nodes.size() << " diagonals.";
-					// Great, we have started on an edge or a diagonal. We can't possibly find all
-					// the edges and diagonals from this the first time round, so we will go again
-					// if they aren't all found. Skip to the second edge. (If N_edges isn't 0 or 3
-					// then it must be 2, you can't find one edge on its own.)
-					if ((edge_nodes.size() != 3) || diagonal_nodes.size() != 3) {
-						start_edge_candidate = edge_nodes.at(1);
-						std::cout << std::endl << "We'll go around again, this time with start_edge_candidate of " << start_edge_candidate;
-						vecPQ = node(start_edge_candidate).position() - node(0).position();
-						magPQ = magnitude(vecPQ);
-						// If we have found edges, then there is no point in searching back
-						i = start_edge_candidate; // ++i will happen before we start the loop again
-					}
-				}
-			}
-		}
-		if (candidates.size() == 1) {
-			// We must have found the one 'edge' vector which isn't planar with two others i.e.
-			// we have the diagonally opposite node.
-			diagonal = candidates.back();
-		} else {
-			std::cerr << "Exited hexahedron node loop without finding the diagonally opposite node." << std::endl;
-			throw;
+			// std::cout << std::endl << "Finishing the ii of " << ii << " and found " << edge_nodes.size() << " edges and " << diagonal_nodes.size() << " diagonals.";
 		}
 		// Now that we have two diagonal corners, we will get 3 faces at each, using them to calculate
 		// the volume via the divergence rule (Nürnberg, 2013). This could have been done as a part of the
@@ -468,12 +476,12 @@ void tds_element::calculate_size() {
 			std::cerr << "Didn't find three nodes that make edges from node 0." << std::endl;
 			throw;
 		}
-		if (diagonal_nodes.size() != 3) {
-			std::cerr << "Didn't find the three nodes that make diagonals from node 0." << std::endl;
+		if (diagonal_nodes.size() != 2) {
+			std::cerr << "Didn't find the first two nodes that make diagonals from node 0." << std::endl;
 			throw;
 		}
 		// The third diagonal is clearly the last node
-		candidates.clear();
+		std::vector<int> candidates;
 		for (int i = 1; i < 8; ++i) candidates.push_back(i);
 		for (int i = 0; i < 2; ++i) {
 			candidates.erase(std::remove(candidates.begin(), candidates.end(), edge_nodes.at(i)), candidates.end());
@@ -508,6 +516,7 @@ void tds_element::calculate_size() {
 		// equal the one term we have for each quad, so we need to multiply our answer by 2 at the end.
 		// We will instead divide by only 3 to achieve the same effect.
 		size(fabs(vol_sum/3.0f));
+		// std::cout << "Volume of this hexahedron: " << size() << std::endl;
 	} else {
 		// then for 3-D planar polygons >4 look at the 3-D polygon area using projection
 		// onto 2D - really clever! http://geomalgorithms.com/a01-_area.html#2D%20Polygons
