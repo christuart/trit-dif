@@ -1147,14 +1147,16 @@ void tds_run::interrupt_post_simulation() {
 
 
 tds_display::tds_display(UserInterface *gui):GUI_(gui){
-	GUI_->RootfileComment->buffer(FRootfileComments);
-	GUI_->TimelineComment->buffer(TimelineComment);
-	GUI_->RootfileName->buffer(FRootfileName);
-	FRootfileComments.text("\n \n \t Choose a file");
+	GUI_->txdsp_run_file_name->buffer(FRunFileName);
+	// GUI_->RootfileComment->buffer(FRootfileComments);
+	// GUI_->TimelineComment->buffer(TimelineComment);
+	// GUI_->RootfileName->buffer(FRootfileName);
+	FRunFileName.text("default.run");
+	// FRootfileComments.text("\n \n \t Choose a file");
 }
 
 tds_display::~tds_display(){
-	GUI_->plotH->clear();
+	// GUI_->plotH->clear();
 }
 
 void tds_display::dialog_open(){
@@ -1168,19 +1170,19 @@ void tds_display::dialog_open(){
 }
 
 void tds_display::load_event(){
-	int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
-	std::cout<<"event to load = "<<e_number<<std::endl;
+	// int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
+	// std::cout<<"event to load = "<<e_number<<std::endl;
 }
 
 void tds_display::load_section(int chnum){
-	int c_number = int(GUI_->channel->value());
-	std::cout<<"loading a section"<<std::endl;
-	load_section(c_number,chnum);
+	// int c_number = int(GUI_->channel->value());
+	// std::cout<<"loading a section"<<std::endl;
+	// load_section(c_number,chnum);
 }
 
 void tds_display::load_section(unsigned int ch_n, int chnum){
-	std::cout<<"load section"<<std::endl;
-	FRootfileComments.text(display_tl_info().c_str());
+	// std::cout<<"load section"<<std::endl;
+	// FRootfileComments.text(display_tl_info().c_str());
 }
 
 void tds_display::resize_plot(int c){

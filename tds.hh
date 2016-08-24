@@ -7,7 +7,7 @@
 #include <list>
 #include <iostream>
 #include "utilities.hh"
-#include "gui.h"
+#include "test.h"
 #include <stdio.h>
 #include <math.h>
 #include <sstream>
@@ -264,6 +264,7 @@ private:
 	std::vector<double> X_, Y_;//for the timelines
 	std::vector<std::string> text_;
 	const char *filename_;
+	Fl_Text_Buffer FRunFileName;
 	Fl_Text_Buffer FRootfileComments;
 	Fl_Text_Buffer FRootfileName;
 	Fl_Text_Buffer TimelineComment;

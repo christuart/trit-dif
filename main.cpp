@@ -1,6 +1,6 @@
 #include <time.h>
 #include <string>
-#include "gui.h"
+#include "test.h"
 #include <iostream>
 #include "tds.hh"
 
@@ -202,7 +202,8 @@ int main(int nArg, char** vArg){
 			//std::cout<<"start at file "<<start_from<<" up to "<<end_at<<std::endl;
 			return 0;
 		} else if (v >= 0) {
-			UI = new UserInterface(); UI->show();
+			UI = new UserInterface();
+			UI->show();
 			tds = new tds_display(UI);
 			int err=Fl::run();
 			return err;
@@ -212,6 +213,8 @@ int main(int nArg, char** vArg){
 	}
 	delete tds;
 	delete tds_b;
+	delete tds_t;
+	delete tds_r;
 };
 
 void show_preamble() {

@@ -1,0 +1,53 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0303 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <FL/Fl_File_Chooser.H>} {public local
+} 
+
+decl {\#include <FL/Fl_Pixmap.H>} {public local
+} 
+
+decl {\#include <FL/Fl_Bitmap.H>} {public local
+} 
+
+decl {\#include <FL/Fl_GIF_Image.H>} {public local
+} 
+
+decl {\#include "Cartesian.h"} {public local
+} 
+
+decl {void userAction(Fl_Widget* target);} {public local
+} 
+
+decl {void userAction(selection sel, Ca_Canvas* sender);} {public local
+} 
+
+decl {void reduce_all();} {public local
+} 
+
+class UserInterface {open
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window main_window {
+      label {Tritium Diffusion Software - v0.1 - Chris Stuart} open
+      xywh {1018 385 900 510} type Double size_range {900 510 900 510} visible
+    } {
+      Fl_Group grp_run_file {open
+        xywh {25 102 366 326} box THIN_UP_BOX
+      } {
+        Fl_Text_Display txdsp_run_file_name {
+          label {Current run file:} selected
+          xywh {30 126 351 45} align 0
+        }
+      }
+    }
+  }
+  Function {show()} {open
+  } {
+    code {make_window();
+//ChnButton[0]=Chn0;
+main_window->show();} {}
+  }
+} 
