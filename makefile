@@ -7,7 +7,7 @@ CPPFLAGS += $(ROOTINC)
 CPPFLAGS +=$(FLTKINC)
 PACKAGE = christuart_trit_diff
 VERSION = 0.1
-DATE := $(shell date +%y%m%d-%H%:%M)
+DATE := $(shell date +%y%m%d-%H:%M)
 DEFS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" -DDATE=\"$(DATE)\"
 CPPFLAGS += $(DEFS)
 
@@ -16,6 +16,16 @@ guiinc:= -I/usr/include
 x11libs:= -L/usr/X11R6/lib -lX11 -lXext
 
 default:
+	g++ -c -Wno-deprecated -std=c++0x -m32 -g \
+	-I/usr/include \
+	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
+	*.cc *.cxx *.cpp
+
+	g++ -m32 *.o -o trit-dif \
+	-L/usr/include \
+	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
+
+slow:
 	g++ -c -O3 -Wno-deprecated -std=c++0x -m32 -g \
 	-I/usr/include \
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
@@ -26,6 +36,16 @@ default:
 	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
 
 64:
+	g++ -c -Wno-deprecated -std=c++0x -m64 -g \
+	-I/usr/include \
+	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
+	*.cc *.cxx *.cpp
+
+	g++ -m64 *.o -o trit-dif \
+	-L/usr/include \
+	$(ROOTLIB) $(guilibs) $(x11libs) $(FLTKLIB)
+
+slow64:
 	g++ -c -O3 -Wno-deprecated -std=c++0x -m64 -g \
 	-I/usr/include \
 	$(CPPFLAGS) $(guiinc) $(CXXFLAGS) \
