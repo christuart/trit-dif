@@ -9,10 +9,12 @@ Fl_Double_Window* UserInterface::make_window() {
   { main_window = new Fl_Double_Window(900, 510, "Tritium Diffusion Software - v0.1 - Chris Stuart");
     main_window->user_data((void*)(this));
     { grp_run_file = new Fl_Group(25, 102, 366, 326);
-      grp_run_file->box(FL_THIN_UP_BOX);
-      { txdsp_run_file_name = new Fl_Text_Display(30, 126, 351, 45, "Current run file:");
-        txdsp_run_file_name->box(FL_THIN_UP_FRAME);
+      grp_run_file->box(FL_DOWN_BOX);
+      { txdsp_run_file_name = new Fl_Text_Display(30, 126, 351, 95, "Current run file:");
+        txdsp_run_file_name->box(FL_UP_FRAME);
         txdsp_run_file_name->align(Fl_Align(FL_ALIGN_CENTER));
+        txdsp_run_file_name->scrollbar_align(FL_ALIGN_RIGHT);
+        txdsp_run_file_name->scroll(0,1);
       } // Fl_Text_Display* txdsp_run_file_name
       grp_run_file->end();
     } // Fl_Group* grp_run_file

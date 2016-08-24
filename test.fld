@@ -14,6 +14,9 @@ decl {\#include <FL/Fl_Bitmap.H>} {public local
 decl {\#include <FL/Fl_GIF_Image.H>} {public local
 } 
 
+decl {\#include <FL/Enumerations.H>} {public local
+} 
+
 decl {\#include "Cartesian.h"} {public local
 } 
 
@@ -35,11 +38,13 @@ class UserInterface {open
       xywh {1018 385 900 510} type Double size_range {900 510 900 510} visible
     } {
       Fl_Group grp_run_file {open
-        xywh {25 102 366 326} box THIN_UP_BOX
+        xywh {25 102 366 326} box DOWN_BOX
       } {
         Fl_Text_Display txdsp_run_file_name {
           label {Current run file:} selected
-          xywh {30 126 351 45} align 0
+          xywh {30 126 351 95} box UP_FRAME align 0
+          code0 {txdsp_run_file_name->scrollbar_align(FL_ALIGN_RIGHT);}
+          code1 {txdsp_run_file_name->scroll(0,1);}
         }
       }
     }

@@ -1,6 +1,8 @@
 #make file for viewer GUI using ROOT and FLTK
 ROOTINC = -I$(shell root-config --incdir)
 ROOTLIB = $(shell root-config --nonew --libs)
+FLTKINC = $(shell /home/cstuart/fltk-1.3.3/fltk-config --cxxflags)
+FLTKLIB = $(shell /home/cstuart/fltk-1.3.3/fltk-config --libs --ldflags)
 FLTKINC = $(shell fltk-config --cxxflags)
 FLTKLIB = $(shell fltk-config --libs --ldflags)
 CPPFLAGS += $(ROOTINC)

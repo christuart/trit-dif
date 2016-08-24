@@ -1151,7 +1151,7 @@ tds_display::tds_display(UserInterface *gui):GUI_(gui){
 	// GUI_->RootfileComment->buffer(FRootfileComments);
 	// GUI_->TimelineComment->buffer(TimelineComment);
 	// GUI_->RootfileName->buffer(FRootfileName);
-	FRunFileName.text("default.run");
+	FRunFileName.text("default.run\n\n\n\n oaisdnoaisdn\no\tndsoinsdo\n\n\n oaisdnoaisdn\no\tndsoinsdo\n\n\n oaisdnoaisdn\no\tndsoinsdonioin");
 	// FRootfileComments.text("\n \n \t Choose a file");
 }
 

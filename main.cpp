@@ -202,6 +202,7 @@ int main(int nArg, char** vArg){
 			//std::cout<<"start at file "<<start_from<<" up to "<<end_at<<std::endl;
 			return 0;
 		} else if (v >= 0) {
+			Fl::scheme("gtk+");
 			UI = new UserInterface();
 			UI->show();
 			tds = new tds_display(UI);

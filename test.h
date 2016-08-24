@@ -7,6 +7,7 @@
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_Bitmap.H>
 #include <FL/Fl_GIF_Image.H>
+#include <FL/Enumerations.H>
 #include "Cartesian.h"
 extern void userAction(Fl_Widget* target); 
 extern void userAction(selection sel, Ca_Canvas* sender); 
