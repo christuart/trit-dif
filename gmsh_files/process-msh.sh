@@ -7,7 +7,7 @@ echo "***  process-msh.sh script written by Chris Stuart"
 echo "***  for generating easy computer-readable"
 echo "***  files from Gmsh outputs files."
 echo "***"
-echo "***  This version: 20/08/2016"
+echo "***  This version: 24/08/2016"
 echo "***"
 echo "***  .msh output from Gmsh is defined at "
 echo "***  http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php"
@@ -241,13 +241,13 @@ do
 		    #     1 - linear bar element
 		    #     2 - linear triangle element
 		    #     3 - linear quadrangle element
-		    #    *4 - linear tetrahedron element
-		    #    *5 - linear hexahedron element
+		    #     4 - linear tetrahedron element
+		    #     5 - linear hexahedron element
 		    #    *7 - linear pyramid element
-		    #     (as of 20-08-2016)
+		    #     (as of 24-08-2016)
 		    #    *these elements are currently being introduced to the code
 
-		    if ! [[ "$type" =~ ^(1|2|3)$ ]] # ^(1|2|1)$ used here to demonstrate how multiple element types will be accommodated here, will be e.g. ^(1|2|5|17|16)$
+		    if ! [[ "$type" =~ ^(1|2|3|4|5)$ ]] # ^(1|2|1)$ used here to demonstrate how multiple element types will be accommodated here, will be e.g. ^(1|2|5|17|16)$
 		    then
 			echo "!!! The element type $type is found in this mesh, but is not yet known to"
 			echo "!!! be accommodated for, so you might need to adjust the mesh for the"

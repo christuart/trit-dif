@@ -1,0 +1,17 @@
+mode				testing
+version				one
+models-directory		models/
+config-directory 		config/
+output-directory 		output/
+gmsh-bin-directory 		~/gmsh-2.12.0-Linux/bin/
+model-name			channeltest3d
+config-name			simple
+output-name			3dchannel
+delta-t				200 seconds
+tracking-interval		1 months
+simulation-length		19 years
+contamination-mode-time 	constant
+contamination-mode-space	constant
+contamination 			1 au
+tracking-mode			all
+track				5
