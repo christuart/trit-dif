@@ -265,17 +265,16 @@ private:
 	std::vector<std::string> text_;
 	const char *filename_;
 	Fl_Text_Buffer FRunFileName;
-	Fl_Text_Buffer FRootfileComments;
-	Fl_Text_Buffer FRootfileName;
-	Fl_Text_Buffer TimelineComment;
+	Fl_Text_Buffer FRunFileContents;
 	std::string e_info_,tl_info_;
 protected:
-	void dialog_open();
+	void open_run_file_dialog();
 	void load_event();
 	void load_section(int chnum);
 	void load_section(unsigned int c, int chnum);
 	void resize_plot(int section);
 	void makeZoomBox(selection sel,int event,int section);
+	bool previous_settings_were_saved();
 public:
 	tds_display(UserInterface *gui);
 	virtual ~tds_display();

@@ -47,6 +47,8 @@ int main(int nArg, char** vArg){
 		} else {
 			tds_r = new tds_run();
 			tds_r->read_run_file(cl[2].arg);
+			tds_r->process_plugins();
+			tds_r->initialise();
 			tds_r->make_analysis();
 			return 0;
 		}

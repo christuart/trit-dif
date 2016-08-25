@@ -5,17 +5,31 @@ void userAction(Fl_Widget* target);
 void userAction(selection sel, Ca_Canvas* sender); 
 void reduce_all(); 
 
+void UserInterface::cb_btn_open_run_file_i(Fl_Button*, void*) {
+  userAction(btn_open_run_file);
+}
+void UserInterface::cb_btn_open_run_file(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_open_run_file_i(o,v);
+}
+
 Fl_Double_Window* UserInterface::make_window() {
   { main_window = new Fl_Double_Window(900, 510, "Tritium Diffusion Software - v0.1 - Chris Stuart");
     main_window->user_data((void*)(this));
-    { grp_run_file = new Fl_Group(25, 102, 366, 326);
+    { grp_run_file = new Fl_Group(12, 99, 505, 404);
       grp_run_file->box(FL_DOWN_BOX);
-      { txdsp_run_file_name = new Fl_Text_Display(30, 126, 351, 95, "Current run file:");
+      { txdsp_run_file_name = new Fl_Text_Display(17, 123, 390, 23, "Current run file:");
         txdsp_run_file_name->box(FL_UP_FRAME);
-        txdsp_run_file_name->align(Fl_Align(FL_ALIGN_CENTER));
-        txdsp_run_file_name->scrollbar_align(FL_ALIGN_RIGHT);
+        txdsp_run_file_name->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+        txdsp_run_file_name->scrollbar_align(0);
         txdsp_run_file_name->scroll(0,1);
       } // Fl_Text_Display* txdsp_run_file_name
+      { txedt_run_file_contents = new Fl_Text_Editor(17, 152, 495, 345);
+        txedt_run_file_contents->box(FL_DOWN_BOX);
+        txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);
+      } // Fl_Text_Editor* txedt_run_file_contents
+      { btn_open_run_file = new Fl_Button(412, 122, 100, 25, "Open...");
+        btn_open_run_file->callback((Fl_Callback*)cb_btn_open_run_file);
+      } // Fl_Button* btn_open_run_file
       grp_run_file->end();
     } // Fl_Group* grp_run_file
     main_window->size_range(900, 510, 900, 510);

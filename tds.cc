@@ -392,6 +392,10 @@ void tds_run::set_units_from_file(const char* units_file_address_) {
 }
 
 void tds_run::initialise() {
+	
+	int progress;
+	uint64 now;
+	uint64 checkmark = GetTimeMs64();
 
 	// Before we can read in any data, we should look for
 	// any settings about (measurement) units we can find
@@ -785,6 +789,9 @@ void tds_run::initialise() {
 			settings.tracking_list->push_back(i);
 		}
 	}
+	now = GetTimeMs64();
+	progress = (now - checkmark)/1000;
+	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
 }
 
 void tds_run::process_plugins() {
@@ -846,7 +853,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	settings.tracking_list = new std::vector<int>();
 	
 	
-	std::cout << "Run file reading not yet fully implemented!" << std::endl;
+	//Run file reading not yet fully implemented!
 
 	// most importantly, the checks to make sure that the user has
 	// specified all the required fields in their .run file before
@@ -1028,9 +1035,6 @@ void tds_run::read_run_file(std::string run_file_name) {
 		}
                 line_processing.clear();
 	}
-
-	// Process the plugins, which have been stored as a list of string plugin names and file names
-	process_plugins();
 	
 	// Set the number of simulation steps from the step size and simulation length
 	steps(ceil(settings.simulation_length/settings.delta_t));
@@ -1040,11 +1044,6 @@ void tds_run::read_run_file(std::string run_file_name) {
 	now = GetTimeMs64();
 	progress = (now - checkmark)/1000;
 	std::cout << "Instructions read in " << progress << " seconds. Initialising..." << std::endl;
-	checkmark = now;
-	this->initialise();
-	now = GetTimeMs64();
-	progress = (now - checkmark)/1000;
-	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
 	
 
 	
@@ -1148,10 +1147,14 @@ void tds_run::interrupt_post_simulation() {
 
 tds_display::tds_display(UserInterface *gui):GUI_(gui){
 	GUI_->txdsp_run_file_name->buffer(FRunFileName);
-	// GUI_->RootfileComment->buffer(FRootfileComments);
-	// GUI_->TimelineComment->buffer(TimelineComment);
-	// GUI_->RootfileName->buffer(FRootfileName);
-	FRunFileName.text("default.run\n\n\n\n oaisdnoaisdn\no\tndsoinsdo\n\n\n oaisdnoaisdn\no\tndsoinsdo\n\n\n oaisdnoaisdn\no\tndsoinsdonioin");
+	GUI_->txedt_run_file_contents->buffer(FRunFileContents);
+	std::string run_file_name = "example.run";
+	FRunFileName.text(run_file_name.c_str());
+        //std::ifstream run_file_(run_file_name);
+        //char defaultRunContents[8192];
+        //run_file_.read(defaultRunContents,8192);
+	//FRunFileContents.text(defaultRunContents);
+	FRunFileContents.loadfile(FRunFileName.text());
 	// FRootfileComments.text("\n \n \t Choose a file");
 }
 
@@ -1159,13 +1162,15 @@ tds_display::~tds_display(){
 	// GUI_->plotH->clear();
 }
 
-void tds_display::dialog_open(){
-	const char *filePtr=fl_file_chooser("Input File",NULL,"",0);
-	if(filePtr){
-		std::cout<<"open"<<std::endl;
-		filename(filePtr);
-		load_section(0);
-		FRootfileName.text(filePtr);
+void tds_display::open_run_file_dialog(){
+	if (previous_settings_were_saved()) {
+		const char *filePtr=fl_file_chooser("Input File","Run Files (*.run)","",0);
+		if(filePtr){
+			filename(filePtr);
+			load_section(0);
+			FRunFileName.text(filePtr);
+			FRunFileContents.loadfile(FRunFileName.text());
+		}
 	}
 }
 
@@ -1203,6 +1208,14 @@ void tds_display::action(selection sel, Fl_Widget *sender){
 
 void tds_display::action(Fl_Widget *sender){
 	std::cout<<"display action"<<std::endl;
+	if (sender == GUI_->btn_open_run_file) {
+		open_run_file_dialog();
+		std::cout << "\tOpen run file..." << std::endl;
+	}
+}
+bool tds_display::previous_settings_were_saved() {
+	std::cout << "Skipped checking settings were saved." << std::endl;
+	return true;
 }
 
 

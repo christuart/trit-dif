@@ -35,16 +35,25 @@ class UserInterface {open
   } {
     Fl_Window main_window {
       label {Tritium Diffusion Software - v0.1 - Chris Stuart} open
-      xywh {1018 385 900 510} type Double size_range {900 510 900 510} visible
+      xywh {776 364 900 510} type Double size_range {900 510 900 510} visible
     } {
       Fl_Group grp_run_file {open
-        xywh {25 102 366 326} box DOWN_BOX
+        xywh {12 99 505 404} box DOWN_BOX
       } {
         Fl_Text_Display txdsp_run_file_name {
-          label {Current run file:} selected
-          xywh {30 126 351 95} box UP_FRAME align 0
-          code0 {txdsp_run_file_name->scrollbar_align(FL_ALIGN_RIGHT);}
+          label {Current run file:}
+          xywh {17 123 390 23} box UP_FRAME align 5
+          code0 {txdsp_run_file_name->scrollbar_align(0);}
           code1 {txdsp_run_file_name->scroll(0,1);}
+        }
+        Fl_Text_Editor txedt_run_file_contents {selected
+          xywh {17 152 495 345} box DOWN_BOX
+          code0 {txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);}
+        }
+        Fl_Button btn_open_run_file {
+          label {Open...}
+          callback {userAction(btn_open_run_file);}
+          xywh {412 122 100 25}
         }
       }
     }

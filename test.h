@@ -15,6 +15,8 @@ extern void reduce_all();
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Button.H>
 
 class UserInterface {
 public:
@@ -22,6 +24,12 @@ public:
   Fl_Double_Window *main_window;
   Fl_Group *grp_run_file;
   Fl_Text_Display *txdsp_run_file_name;
+  Fl_Text_Editor *txedt_run_file_contents;
+  Fl_Button *btn_open_run_file;
+private:
+  inline void cb_btn_open_run_file_i(Fl_Button*, void*);
+  static void cb_btn_open_run_file(Fl_Button*, void*);
+public:
   void show();
 };
 #endif
