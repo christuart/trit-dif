@@ -14,8 +14,8 @@
 
 typedef long long int64; typedef unsigned long long uint64;
 
-// Andreas Bonini's timing method from http://stackoverflow.com/a/1861337
-/* Returns the amount of milliseconds elapsed since the UNIX epoch. Works on both
+/// Andreas Bonini's timing method from http://stackoverflow.com/a/1861337
+/** Returns the amount of milliseconds elapsed since the UNIX epoch. Works on both
  * windows and linux. */
 uint64 GetTimeMs64();
 

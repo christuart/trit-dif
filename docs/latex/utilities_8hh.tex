@@ -1,123 +1,122 @@
-\hypertarget{utilities_8hh}{\section{utilities.\-hh File Reference}
-\label{utilities_8hh}\index{utilities.\-hh@{utilities.\-hh}}
-}
+\hypertarget{utilities_8hh}{}\section{utilities.\+hh File Reference}
+\label{utilities_8hh}\index{utilities.\+hh@{utilities.\+hh}}
 {\ttfamily \#include $<$string$>$}\\*
-{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
 {\ttfamily \#include $<$fstream$>$}\\*
 {\ttfamily \#include $<$sstream$>$}\\*
-{\ttfamily \#include $<$time.\-h$>$}\\*
-{\ttfamily \#include $<$dirent.\-h$>$}\\*
-{\ttfamily \#include $<$signal.\-h$>$}\\*
-{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include $<$dirent.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
 {\ttfamily \#include $<$vector$>$}\\*
 {\ttfamily \#include $<$iostream$>$}\\*
-{\ttfamily \#include $<$sys/wait.\-h$>$}\\*
-{\ttfamily \#include $<$sys/types.\-h$>$}\\*
-{\ttfamily \#include $<$sys/stat.\-h$>$}\\*
-{\ttfamily \#include $<$sys/resource.\-h$>$}\\*
-{\ttfamily \#include $<$pwd.\-h$>$}\\*
-{\ttfamily \#include $<$pthread.\-h$>$}\\*
+{\ttfamily \#include $<$sys/wait.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+{\ttfamily \#include $<$sys/resource.\+h$>$}\\*
+{\ttfamily \#include $<$pwd.\+h$>$}\\*
+{\ttfamily \#include $<$pthread.\+h$>$}\\*
 \subsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
-class \hyperlink{classcCommandLine}{c\-Command\-Line}
+class \hyperlink{classcCommandLine}{c\+Command\+Line}
 \item 
-struct \hyperlink{structcCommandLine_1_1clParameter}{c\-Command\-Line\-::cl\-Parameter}
+struct \hyperlink{structcCommandLine_1_1clParameter}{c\+Command\+Line\+::cl\+Parameter}
 \end{DoxyCompactItemize}
 \subsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
-\#define \hyperlink{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}{M\-A\-X\-\_\-\-D\-A\-T\-E}~25
+\#define \hyperlink{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}{M\+A\+X\+\_\+\+D\+A\+TE}~25
 \end{DoxyCompactItemize}
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}{c\-Separate\-Values} (std\-::vector$<$ std\-::string $>$ \&, std\-::string \&, std\-::string, std\-::string no=\char`\"{}\char`\"{})
+void \hyperlink{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}{c\+Separate\+Values} (std\+::vector$<$ std\+::string $>$ \&, std\+::string \&, std\+::string, std\+::string no=\char`\"{}\char`\"{})
 \item 
-{\footnotesize template$<$class Type $>$ }\\int \hyperlink{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}{c\-Contains} (std\-::vector$<$ Type $>$ \&tgt, Type arg)
+{\footnotesize template$<$class Type $>$ }\\int \hyperlink{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}{c\+Contains} (std\+::vector$<$ Type $>$ \&tgt, Type arg)
 \item 
-{\footnotesize template$<$class in\-Type $>$ }\\std\-::string \& \hyperlink{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}{operator$<$$<$} (std\-::string \&str, in\-Type Data)
+{\footnotesize template$<$class in\+Type $>$ }\\std\+::string \& \hyperlink{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}{operator$<$$<$} (std\+::string \&str, in\+Type Data)
 \item 
-{\footnotesize template$<$class Type $>$ }\\std\-::string \hyperlink{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}{c\-String} (Type Data)
+{\footnotesize template$<$class Type $>$ }\\std\+::string \hyperlink{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}{c\+String} (Type Data)
 \item 
-std\-::string \hyperlink{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}{find\-\_\-replace} (const std\-::string \&pattern, const std\-::string \&rep, const std\-::string \&str)
+std\+::string \hyperlink{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}{find\+\_\+replace} (const std\+::string \&pattern, const std\+::string \&rep, const std\+::string \&str)
 \item 
-void \hyperlink{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}{ensure\-\_\-ending} (std\-::string \&str, const std\-::string \&suffix)
+void \hyperlink{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}{ensure\+\_\+ending} (std\+::string \&str, const std\+::string \&suffix)
 \item 
-void \hyperlink{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}{trim} (std\-::string \&str)
+void \hyperlink{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}{trim} (std\+::string \&str)
 \item 
-std\-::string \hyperlink{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}{get\-\_\-timestamp} ()
+std\+::string \hyperlink{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}{get\+\_\+timestamp} ()
 \end{DoxyCompactItemize}
 
 
 \subsection{Macro Definition Documentation}
-\hypertarget{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}{\index{utilities.\-hh@{utilities.\-hh}!M\-A\-X\-\_\-\-D\-A\-T\-E@{M\-A\-X\-\_\-\-D\-A\-T\-E}}
-\index{M\-A\-X\-\_\-\-D\-A\-T\-E@{M\-A\-X\-\_\-\-D\-A\-T\-E}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{M\-A\-X\-\_\-\-D\-A\-T\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-A\-X\-\_\-\-D\-A\-T\-E~25}}\label{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}
+\index{utilities.\+hh@{utilities.\+hh}!M\+A\+X\+\_\+\+D\+A\+TE@{M\+A\+X\+\_\+\+D\+A\+TE}}
+\index{M\+A\+X\+\_\+\+D\+A\+TE@{M\+A\+X\+\_\+\+D\+A\+TE}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{M\+A\+X\+\_\+\+D\+A\+TE}{MAX_DATE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+D\+A\+TE~25}\hypertarget{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}{}\label{utilities_8hh_ab2854f198e119d1843f14002a2621aa7}
 
 
 \subsection{Function Documentation}
-\hypertarget{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}{\index{utilities.\-hh@{utilities.\-hh}!c\-Contains@{c\-Contains}}
-\index{c\-Contains@{c\-Contains}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{c\-Contains}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Type $>$ int c\-Contains (
+\index{utilities.\+hh@{utilities.\+hh}!c\+Contains@{c\+Contains}}
+\index{c\+Contains@{c\+Contains}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{c\+Contains(std\+::vector$<$ Type $>$ \&tgt, Type arg)}{cContains(std::vector< Type > &tgt, Type arg)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Type $>$ int c\+Contains (
 \begin{DoxyParamCaption}
-\item[{std\-::vector$<$ Type $>$ \&}]{tgt, }
+\item[{std\+::vector$<$ Type $>$ \&}]{tgt, }
 \item[{Type}]{arg}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}
-\hypertarget{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}{\index{utilities.\-hh@{utilities.\-hh}!c\-Separate\-Values@{c\-Separate\-Values}}
-\index{c\-Separate\-Values@{c\-Separate\-Values}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{c\-Separate\-Values}]{\setlength{\rightskip}{0pt plus 5cm}void c\-Separate\-Values (
+)}\hypertarget{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}{}\label{utilities_8hh_ac50055ad10ac4af6192feb9ea7fa5e00}
+\index{utilities.\+hh@{utilities.\+hh}!c\+Separate\+Values@{c\+Separate\+Values}}
+\index{c\+Separate\+Values@{c\+Separate\+Values}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{c\+Separate\+Values(std\+::vector$<$ std\+::string $>$ \&, std\+::string \&, std\+::string, std\+::string no="""")}{cSeparateValues(std::vector< std::string > &, std::string &, std::string, std::string no="")}}]{\setlength{\rightskip}{0pt plus 5cm}void c\+Separate\+Values (
 \begin{DoxyParamCaption}
-\item[{std\-::vector$<$ std\-::string $>$ \&}]{, }
-\item[{std\-::string \&}]{, }
-\item[{std\-::string}]{, }
-\item[{std\-::string}]{no = {\ttfamily \char`\"{}\char`\"{}}}
+\item[{std\+::vector$<$ std\+::string $>$ \&}]{, }
+\item[{std\+::string \&}]{, }
+\item[{std\+::string}]{, }
+\item[{std\+::string}]{no = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}
-\hypertarget{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}{\index{utilities.\-hh@{utilities.\-hh}!c\-String@{c\-String}}
-\index{c\-String@{c\-String}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{c\-String}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Type $>$ std\-::string c\-String (
+)}\hypertarget{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}{}\label{utilities_8hh_a2f854ac6ac93c0790fd5a5c0b9715a74}
+\index{utilities.\+hh@{utilities.\+hh}!c\+String@{c\+String}}
+\index{c\+String@{c\+String}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{c\+String(\+Type Data)}{cString(Type Data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Type $>$ std\+::string c\+String (
 \begin{DoxyParamCaption}
 \item[{Type}]{Data}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}
-\hypertarget{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}{\index{utilities.\-hh@{utilities.\-hh}!ensure\-\_\-ending@{ensure\-\_\-ending}}
-\index{ensure\-\_\-ending@{ensure\-\_\-ending}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{ensure\-\_\-ending}]{\setlength{\rightskip}{0pt plus 5cm}void ensure\-\_\-ending (
+)}\hypertarget{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}{}\label{utilities_8hh_af0192c9d10463d2686dc99fde19913e6}
+\index{utilities.\+hh@{utilities.\+hh}!ensure\+\_\+ending@{ensure\+\_\+ending}}
+\index{ensure\+\_\+ending@{ensure\+\_\+ending}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{ensure\+\_\+ending(std\+::string \&str, const std\+::string \&suffix)}{ensure_ending(std::string &str, const std::string &suffix)}}]{\setlength{\rightskip}{0pt plus 5cm}void ensure\+\_\+ending (
 \begin{DoxyParamCaption}
-\item[{std\-::string \&}]{str, }
-\item[{const std\-::string \&}]{suffix}
+\item[{std\+::string \&}]{str, }
+\item[{const std\+::string \&}]{suffix}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}
-\hypertarget{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}{\index{utilities.\-hh@{utilities.\-hh}!find\-\_\-replace@{find\-\_\-replace}}
-\index{find\-\_\-replace@{find\-\_\-replace}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{find\-\_\-replace}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string find\-\_\-replace (
+)}\hypertarget{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}{}\label{utilities_8hh_a5bcdfdc95f2e3d46749414d783bc6d42}
+\index{utilities.\+hh@{utilities.\+hh}!find\+\_\+replace@{find\+\_\+replace}}
+\index{find\+\_\+replace@{find\+\_\+replace}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{find\+\_\+replace(const std\+::string \&pattern, const std\+::string \&rep, const std\+::string \&str)}{find_replace(const std::string &pattern, const std::string &rep, const std::string &str)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string find\+\_\+replace (
 \begin{DoxyParamCaption}
-\item[{const std\-::string \&}]{pattern, }
-\item[{const std\-::string \&}]{rep, }
-\item[{const std\-::string \&}]{str}
+\item[{const std\+::string \&}]{pattern, }
+\item[{const std\+::string \&}]{rep, }
+\item[{const std\+::string \&}]{str}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}
-\hypertarget{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}{\index{utilities.\-hh@{utilities.\-hh}!get\-\_\-timestamp@{get\-\_\-timestamp}}
-\index{get\-\_\-timestamp@{get\-\_\-timestamp}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{get\-\_\-timestamp}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string get\-\_\-timestamp (
+)}\hypertarget{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}{}\label{utilities_8hh_a2a1d823bc6c237b6c1dfccfe9f781394}
+\index{utilities.\+hh@{utilities.\+hh}!get\+\_\+timestamp@{get\+\_\+timestamp}}
+\index{get\+\_\+timestamp@{get\+\_\+timestamp}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{get\+\_\+timestamp()}{get_timestamp()}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string get\+\_\+timestamp (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}
-\hypertarget{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}{\index{utilities.\-hh@{utilities.\-hh}!operator$<$$<$@{operator$<$$<$}}
-\index{operator$<$$<$@{operator$<$$<$}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class in\-Type $>$ std\-::string\& operator$<$$<$ (
+)}\hypertarget{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}{}\label{utilities_8hh_a3f3b864aa1926634aeab0d037cefc11d}
+\index{utilities.\+hh@{utilities.\+hh}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{operator$<$$<$(std\+::string \&str, in\+Type Data)}{operator<<(std::string &str, inType Data)}}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class in\+Type $>$ std\+::string\& operator$<$$<$ (
 \begin{DoxyParamCaption}
-\item[{std\-::string \&}]{str, }
-\item[{in\-Type}]{Data}
+\item[{std\+::string \&}]{str, }
+\item[{in\+Type}]{Data}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}
-\hypertarget{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}{\index{utilities.\-hh@{utilities.\-hh}!trim@{trim}}
-\index{trim@{trim}!utilities.hh@{utilities.\-hh}}
-\subsubsection[{trim}]{\setlength{\rightskip}{0pt plus 5cm}void trim (
+)}\hypertarget{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}{}\label{utilities_8hh_a0f99b3edfdcfe1466f26eea911b4c7d0}
+\index{utilities.\+hh@{utilities.\+hh}!trim@{trim}}
+\index{trim@{trim}!utilities.\+hh@{utilities.\+hh}}
+\subsubsection[{\texorpdfstring{trim(std\+::string \&str)}{trim(std::string &str)}}]{\setlength{\rightskip}{0pt plus 5cm}void trim (
 \begin{DoxyParamCaption}
-\item[{std\-::string \&}]{str}
+\item[{std\+::string \&}]{str}
 \end{DoxyParamCaption}
-)}}\label{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}
+)}\hypertarget{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}{}\label{utilities_8hh_a83375b89f8b135c348ba5bea0c847da0}

@@ -1,7 +1,6 @@
-\hypertarget{timing_8hh}{\section{timing.\-hh File Reference}
-\label{timing_8hh}\index{timing.\-hh@{timing.\-hh}}
-}
-{\ttfamily \#include $<$sys/time.\-h$>$}\\*
+\hypertarget{timing_8hh}{}\section{timing.\+hh File Reference}
+\label{timing_8hh}\index{timing.\+hh@{timing.\+hh}}
+{\ttfamily \#include $<$sys/time.\+h$>$}\\*
 {\ttfamily \#include $<$ctime$>$}\\*
 {\ttfamily \#include $<$iostream$>$}\\*
 {\ttfamily \#include $<$sstream$>$}\\*
@@ -16,43 +15,48 @@ typedef unsigned long long \hyperlink{timing_8hh_a29940ae63ec06c9998bba873e25407
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{timing_8hh_a29940ae63ec06c9998bba873e25407ad}{uint64} \hyperlink{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}{Get\-Time\-Ms64} ()
+\hyperlink{timing_8hh_a29940ae63ec06c9998bba873e25407ad}{uint64} \hyperlink{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}{Get\+Time\+Ms64} ()
+\begin{DoxyCompactList}\small\item\em Andreas Bonini\textquotesingle{}s timing method from \href{http://stackoverflow.com/a/1861337}{\tt http\+://stackoverflow.\+com/a/1861337}. \end{DoxyCompactList}\item 
+double \hyperlink{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}{average\+\_\+historic\+\_\+time} (double \+\_\+history\+\_\+times\mbox{[}$\,$\mbox{]}, int \+\_\+history\+\_\+count)
 \item 
-double \hyperlink{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}{average\-\_\-historic\-\_\-time} (double \-\_\-history\-\_\-times\mbox{[}$\,$\mbox{]}, int \-\_\-history\-\_\-count)
-\item 
-std\-::string \hyperlink{timing_8hh_aab459cac7ed4df8d570398f7cd204574}{format\-\_\-time} (double time)
+std\+::string \hyperlink{timing_8hh_aab459cac7ed4df8d570398f7cd204574}{format\+\_\+time} (double time)
 \end{DoxyCompactItemize}
 
 
 \subsection{Typedef Documentation}
-\hypertarget{timing_8hh_aecfc3c54bd29ad5964e1c1c3ccbf89df}{\index{timing.\-hh@{timing.\-hh}!int64@{int64}}
-\index{int64@{int64}!timing.hh@{timing.\-hh}}
-\subsubsection[{int64}]{\setlength{\rightskip}{0pt plus 5cm}typedef long long {\bf int64}}}\label{timing_8hh_aecfc3c54bd29ad5964e1c1c3ccbf89df}
-\hypertarget{timing_8hh_a29940ae63ec06c9998bba873e25407ad}{\index{timing.\-hh@{timing.\-hh}!uint64@{uint64}}
-\index{uint64@{uint64}!timing.hh@{timing.\-hh}}
-\subsubsection[{uint64}]{\setlength{\rightskip}{0pt plus 5cm}typedef unsigned long long {\bf uint64}}}\label{timing_8hh_a29940ae63ec06c9998bba873e25407ad}
+\index{timing.\+hh@{timing.\+hh}!int64@{int64}}
+\index{int64@{int64}!timing.\+hh@{timing.\+hh}}
+\subsubsection[{\texorpdfstring{int64}{int64}}]{\setlength{\rightskip}{0pt plus 5cm}typedef long long {\bf int64}}\hypertarget{timing_8hh_aecfc3c54bd29ad5964e1c1c3ccbf89df}{}\label{timing_8hh_aecfc3c54bd29ad5964e1c1c3ccbf89df}
+\index{timing.\+hh@{timing.\+hh}!uint64@{uint64}}
+\index{uint64@{uint64}!timing.\+hh@{timing.\+hh}}
+\subsubsection[{\texorpdfstring{uint64}{uint64}}]{\setlength{\rightskip}{0pt plus 5cm}typedef unsigned long long {\bf uint64}}\hypertarget{timing_8hh_a29940ae63ec06c9998bba873e25407ad}{}\label{timing_8hh_a29940ae63ec06c9998bba873e25407ad}
 
 
 \subsection{Function Documentation}
-\hypertarget{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}{\index{timing.\-hh@{timing.\-hh}!average\-\_\-historic\-\_\-time@{average\-\_\-historic\-\_\-time}}
-\index{average\-\_\-historic\-\_\-time@{average\-\_\-historic\-\_\-time}!timing.hh@{timing.\-hh}}
-\subsubsection[{average\-\_\-historic\-\_\-time}]{\setlength{\rightskip}{0pt plus 5cm}double average\-\_\-historic\-\_\-time (
+\index{timing.\+hh@{timing.\+hh}!average\+\_\+historic\+\_\+time@{average\+\_\+historic\+\_\+time}}
+\index{average\+\_\+historic\+\_\+time@{average\+\_\+historic\+\_\+time}!timing.\+hh@{timing.\+hh}}
+\subsubsection[{\texorpdfstring{average\+\_\+historic\+\_\+time(double \+\_\+history\+\_\+times[], int \+\_\+history\+\_\+count)}{average_historic_time(double _history_times[], int _history_count)}}]{\setlength{\rightskip}{0pt plus 5cm}double average\+\_\+historic\+\_\+time (
 \begin{DoxyParamCaption}
-\item[{double}]{\-\_\-history\-\_\-times\mbox{[}$\,$\mbox{]}, }
-\item[{int}]{\-\_\-history\-\_\-count}
+\item[{double}]{\+\_\+history\+\_\+times\mbox{[}$\,$\mbox{]}, }
+\item[{int}]{\+\_\+history\+\_\+count}
 \end{DoxyParamCaption}
-)}}\label{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}
-\hypertarget{timing_8hh_aab459cac7ed4df8d570398f7cd204574}{\index{timing.\-hh@{timing.\-hh}!format\-\_\-time@{format\-\_\-time}}
-\index{format\-\_\-time@{format\-\_\-time}!timing.hh@{timing.\-hh}}
-\subsubsection[{format\-\_\-time}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string format\-\_\-time (
+)}\hypertarget{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}{}\label{timing_8hh_a6b7ae6f9ca0b1d58941a5a7bd5b70554}
+\index{timing.\+hh@{timing.\+hh}!format\+\_\+time@{format\+\_\+time}}
+\index{format\+\_\+time@{format\+\_\+time}!timing.\+hh@{timing.\+hh}}
+\subsubsection[{\texorpdfstring{format\+\_\+time(double time)}{format_time(double time)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string format\+\_\+time (
 \begin{DoxyParamCaption}
 \item[{double}]{time}
 \end{DoxyParamCaption}
-)}}\label{timing_8hh_aab459cac7ed4df8d570398f7cd204574}
-\hypertarget{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}{\index{timing.\-hh@{timing.\-hh}!Get\-Time\-Ms64@{Get\-Time\-Ms64}}
-\index{Get\-Time\-Ms64@{Get\-Time\-Ms64}!timing.hh@{timing.\-hh}}
-\subsubsection[{Get\-Time\-Ms64}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint64} Get\-Time\-Ms64 (
+)}\hypertarget{timing_8hh_aab459cac7ed4df8d570398f7cd204574}{}\label{timing_8hh_aab459cac7ed4df8d570398f7cd204574}
+\index{timing.\+hh@{timing.\+hh}!Get\+Time\+Ms64@{Get\+Time\+Ms64}}
+\index{Get\+Time\+Ms64@{Get\+Time\+Ms64}!timing.\+hh@{timing.\+hh}}
+\subsubsection[{\texorpdfstring{Get\+Time\+Ms64()}{GetTimeMs64()}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint64} Get\+Time\+Ms64 (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
-)}}\label{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}
+)}\hypertarget{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}{}\label{timing_8hh_a80d549c116a695a963ad5b7d193fb33e}
+
+
+Andreas Bonini\textquotesingle{}s timing method from \href{http://stackoverflow.com/a/1861337}{\tt http\+://stackoverflow.\+com/a/1861337}. 
+
+Returns the amount of milliseconds elapsed since the U\+N\+IX epoch. Works on both windows and linux. 
