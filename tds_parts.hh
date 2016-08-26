@@ -1,6 +1,7 @@
 #ifndef TDS_PARTS_HH
 #define TDS_PARTS_HH
 
+#include <algorithm>
 #include "vector_ops.hh"
 
 class tds_part;
@@ -50,6 +51,8 @@ public:
 	inline int n_elements() { return elements_.size(); }
 	void clean_elements();
 	void remove_last_element();
+
+	static double get_3Dplanar_area(tds_nodes shared_nodes, std::vector<double> &e_n);
 };
 
 class tds_element : public tds_part {

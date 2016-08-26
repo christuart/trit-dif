@@ -11,7 +11,7 @@
 
 
 
-tds::tds():sections_(){
+tds::tds():sections_() {
 	element_dimensions_ = 0x0;
 }
 
@@ -22,44 +22,69 @@ tds::~tds(){
 	clean_nodes();
 }
 
-int tds::add_section(tds_section* new_section){
+int tds::add_section(tds_section* new_section) {
 	std::cout<<"adding a new section"<<std::endl;
 	sections_.push_back(new_section);
 	return sections_.size()-1;
 }
-int tds::add_material(tds_material* new_material){
+int tds::add_material(tds_material* new_material) {
 	std::cout << "adding a new material: " << (*new_material).name() << std::endl;
 	material_map_[(*new_material).name()] = new_material;
 	materials_.push_back(new_material);
 	return materials_.size()-1;
 }
-int tds::add_node(tds_node* new_node){
+int tds::add_node(tds_node* new_node) {
 	// std::cout<<"adding a new node"<<std::endl;
 	nodes_.push_back(new_node);
 	return nodes_.size()-1;
 }
-int tds::add_element(tds_element* new_element){
+int tds::add_element(tds_element* new_element) {
 	// std::cout<<"adding a new element"<<std::endl;
 	elements_.push_back(new_element);
 	return elements_.size()-1;
 }
 
-void tds::clean_sections(){
+void tds::clean_sections() {
 	for (int i=0; i<sections_.size(); ++i) delete sections_[i];
 	sections_.resize(0);
 }
-void tds::clean_materials(){
+void tds::clean_materials() {
 	for (int i=0; i<materials_.size(); ++i) delete materials_[i];
 	materials_.resize(0);
 }
-void tds::clean_nodes(){
+void tds::clean_nodes() {
 	for (int i=0; i<nodes_.size(); ++i) delete nodes_[i];
 	nodes_.resize(0);
 }
-void tds::clean_elements(){
+void tds::clean_elements() {
 	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
 	elements_.resize(0);
 }
+void tds::clean_inactive_elements() {
+	for (int i=0; i<elements_.size(); ++i) {
+		int j = i;
+		// We're going to erase, and then continue moving through.
+		// That means that we will go from
+		// (1, 2, 3*, 4*, 5, 6*, 7) where * means empty
+		// to
+		// (1, 2, 5, 6*, 7)
+		// and need to access 5 using index 3, not index 5.
+		// So whilst looking for how many to delete, i doesn't change,
+		// and j does.
+		// std::cout << i << std::flush;
+		while (j < elements_.size() && element(j).n_neighbours() == 0) {
+			++j;
+			// std::cout << ", " << j << std::flush;
+		}
+		if (j > i) {
+			// std::cout << " bad " << std::flush;
+			elements_.erase(elements_.begin()+i,elements_.begin()+j); // start inclusive end exclusive
+		} else {
+			// std::cout << " good " << std::flush;
+		}
+	}
+}
+
 /// Allocates at least enough memory for the expected number of materials
 /** This is necessary to prevent reallocation occurring during the program.
     Reallocation would invalidate any pointers or iterators for the vector.
@@ -157,7 +182,6 @@ void tds::register_element_type(int element_type) {
 	case 6: // 6 node prism
 	case 7: // 5 node pyramid
 		element_dimensions_.set(three_d);
-		std::cerr << "Detected 3-D stuff. This hasn't been programmed for yet." << std::endl;
 		break;
 	case 15: // 1 node point
 		std::cerr << "Detected a single node point 'element' :/" << std::endl;
@@ -214,7 +238,14 @@ tds_run::~tds_run(){
 // }
 
 void tds_run::make_analysis() {
-
+	
+	std::cout << std::endl;
+	std::cout << "Checking the model..." << std::endl;
+	if ((n_sections() == 0) || (n_elements() == 0) || (n_nodes() == 0)) {
+		std::cerr << "Model is incomplete. Simulation cancelled!" << std::endl;
+		throw;
+	}
+	
 	std::cout << "Running the model..." << std::endl;
 
 	// This is a very basic implementation of 'make_analysis' which has constant
@@ -720,9 +751,9 @@ void tds_run::initialise() {
 						//           << o << " more elements." << std::endl;
 						for (int k=o; k > 0; k--) {
 							if (section(s).element(i).node(j).element(k-1).material().is_source()) {
-								//std::cout << "No need to give a link from source to source, skipping." << std::endl;
+								// std::cout << "No need to give a link from source to source, skipping." << std::endl;
 							} else if (&section(s).element(i) == &(section(s).element(i).node(j).element(k-1))) {
-								//std::cout << "Skipping - don't need to link to self!" << std::endl;
+								// std::cout << "Skipping - don't need to link to self!" << std::endl;
 							} else {
 								// std::cout << "Making link from " << &section(s).element(i) << " to "
 								//           << &(section(s).element(i).node(j).element(k-1)) << std::endl;
@@ -779,17 +810,13 @@ void tds_run::initialise() {
 	} else if (!(element_dimensions(three_d) || element_dimensions(second_order_or_worse)) &&
 	           (element_dimensions(two_d))
 	           ) {
-		// We don't want to use the global elements list, but instead
-		// iterate through each section's list of elements. This allows
-		// us to treat source and/or outgassing sections differently
-		// from the rest.
 
 		// 2D is nice because whatever shape the element is,
 		// it can only build an interface from two nodes.
 		
 		int n, m, o, p, t = 0, c;
 		for (int s = 0; s < n_sections(); s++ ) {
-			std::cout << "Starting section " << s << " (" << section(s).material().name() << ")" << std::endl;
+			std::cout << "Starting section " << s << " (" << section(s).name() << ")" << std::endl;
 			n = section(s).n_elements();
 			t += n;
 			//if (section(s).material().is_source()) {
@@ -846,9 +873,82 @@ void tds_run::initialise() {
 			}
 		}
 		
+	} else if (!element_dimensions(second_order_or_worse) &&
+	           (element_dimensions(three_d))
+	           ) {
+
+		// 3D is less nice because the interface may have any number
+		// of nodes from 3 upwards. Still, let's get cracking...
+
+		int n, m, o, p, t = 0, c;
+		for (int s = 0; s < n_sections(); s++ ) {
+			std::cout << "Starting section " << s << " (" << section(s).name() << ")" << std::endl;
+			n = section(s).n_elements();
+			t += n;
+			for (int i=0; i < n; ++i) {
+				// std::cout << "Starting i of " << i << " i.e. element " << &section(s).element(i) << std::endl;
+				m = section(s).element(i).n_nodes();
+				for (int j=0; j < m; ++j) {
+					// std::cout << "\tStarting j: node " << j << std::endl;
+					o = section(s).element(i).node(j).n_elements();
+					for (int k=0; k < o; ++k) {
+						// std::cout << "\t\tStarting k of " << k << " i.e. element " << &section(s).element(i).node(j).element(k) << std::endl;
+						// don't try and link to yourself, or to something already linked:
+						if (
+						    (&section(s).element(i) != &section(s).element(i).node(j).element(k)) &&
+						    (section(s).element(i).is_linked_to(
+											( &section(s).element(i).node(j).element(k) )
+											)==false)
+						    ) {
+							p = section(s).element(i).node(j).element(k).n_nodes();
+							// c is a count of the common nodes
+							c = 1; // we know that one node is the same already
+							for (int l=0; (l < p); ++l) {
+								// ignore that one node
+								if (&section(s).element(i).node(j) != &section(s).element(i).node(j).element(k).node(l)) {
+									for (int q=0; (q < m); ++q) {
+										if (&section(s).element(i).node(j).element(k).node(l) == &section(s).element(i).node(q)) {
+											++c;
+										}
+									}
+								}
+							}
+							if (c >= 3) {
+								// std::cout << "Making link from " << &section(s).element(i) << " to "
+								//            << &(section(s).element(i).node(j).element(k)) << std::endl;
+								tds_element_link* new_link = new tds_element_link(&section(s).element(i),
+														  &(section(s).element(i).node(j).element(k)));
+								element_link_count++;
+								// std::cout << "Made link" << std::endl;
+								element_link_identifier _el_id;
+								_el_id.element_link = new_link;
+								interrupt_element_link(_el_id);
+								// Reread pointer in case changed by interruption:
+								new_link = _el_id.element_link;
+								section(s).element(i).add_element_link(new_link);
+								section(s).element(i).node(j).element(k).add_element_link(new_link);
+							}
+							// std::cout << "found " << c << " nodes in common." << std::endl;
+						} else {
+							// std::cout << "skipped: k="<<k<<";j="<<j<<";i="<<i << std::endl;
+						}
+					}
+				}
+			}
+		}
+		
 	} else {
-		std::cout << "Element links could not be made, only 1-D programmed." << std::endl;
+		std::cout << "Element links could not be made, only linear in 1-D, 2-D and 3-D programmed." << std::endl;
 	}
+
+	// There will be some elements which have not produced any links. These will not take
+	// part in the simulation as a result. These come about from
+	//  a) elements in the .msh file of 1-D or 2-D (or 0-D... silly gmsh) when a 2-D or
+	//     3-D (or 1-D) mesh was present
+	//  b) weirdly defined meshes with e.g. a single floating element
+	// To avoid wasting memory and time (update will still get called for these elements,
+	// but won't do anything) we will clean (remove) these.
+	clean_inactive_elements();
 
 	//output_model_summary(true,true,true,true,true);
 	output_model_summary(false,false,false,false,false);
