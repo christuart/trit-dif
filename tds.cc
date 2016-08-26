@@ -16,8 +16,10 @@ tds::tds():sections_(){
 }
 
 tds::~tds(){
-	std::cout<<"cleaning sections"<<std::endl;
 	clean_sections();
+	clean_materials();
+	clean_elements();
+	clean_nodes();
 }
 
 int tds::add_section(tds_section* new_section){
@@ -396,6 +398,7 @@ void tds_run::make_analysis() {
 
 		// Contaminations: final values at all elements
 		contaminations_file_address_ = contaminations_file_address();
+		contaminationsfile_.exceptions(ofstream::failbit | ofstream::badbit);
 		contaminationsfile_.open(contaminations_file_address_);
 		contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
 		                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
@@ -408,10 +411,13 @@ void tds_run::make_analysis() {
 			                    << std::endl;
 		contaminationsfile_.close();
 	} catch (ofstream::failure& e) {
+		// These files can only be open if the exception was thrown while they were being built up
+		// so if they are open, we might as well get rid of the incomplete file after we close them.
+		std::cerr << e.what() << std::endl;
 		if (trackingfile_.is_open()) {
 			trackingfile_.close();
 			if (remove(tracking_file_address_) != 0) {
-				std::cerr << "Failed to remove possible garbage tracking file." << std::endl;
+				std::cerr << "Failed to remove possible garbage tracking file." <<   std::endl;
 			}
 		}
 		if (contaminationsfile_.is_open()) {
@@ -447,208 +453,242 @@ void tds_run::initialise() {
 	// Now read in data
 	// First open all the necessary files (no point in getting half way through
 	// processing only to find a file we need is missing)
-	// std::cout << "gonna open me some files" << std::endl;
-	materialsfile_.open(materials_file_address());
-	sectionsfile_.open(sections_file_address());
-	elementsfile_.open(elements_file_address());
-	nodesfile_.open(nodes_file_address());
+	{
+		// We start a new scope so that the fstream destructors are called as soon as
+		// we are done with them.
+		std::ifstream materialsfile_;
+		std::ifstream sectionsfile_;
+		std::ifstream nodesfile_;
+		std::ifstream elementsfile_;
+		
+		materialsfile_.open(materials_file_address());
+		if (!materialsfile_.good()) throw Errors::MissingInputDataException(std::string(materials_file_address()) + " couldn't be opened.");
+		sectionsfile_.open(sections_file_address());
+		if (!sectionsfile_.good()) throw Errors::MissingInputDataException(std::string(sections_file_address()) + " couldn't be opened.");
+		elementsfile_.open(elements_file_address());
+		if (!elementsfile_.good()) throw Errors::MissingInputDataException(std::string(elements_file_address()) + " couldn't be opened.");
+		nodesfile_.open(nodes_file_address());
+		if (!nodesfile_.good()) throw Errors::MissingInputDataException(std::string(nodes_file_address()) + " couldn't be opened.");
 
-	int materials_count, sections_count, elements_count, nodes_count;
+		int materials_count, sections_count, elements_count, nodes_count;
 	
-	//std::cout << "gonna read me some files" << std::endl;
-	std::string line;
+		//std::cout << "gonna read me some files" << std::endl;
+		std::string line;
 		
-	//Let's start off by populating tds with some materials
-	if (std::getline(materialsfile_, line)) {
-		std::istringstream sizess(line);
-		if (!(sizess >> materials_count)) {
-			std::cerr << "Materials count not found, segmentation violations will occur after "
-			          << "vector expands to accommodate many materials." << std::endl;
-		} else {
-			std::cout << "Expanding materials vector to accommodate " << materials_count
-			          << " materials." << std::endl;
-			expected_materials(materials_count+3); // not forgetting error, source and outgassing = +3
-		}
-		while (std::getline(materialsfile_, line)) {
-			std::istringstream iss(line);
-			std::string _name, _density_unit, _diffusion_constant_unit;
-			double _density, _diffusion_constant;
-		
-			if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
-				std::cerr << "Invalid line, skipping. (material)\n";
-				continue;
+		//Let's start off by populating tds with some materials
+		if (std::getline(materialsfile_, line)) {
+			std::istringstream sizess(line);
+			if (!(sizess >> materials_count)) {
+				// This doesn't require a throw, should probabling be in a warning() method
+				std::cerr << "Materials count not found, segmentation violations will occur after "
+				          << "vector expands to accommodate many materials." << std::endl;
+			} else {
+				std::cout << "Expanding materials vector to accommodate " << materials_count
+				          << " materials." << std::endl;
+				expected_materials(materials_count+3); // not forgetting error, source and outgassing = +3
 			}
-
-			//std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
+			while (std::getline(materialsfile_, line)) {
+				std::istringstream iss(line);
+				std::string _name, _density_unit, _diffusion_constant_unit;
+				double _density, _diffusion_constant;
 		
-			// let's make all names lower case
-			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
-		
-			tds_material* _m = new tds_material(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
-			material_identifier _id;
-			_id.material_id = add_material(_m);
-			_id.material = _m;
-			interrupt_material(_id);
-			
-		}
-	} else {
-		throw Errors::MissingInputDataException("No materials found? Is the config name good?");
-	}
-	// we'll add an error material for when a bad name is given
-	// and source/outgassings materials for the regions which will
-	// behave in a special manner. UPDATE: these last two are
-	// being moved to the plug-ins which will use them.
-	add_material(new tds_material("error", 1.0, 0.0));
-	add_material(new tds_material("source", 1.0, 0.0));
-	
-	//Now we've got materials, let's get the physical sections which use them
-	if (std::getline(sectionsfile_, line)) {
-		std::istringstream sizess(line);
-		if (!(sizess >> sections_count)) {
-			std::cerr << "Sections count not found, segmentation violations will occur after "
-			          << "vector expands to accommodate many sections." << std::endl;
-		} else {
-			std::cout << "Expanding sections vector to accommodate " << sections_count
-			          << " sections." << std::endl;
-			expected_sections(sections_count);
-		}
-		while (std::getline(sectionsfile_, line)) {
-			std::istringstream iss(line);
-			int _dim, _id;
-			std::string _name;
-		
-			if (!(iss >> _dim >> _id >> _name)) {
-				std::cerr << "Invalid line, skipping. (section)\n";
-				continue;
-			}
-			{
-				std::string _extra;
-				while (iss >> _extra) {
-					_name += " " + _extra;
+				if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
+					std::cerr << "Invalid line, skipping. (material)\n";
+					continue;
 				}
-			}
 
-			//std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
+				//std::cout << "We obtained five values [" << _name << ", " << _density << ", " << _density_unit << ", " << _diffusion_constant << ", " << _diffusion_constant_unit << "].\n";
 		
-			// Get rid of the double quotes Gmsh puts in, and put to lower case
-			_name.erase(_name.end()-1); _name.erase(_name.begin());
-			std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
-
-			if (_id != n_sections()+1) {
-				std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
-				continue;
-			}
-			// std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
-			tds_section* _s = new tds_section(_name, &material(_name));
-			section_identifier _s_id;
-			_s_id.section_id = add_section(_s);
-			_s_id.section = _s;
-			interrupt_section(_s_id);
+				// let's make all names lower case
+				std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
+		
+				tds_material* _m = new tds_material(_name, units().convert_density_from(_density_unit,_density), units().convert_diffusion_constant_from(_diffusion_constant_unit,_diffusion_constant));
+				material_identifier _id;
+				_id.material_id = add_material(_m);
+				_id.material = _m;
+				interrupt_material(_id);
 			
-			std::cout << "Now " << n_sections() << " sections." << std::endl;
-		}
-	} else {
-		throw Errors::MissingInputDataException("No sections found? Is the model name good?");
-	}
-	//Next we'll get some nodes in
-	if (std::getline(nodesfile_, line)) {
-		std::istringstream sizess(line);
-		if (!(sizess >> nodes_count)) {
-			std::cerr << "Nodes count not found, segmentation violations will occur after "
-			          << "vector expands to accommodate many nodes." << std::endl;
+			}
+			if (materialsfile_.fail())
+				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(materials_file_address()));
 		} else {
-			std::cout << "Expanding nodes vector to accommodate " << nodes_count
-			          << " nodes." << std::endl;
-			expected_nodes(nodes_count);
+			throw Errors::MissingInputDataException("No data read from " + std::string(materials_file_address()) + ". Is the config name good?");
 		}
-		while (std::getline(nodesfile_, line)) {
-			std::istringstream iss(line);
-			int id;
-			double _x, _y, _z;
+		if (n_materials() == 0)
+			throw Errors::MissingInputDataException("No materials found in " + std::string(materials_file_address()) + ". Is the config name good?");
+	
+		// we'll add an error material for when a bad name is given
+		// and source/outgassings materials for the regions which will
+		// behave in a special manner. UPDATE: these last two are
+		// being moved to the plug-ins which will use them.
+		add_material(new tds_material("error", 1.0, 0.0));
+		add_material(new tds_material("source", 1.0, 0.0));
+	
+		//Now we've got materials, let's get the physical sections which use them
+		if (std::getline(sectionsfile_, line)) {
+			std::istringstream sizess(line);
+			if (!(sizess >> sections_count)) {
+				// Requires a warning()
+				std::cerr << "Sections count not found, segmentation violations will occur after "
+				          << "vector expands to accommodate many sections." << std::endl;
+			} else {
+				std::cout << "Expanding sections vector to accommodate " << sections_count
+				          << " sections." << std::endl;
+				expected_sections(sections_count);
+			}
+			while (std::getline(sectionsfile_, line)) {
+				std::istringstream iss(line);
+				int _dim, _id;
+				std::string _name;
 		
-			if (!(iss >> id >> _x >> _y >> _z)) {
-				std::cerr << "Invalid line, skipping. (node)\n";
-				continue;
-			}
+				if (!(iss >> _dim >> _id >> _name)) {
+					std::cerr << "Invalid line, skipping. (section)\n";
+					continue;
+				}
+				{
+					std::string _extra;
+					while (iss >> _extra) {
+						_name += " " + _extra;
+					}
+				}
 
-			//std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
-
-			if (id != n_nodes()+1) {
-				std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
-				continue;
-			}
-			tds_node* _n = new tds_node(_x,_y,_z);
-			node_identifier _n_id;
-			_n_id.node_id = add_node(_n);
-			_n_id.node = _n;
-			interrupt_node(_n_id);
-		}
-	} else {
-		throw Errors::MissingInputDataException("No nodes found? Is the model name good?");
-	}
-	//Now finally we'll read the elements
-	if (std::getline(elementsfile_, line)) {
-		std::istringstream sizess(line);
-		if (!(sizess >> elements_count)) {
-			std::cerr << "Elements count not found, segmentation violations will occur after "
-			          << "vector expands to accommodate many elements." << std::endl;
-		} else {
-			std::cout << "Expanding elements vector to accommodate " << elements_count
-			          << " elements." << std::endl;
-			expected_elements(elements_count);
-		}
-		while (std::getline(elementsfile_, line)) {
-			std::istringstream iss(line);
-			int id, type, n_tags, section_id, entity_id;
-			std::ostringstream extra_tags;
+				//std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
 		
-			if (!(iss >> id >> type >> n_tags)) {
-				std::cerr << "Invalid line, skipping. (element)\n";
-				continue;
-			}
-			register_element_type(type);
-			if (id != n_elements()+1) {
-				std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
-				continue;
-			}
-			int tags_processed = 0;
-			iss >> section_id >> entity_id;
-			for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
-				extra_tags << iss << " ";
-			}
-			if (extra_tags.str().length() > 0)
-				std::cerr << "Unprocessed tags: " << extra_tags.str() << std::endl;
-			tds_nodes _element_nodes;
-			int this_node;
-			while (iss >> this_node) {
-				//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
-				_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
-			}
-			tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1)),0.0);
-			element_identifier _e_id;
-			_e_id.element_id = add_element(new_element);
-			_e_id.section_id = section_id-1;
-			_e_id.section_element_id = section(section_id-1).add_element(new_element);
-			_e_id.element = new_element;
-			interrupt_element(_e_id);
+				// Get rid of the double quotes Gmsh puts in, and put to lower case
+				_name.erase(_name.end()-1); _name.erase(_name.begin());
+				std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
+
+				if (_id != n_sections()+1) {
+					std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
+					continue;
+				}
+				// std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
+				tds_section* _s = new tds_section(_name, &material(_name));
+				section_identifier _s_id;
+				_s_id.section_id = add_section(_s);
+				_s_id.section = _s;
+				interrupt_section(_s_id);
 			
-			// the interruption could change the element pointer e.g. if it
-			// replaces the element with a derived class, so we should read
-			// it back again:
-			new_element = _e_id.element;
-
-			// Once the element has been created, and plugins have had a chance to play around with it, it should be placed in the nodes that form it
-			(*new_element).propogate_into_nodes();
-
-			//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+				std::cout << "Now " << n_sections() << " sections." << std::endl;
+			}
+			if (sectionsfile_.fail())
+				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(sections_file_address()));
+		} else {
+			throw Errors::MissingInputDataException("No data read from " + std::string(sections_file_address()) + ". Is the model name good?");
 		}
-	} else {
-		throw Errors::MissingInputDataException("No elements found? Is the model name good?");
-	}
-	// std::cout << "gonna close me some files" << std::endl;
-	sectionsfile_.close();
-	elementsfile_.close();
-	nodesfile_.close();
+		if (n_sections() == 0)
+			throw Errors::MissingInputDataException("No sections found in " + std::string(sections_file_address()) + ". Is the model name good?");
+	
+		//Next we'll get some nodes in
+		if (std::getline(nodesfile_, line)) {
+			std::istringstream sizess(line);
+			if (!(sizess >> nodes_count)) {
+				// This requires a warning()
+				std::cerr << "Nodes count not found, segmentation violations will occur after "
+				          << "vector expands to accommodate many nodes." << std::endl;
+			} else {
+				std::cout << "Expanding nodes vector to accommodate " << nodes_count
+				          << " nodes." << std::endl;
+				expected_nodes(nodes_count);
+			}
+			while (std::getline(nodesfile_, line)) {
+				std::istringstream iss(line);
+				int id;
+				double _x, _y, _z;
+		
+				if (!(iss >> id >> _x >> _y >> _z)) {
+					std::cerr << "Invalid line, skipping. (node)\n";
+					continue;
+				}
+
+				//std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
+
+				if (id != n_nodes()+1) {
+					std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
+					continue;
+				}
+				tds_node* _n = new tds_node(_x,_y,_z);
+				node_identifier _n_id;
+				_n_id.node_id = add_node(_n);
+				_n_id.node = _n;
+				interrupt_node(_n_id);
+			}
+			if (nodesfile_.fail())
+				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(nodes_file_address()));
+		} else {
+			throw Errors::MissingInputDataException("No data read from " + std::string(nodes_file_address()) + ". Is the model name good?");
+		}
+		if (n_nodes() == 0)
+			throw Errors::MissingInputDataException("No nodes found in " + std::string(nodes_file_address()) + ". Is the model name good?");
+	
+		//Now finally we'll read the elements
+		if (std::getline(elementsfile_, line)) {
+			std::istringstream sizess(line);
+			if (!(sizess >> elements_count)) {
+				std::cerr << "Elements count not found, segmentation violations will occur after "
+				          << "vector expands to accommodate many elements." << std::endl;
+			} else {
+				std::cout << "Expanding elements vector to accommodate " << elements_count
+				          << " elements." << std::endl;
+				expected_elements(elements_count);
+			}
+			while (std::getline(elementsfile_, line)) {
+				std::istringstream iss(line);
+				int id, type, n_tags, section_id, entity_id;
+				std::ostringstream extra_tags;
+		
+				if (!(iss >> id >> type >> n_tags)) {
+					std::cerr << "Invalid line, skipping. (element)\n";
+					continue;
+				}
+				register_element_type(type);
+				if (id != n_elements()+1) {
+					std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
+					continue;
+				}
+				int tags_processed = 0;
+				iss >> section_id >> entity_id;
+				for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
+					extra_tags << iss << " ";
+				}
+				if (extra_tags.str().length() > 0)
+					std::cerr << "Unprocessed tags: " << extra_tags.str() << std::endl;
+				tds_nodes _element_nodes;
+				int this_node;
+				while (iss >> this_node) {
+					//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
+					_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
+				}
+				tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1)),0.0);
+				element_identifier _e_id;
+				_e_id.element_id = add_element(new_element);
+				_e_id.section_id = section_id-1;
+				_e_id.section_element_id = section(section_id-1).add_element(new_element);
+				_e_id.element = new_element;
+				interrupt_element(_e_id);
+			
+				// the interruption could change the element pointer e.g. if it
+				// replaces the element with a derived class, so we should read
+				// it back again:
+				new_element = _e_id.element;
+
+				// Once the element has been created, and plugins have had a chance to play around with it, it should be placed in the nodes that form it
+				(*new_element).propogate_into_nodes();
+
+				//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
+			}
+			if (elementsfile_.fail())
+				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(elements_file_address()));
+		} else {
+			throw Errors::MissingInputDataException("No data read from " + std::string(elements_file_address()) + ". Is the model name good?");
+		}
+		if (n_elements() == 0)
+			throw Errors::MissingInputDataException("No elements found in " + std::string(elements_file_address()) + ". Is the model name good?");
+	
+		sectionsfile_.close();
+		elementsfile_.close();
+		nodesfile_.close();
+	} // end the file reading scope; files will close now even if exception was thrown.
 
 	// Every element now has a list of nodes that it make it,
 	// and every node has a list of every element that makes

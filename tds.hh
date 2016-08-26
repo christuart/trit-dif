@@ -126,10 +126,6 @@ public:
 class tds_run: public tds {
 public:
 private:
-	std::ifstream materialsfile_;
-	std::ifstream sectionsfile_;
-	std::ifstream nodesfile_;
-	std::ifstream elementsfile_;
 	std::ifstream sourcefile_;
 	std::ifstream simparamsfile_;
 	std::ofstream trackingfile_;
