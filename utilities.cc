@@ -213,3 +213,12 @@ std::string get_timestamp() {
 
    return std::string(the_date) + "-GMT";
 }
+
+/// Check whether file exists without opening it
+/** Method courtesy of Rico: http://stackoverflow.com/a/6296808/2569197
+    */
+bool get_file_exists(const std::string& filename)
+{
+    struct stat buf;
+    return (stat(filename.c_str(), &buf) != -1);
+}

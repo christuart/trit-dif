@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include "vector_ops.hh"
+#include "exceptions.hh"
+#include <sstream>
 
 class tds_part;
 class tds_node;
@@ -41,12 +43,36 @@ public:
 	void add_element(tds_element* new_element);
 	//setters
 	inline void position(std::vector<double> _position) { position_ = _position; }
-	inline void position(int i, double _p) { position_[i] = _p; }
+	inline void position(int i, double _p) {
+		if (i < 3) { position_[i] = _p; }
+		else {
+			std::ostringstream oss; oss << "Writing dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	//getters
 	inline std::vector<double> position() { return position_; }
-	inline double position(int i) { return position_[i]; }
-	inline tds_element& element(int i) { return *elements_[i]; }
-	inline void element(int i, tds_element* _new_element) { elements_[i] = _new_element; }
+	inline double position(int i) {
+		if (i < 3) { return position_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
+	inline tds_element& element(int i) {
+		if (i < n_elements()) { return *elements_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading element " << i << " out of " << n_elements() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
+	inline void element(int i, tds_element* _new_element) {
+		if (i < n_elements()) { elements_[i] = _new_element; }
+		else {
+			std::ostringstream oss; oss << "Writing element " << i << " out of " << n_elements() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline bool elements_empty() { return elements_.empty(); }
 	inline int n_elements() { return elements_.size(); }
 	void clean_elements();

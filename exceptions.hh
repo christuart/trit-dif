@@ -42,6 +42,11 @@ namespace Errors {
 		explicit UIException(const std::string& what_arg):std::runtime_error("UI Exception: " + what_arg) {}
 	};
 
+	class VectorOutOfBoundsException : public std::runtime_error {
+	public:
+		explicit VectorOutOfBoundsException(const std::string& what_arg):std::runtime_error("Vector index out of bounds: " + what_arg) {}
+	  };
+	
 	/*
 	  class  : public std::runtime_error {
 	  public:

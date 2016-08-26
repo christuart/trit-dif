@@ -46,10 +46,8 @@ double get_3Dplanar_area(tds_nodes shared_nodes, std::vector<double> &e_n) {
 	// Adapted from area3D_Polygon() by Dan Sunday
 	// Found at: http://geomalgorithms.com/a01-_area.html#2D%20Polygons
 	int n = shared_nodes.size();
-	if (n < 3) {
-		std::cerr << "Trying to find area of 'surface' defined by too few nodes." << std::endl;
-		throw;
-	}
+	if (n < 3)
+		throw Errors::AlgorithmFailedException("Trying to find area of 'surface' defined by too few nodes.");
 
 	shared_nodes.push_back(shared_nodes.at(0));
 	shared_nodes.push_back(shared_nodes.at(1));
@@ -59,55 +57,55 @@ double get_3Dplanar_area(tds_nodes shared_nodes, std::vector<double> &e_n) {
 	int coord;           // coord to ignore: 1=x, 2=y, 3=z
 	int i, j, k;         // loop indices
 
-    // select largest abs coordinate to ignore for projection
-    ax = fabs(e_n.at(0));    // abs x-coord
-    ay = fabs(e_n.at(1));     // abs y-coord
-    az = fabs(e_n.at(2));     // abs z-coord
+	// select largest abs coordinate to ignore for projection
+	ax = fabs(e_n.at(0));    // abs x-coord
+	ay = fabs(e_n.at(1));     // abs y-coord
+	az = fabs(e_n.at(2));     // abs z-coord
 
-    coord = 3;                    // ignore z-coord
-    if (ax > ay) {
-        if (ax > az) coord = 1;   // ignore x-coord
-    }
-    else if (ay > az) coord = 2;  // ignore y-coord
+	coord = 3;                    // ignore z-coord
+	if (ax > ay) {
+		if (ax > az) coord = 1;   // ignore x-coord
+	}
+	else if (ay > az) coord = 2;  // ignore y-coord
 
-    // compute area of the 2D projection
-    switch (coord) {
-      case 1:
-        for (i=1, j=2, k=0; i<n; i++, j++, k++)
-            area += (shared_nodes.at(i)->position(1) * (shared_nodes.at(j)->position(2) - shared_nodes.at(k)->position(2)));
-        break;
-      case 2:
-        for (i=1, j=2, k=0; i<n; i++, j++, k++)
-            area += (shared_nodes.at(i)->position(2) * (shared_nodes.at(j)->position(0) - shared_nodes.at(k)->position(0)));
-        break;
-      case 3:
-        for (i=1, j=2, k=0; i<n; i++, j++, k++)
-            area += (shared_nodes.at(i)->position(0) * (shared_nodes.at(j)->position(1) - shared_nodes.at(k)->position(1)));
-        break;
-    }
-    switch (coord) {    // wrap-around term
-      case 1:
-        area += (shared_nodes.at(n)->position(1) * (shared_nodes.at(1)->position(2) - shared_nodes.at(n-1)->position(2)));
-        break;
-      case 2:
-        area += (shared_nodes.at(n)->position(2) * (shared_nodes.at(1)->position(0) - shared_nodes.at(n-1)->position(0)));
-        break;
-      case 3:
-        area += (shared_nodes.at(n)->position(0) * (shared_nodes.at(1)->position(1) - shared_nodes.at(n-1)->position(1)));
-        break;
-    }
+	// compute area of the 2D projection
+	switch (coord) {
+	case 1:
+		for (i=1, j=2, k=0; i<n; i++, j++, k++)
+			area += (shared_nodes.at(i)->position(1) * (shared_nodes.at(j)->position(2) - shared_nodes.at(k)->position(2)));
+		break;
+	case 2:
+		for (i=1, j=2, k=0; i<n; i++, j++, k++)
+			area += (shared_nodes.at(i)->position(2) * (shared_nodes.at(j)->position(0) - shared_nodes.at(k)->position(0)));
+		break;
+	case 3:
+		for (i=1, j=2, k=0; i<n; i++, j++, k++)
+			area += (shared_nodes.at(i)->position(0) * (shared_nodes.at(j)->position(1) - shared_nodes.at(k)->position(1)));
+		break;
+	}
+	switch (coord) {    // wrap-around term
+	case 1:
+		area += (shared_nodes.at(n)->position(1) * (shared_nodes.at(1)->position(2) - shared_nodes.at(n-1)->position(2)));
+		break;
+	case 2:
+		area += (shared_nodes.at(n)->position(2) * (shared_nodes.at(1)->position(0) - shared_nodes.at(n-1)->position(0)));
+		break;
+	case 3:
+		area += (shared_nodes.at(n)->position(0) * (shared_nodes.at(1)->position(1) - shared_nodes.at(n-1)->position(1)));
+		break;
+	}
 
-    switch (coord) {
-      case 1:
-        area *= (1.0f / (2 * e_n.at(0)));
-        break;
-      case 2:
-        area *= (1.0f / (2 * e_n.at(1)));
-        break;
-      case 3:
-        area *= (1.0f / (2 * e_n.at(2)));
-    }
-    return area;
+	switch (coord) {
+	case 1:
+		area *= (1.0f / (2 * e_n.at(0)));
+		break;
+	case 2:
+		area *= (1.0f / (2 * e_n.at(1)));
+		break;
+	case 3:
+		area *= (1.0f / (2 * e_n.at(2)));
+	}
+	return area;
 }
 
 
@@ -315,7 +313,6 @@ void tds_element::calculate_size() {
 			//std::cout << "element with 4 nodes, tet, size: " << size() << std::endl;
 		}
 	} else if (n_nodes() == 5) {
-		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF PYRAMIDAL ELEMENTS YET!" << std::endl;
 		// This will involve a 1/3 * base * height method
 		// The most difficult part will be identifying the base nodes vs point node
 		// This will be done by checking parallelism WHICH mustn't be too sensitive
@@ -323,7 +320,7 @@ void tds_element::calculate_size() {
 		// 
 		// Logic behind finding the point node (non-base node):
 		// 
-		throw;
+		throw Errors::FutureImplementationException("Haven't programmed volume of pyramidal elements yet.");
 	} else if (n_nodes() == 8) {
 		// for (int i = 0; i < 8; ++i)
 		// 	std::cout << "Node " << i << ": ["
@@ -472,15 +469,11 @@ void tds_element::calculate_size() {
 		// 
 		// In the above algorithm, as well as the diagonal we should have identified 3 edges from node 0
 		// and 2 diagonals. We need to now find that third diagonal.
-		if (edge_nodes.size() != 3) {
-			std::cerr << "Didn't find three nodes that make edges from node 0." << std::endl;
-			throw;
-		}
-		if (diagonal_nodes.size() != 2) {
-			std::cerr << "Didn't find the first two nodes that make diagonals from node 0." << std::endl;
-			throw;
-		}
-		// The third diagonal is clearly the last node
+		if (edge_nodes.size() != 3)
+			throw Errors::AlgorithmFailedException("For hexahedron volume, didn't find three nodes that make edges from node 0.");
+		if (diagonal_nodes.size() != 2)
+			throw Errors::AlgorithmFailedException("For hexahedron volume, didn't find first two nodes that make edges from node 0.");
+		// The third diagonal is clearly the last node, which we now find:
 		std::vector<int> candidates;
 		for (int i = 1; i < 8; ++i) candidates.push_back(i);
 		for (int i = 0; i < 2; ++i) {
@@ -493,8 +486,7 @@ void tds_element::calculate_size() {
 			// We found the last diagonal.
 			diagonal_nodes.push_back(candidates.back());
 		} else {
-			std::cerr << "Failed to find the last diagonal node." << std::endl;
-			throw;
+			throw Errors::AlgorithmFailedException("For hexahedron volume, didn't find the last diagonal node.");
 		}
 		
 			
@@ -518,10 +510,8 @@ void tds_element::calculate_size() {
 		size(fabs(vol_sum/3.0f));
 		// std::cout << "Volume of this hexahedron: " << size() << std::endl;
 	} else {
-		// then for 3-D planar polygons >4 look at the 3-D polygon area using projection
-		// onto 2D - really clever! http://geomalgorithms.com/a01-_area.html#2D%20Polygons
-		std::cerr << "!!! HAVEN'T PROGRAMMED AREA/VOLUME OF THIS ELEMENT SHAPE YET!" << std::endl;
-		throw;
+		std::ostringstream oss; oss << n_nodes();
+		throw Errors::FutureImplementationException("Unusual element size/area/volume request for element with " + oss.str() + " nodes.");
 	}
 }
 void tds_element::debug_contamination() {

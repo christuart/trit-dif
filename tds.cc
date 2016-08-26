@@ -1346,6 +1346,11 @@ void tds_display::dialog_open(){
 		filename(filePtr);
 		load_section(0);
 		FRootfileName.text(filePtr);
+		if (!get_file_exists(std::string(filePtr))) {
+			// either needs a warning() or to change back to previous result, showing
+			// an error box in the UI
+			std::cerr << "Chosen file can no longer be found." << std::endl;
+		}
 	}
 }
 
