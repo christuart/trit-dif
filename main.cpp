@@ -52,10 +52,10 @@ int main(int nArg, char** vArg){
 					tds_r->make_analysis();
 					return 0;
 				}
-				catch (BadRunFileException& e) {
+				catch (Errors::BadRunFileException& e) {
 					std::cout << e.what() << std::endl;
 				}
-				catch (AnalysisException& e) {
+				catch (Errors::AnalysisException& e) {
 					std::cout << e.what() << std::endl;
 				}
 				return 0;
@@ -67,6 +67,10 @@ int main(int nArg, char** vArg){
 					tds = new tds_display(UI);
 					int err=Fl::run();
 					return err;
+				}
+				catch (Errors::UIException& e) {
+					std::cerr << e.what() << std::endl;
+				}
 			} else if (t>=0) {
 				// looks like we're testing functionality rather than using the display or batch processing
 				std::string basename = "simple2d";

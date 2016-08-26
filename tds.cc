@@ -58,9 +58,33 @@ void tds::clean_elements(){
 	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
 	elements_.resize(0);
 }
+/// Allocates at least enough memory for the expected number of materials
+/** This is necessary to prevent reallocation occurring during the program.
+    Reallocation would invalidate any pointers or iterators for the vector.
+    Since it is only a vector of pointers, this wouldn't necessarily be
+    disastrous but should probably be avoided if possible.
+    */
 void tds::expected_materials(int _n) { materials_.reserve(_n); }
+/// Allocates at least enough memory for the expected number of sections
+/** This is necessary to prevent reallocation occurring during the program.
+    Reallocation would invalidate any pointers or iterators for the vector.
+    Since it is only a vector of pointers, this wouldn't necessarily be
+    disastrous but should probably be avoided if possible.
+    */
 void tds::expected_sections(int _n) { sections_.reserve(_n); }
+/// Allocates at least enough memory for the expected number of nodes
+/** This is necessary to prevent reallocation occurring during the program.
+    Reallocation would invalidate any pointers or iterators for the vector.
+    Since it is only a vector of pointers, this wouldn't necessarily be
+    disastrous but should probably be avoided if possible.
+    */
 void tds::expected_nodes(int _n) { nodes_.reserve(_n); }
+/// Allocates at least enough memory for the expected number of elements
+/** This is necessary to prevent reallocation occurring during the program.
+    Reallocation would invalidate any pointers or iterators for the vector.
+    Since it is only a vector of pointers, this wouldn't necessarily be
+    disastrous but should probably be avoided if possible.
+    */
 void tds::expected_elements(int _n) { elements_.reserve(_n); }
 
 void tds::output_model_summary(bool show_materials, bool show_sections, bool show_elements, bool show_element_links, bool show_nodes) {
@@ -235,148 +259,170 @@ void tds_run::make_analysis() {
 	
 	double time = 0.0;
 	double next_time_recording = tracking_interval();
-	
-	trackingfile_.open(tracking_file_address());
-	trackingfile_ << "element, time, contamination" << std::endl;
-	trackingfile_ << std::scientific;
-	for (int i=0; i < tracked_elements()->size(); ++i)
-		trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
 
-	// Let's do some timing
-	const int trail_length = 5;
-	int history_count = 0;
-	int history_index = trail_length-1;
-	double step_times[trail_length]; // values stored will be ms per step per element.
-	uint64 start_checkmark = GetTimeMs64();
-	uint64 last_checkmark = start_checkmark;
+	const char* tracking_file_address_;
+	const char* contaminations_file_address_;
+	try {
+		trackingfile_.exceptions(ofstream::failbit | ofstream::badbit);
+		tracking_file_address_ = tracking_file_address();
+		trackingfile_.open(tracking_file_address_);
+		trackingfile_ << "element, time, contamination" << std::endl;
+		trackingfile_ << std::scientific;
+		for (int i=0; i < tracked_elements()->size(); ++i)
+			trackingfile_ << (tracked_element(i)) << ", " << time << ", " << element(tracked_element(i)-1).contamination() << std::endl;
+
+		// Let's do some timing
+		const int trail_length = 5;
+		int history_count = 0;
+		int history_index = trail_length-1;
+		double step_times[trail_length]; // values stored will be ms per step per element.
+		uint64 start_checkmark = GetTimeMs64();
+		uint64 last_checkmark = start_checkmark;
 	
-	int reporting_interval = ceil(steps()/100.0f);
-	reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
-	// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
-	// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
-	// there should be no problem.
+		int reporting_interval = ceil(steps()/100.0f);
+		reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
+		// 2.5x10^7 is a figure chosen to give acceptable initial reporting intervals on the development computer that was used.
+		// performance on other computers may vary, but hopefully the adaptive timing will cope with variations anyway so
+		// there should be no problem.
 	
-        // std::cout << "rasegaerhershsdtyui" << std::endl;
-        // std::cout << steps() << std::endl;
-        // std::cout << reporting_interval << std::endl;
-        // std::cout << reporting_interval << std::endl;
-        // std::cout << (1) % reporting_interval<< std::endl;
-        // std::cout << "ok" << std::endl;
+		// std::cout << "rasegaerhershsdtyui" << std::endl;
+		// std::cout << steps() << std::endl;
+		// std::cout << reporting_interval << std::endl;
+		// std::cout << reporting_interval << std::endl;
+		// std::cout << (1) % reporting_interval<< std::endl;
+		// std::cout << "ok" << std::endl;
                 
-	for (int step = 0; step < steps(); ++step) {
+		for (int step = 0; step < steps(); ++step) {
 		
-		// Every step we need to:
-		// 0.5) Let plug-ins take any required start-step actions
-		// 1) Update every element (each element decides what it needs to do to consitute an update)
-		// 1.5) Let plug-ins take any required end-step actions
-		// 2) Switch all of the flags in the elements (BUT NOT IN THE LINKS!)
-		// 3a) Output any outputs that have been requested and any warnings to std::cout
-		// 3b) Output any outputs that have been requested to the output file
-		// It may be necessary for speed's sake to put these outputs into arrays or buffers
-		// and output only at the end of simulation.
+			// Every step we need to:
+			// 0.5) Let plug-ins take any required start-step actions
+			// 1) Update every element (each element decides what it needs to do to consitute an update)
+			// 1.5) Let plug-ins take any required end-step actions
+			// 2) Switch all of the flags in the elements (BUT NOT IN THE LINKS!)
+			// 3a) Output any outputs that have been requested and any warnings to std::cout
+			// 3b) Output any outputs that have been requested to the output file
+			// It may be necessary for speed's sake to put these outputs into arrays or buffers
+			// and output only at the end of simulation.
 
-		// 0.5) Plug-in start-step
-		interrupt_start_step(step,time);
+			// 0.5) Plug-in start-step
+			interrupt_start_step(step,time);
 		
-		// 1) Update elements
-		for (int i=0; i < n_sections(); ++i) {
-			// Note simple model with constant source so no need to update them
-			if (!section(i).material().is_source()) {
-				for (int j=0; j < section(i).n_elements(); ++j) {
-					section(i).element(j).update(delta_t());
+			// 1) Update elements
+			for (int i=0; i < n_sections(); ++i) {
+				// Note simple model with constant source so no need to update them
+				if (!section(i).material().is_source()) {
+					for (int j=0; j < section(i).n_elements(); ++j) {
+						section(i).element(j).update(delta_t());
+					}
 				}
 			}
-		}
-		// 1.5) Plug-in end-step
-		interrupt_end_step(step,time);
+			// 1.5) Plug-in end-step
+			interrupt_end_step(step,time);
 		
-		time += delta_t();
+			time += delta_t();
 		
-		// 2) Switch flags in elements
-		//this_flag != this_flag;
-		//for (int i=0; i < n_elements(); ++i) {
-		//	element(i).flagAB(this_flag);
-		//}
-		//
-		// 3)
-		if (next_time_recording < time) {
-			for (int i=0; i < tracked_elements()->size(); ++i) {
-				trackingfile_ << (tracked_element(i)) << ", " << time
-				              << ", " << element(tracked_element(i)-1).contamination()
-				              //<< ", " << element(tracked_element(i)-1).contamination(false)
-				              //<< ", " << element(tracked_element(i)-1).contamination(true)
-				              << std::endl;
+			// 2) Switch flags in elements
+			//this_flag != this_flag;
+			//for (int i=0; i < n_elements(); ++i) {
+			//	element(i).flagAB(this_flag);
+			//}
+			//
+			// 3)
+			if (next_time_recording < time) {
+				for (int i=0; i < tracked_elements()->size(); ++i) {
+					trackingfile_ << (tracked_element(i)) << ", " << time
+					              << ", " << element(tracked_element(i)-1).contamination()
+						//<< ", " << element(tracked_element(i)-1).contamination(false)
+						//<< ", " << element(tracked_element(i)-1).contamination(true)
+					              << std::endl;
+				}
+				next_time_recording += tracking_interval();
 			}
-			next_time_recording += tracking_interval();
-		}
-		// for (int i=0; i < n_elements(); ++i)
-		// 	element(i).debug_contamination();
-		double remaining_time, elapsed_time;
-		if ((step+1) % reporting_interval == 0) {
+			// for (int i=0; i < n_elements(); ++i)
+			// 	element(i).debug_contamination();
+			double remaining_time, elapsed_time;
+			if ((step+1) % reporting_interval == 0) {
 
-			++history_index;
-			history_index %= trail_length;
+				++history_index;
+				history_index %= trail_length;
 
-			uint64 now = GetTimeMs64();
-			step_times[history_index] = (now - last_checkmark)/(1.0*(reporting_interval*n_elements()));
-			history_count = std::min(trail_length,++history_count);
-			elapsed_time = (now - start_checkmark)*1e-3;
-			// Added an extra 50% on the prediction, because it almost always underestimates
-			// This is as a result of the assumed initial sparseness of the model.
-			remaining_time = n_elements() * average_historic_time(step_times, history_count) * 1.5 * (0.001) * (steps() - step);
-			/*
-			std::cout << "remaining_time = " << 1.5 << " * " << (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << steps() << " - " << step << ") * " << n_elements() << std::endl;
-			std::cout << "remaining_time = " << 1.5 * (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << (steps() - step) << ") * " << n_elements() << std::endl;
-			std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) << " * " << ((steps() - step) * n_elements()) << std::endl;
-			std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) * ((steps() - step) * n_elements()) << std::endl;
-			*/
+				uint64 now = GetTimeMs64();
+				step_times[history_index] = (now - last_checkmark)/(1.0*(reporting_interval*n_elements()));
+				history_count = std::min(trail_length,++history_count);
+				elapsed_time = (now - start_checkmark)*1e-3;
+				// Added an extra 50% on the prediction, because it almost always underestimates
+				// This is as a result of the assumed initial sparseness of the model.
+				remaining_time = n_elements() * average_historic_time(step_times, history_count) * 1.5 * (0.001) * (steps() - step);
+				/*
+				  std::cout << "remaining_time = " << 1.5 << " * " << (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << steps() << " - " << step << ") * " << n_elements() << std::endl;
+				  std::cout << "remaining_time = " << 1.5 * (0.001) << " * " << average_historic_time(step_times, history_count) << " * (" << (steps() - step) << ") * " << n_elements() << std::endl;
+				  std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) << " * " << ((steps() - step) * n_elements()) << std::endl;
+				  std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) * ((steps() - step) * n_elements()) << std::endl;
+				*/
 				
-			std::cout << "Step: "
-			          << std::right << std::setw(12) << (step+1) << "/"
-			          << std::left << std::setw(12) << steps() << std::left
-			          << "        sim time: "
-			          << std::setw(13) << format_time(time)
-			          << "        elapsed: "
-			          << std::setw(13) << format_time(elapsed_time)
-			          << "        remaining (est.): "
-			          << std::setw(13) << format_time(remaining_time)
-			          << "        total (est.): "
-			          << std::setw(13) << format_time(elapsed_time+remaining_time)
-			          << std::endl;
+				std::cout << "Step: "
+				          << std::right << std::setw(12) << (step+1) << "/"
+				          << std::left << std::setw(12) << steps() << std::left
+				          << "        sim time: "
+				          << std::setw(13) << format_time(time)
+				          << "        elapsed: "
+				          << std::setw(13) << format_time(elapsed_time)
+				          << "        remaining (est.): "
+				          << std::setw(13) << format_time(remaining_time)
+				          << "        total (est.): "
+				          << std::setw(13) << format_time(elapsed_time+remaining_time)
+				          << std::endl;
 
-			// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
-			double r = (now - last_checkmark)/2000.0;
-			r -= 1;
-			r /= history_count*2;
-			r += 1;
-			r = std::fmax(0.5,std::fmin(r,2.0));
-			reporting_interval = std::ceil(reporting_interval/r);
-			last_checkmark = now;
+				// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
+				double r = (now - last_checkmark)/2000.0;
+				r -= 1;
+				r /= history_count*2;
+				r += 1;
+				r = std::fmax(0.5,std::fmin(r,2.0));
+				reporting_interval = std::ceil(reporting_interval/r);
+				last_checkmark = now;
 						
+			}
 		}
-	}
-	// Out of the element-for-loops and the time-for-loops, allow plug-ins
-	// to take the post simulation actions
-	interrupt_post_simulation();
+		// Out of the element-for-loops and the time-for-loops, allow plug-ins
+		// to take the post simulation actions
+		interrupt_post_simulation();
 
-	// Show how long the entire simulation took
-	double elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
-	std::cout << "Total elapsed time: " << format_time(elapsed_time) << std::endl;
+		// Show how long the entire simulation took
+		double elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
+		std::cout << "Total elapsed time: " << format_time(elapsed_time) << std::endl;
 	
-	trackingfile_.close();
+		trackingfile_.close();
 
-	// Contaminations: final values at all elements
-	contaminationsfile_.open(contaminations_file_address());
-	contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
-	                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
-	                    << "s" << std::endl;
-	contaminationsfile_ << "element, x, y, z, contamination" << std::endl;
-	contaminationsfile_ << std::scientific;
-	for (int i=0; i < n_elements(); ++i)
-		contaminationsfile_ << (i+1) << ", " << element(i).origin(0) << ", " << element(i).origin(1)
-		                    << ", " << element(i).origin(2) << ", " << element(i).contamination()
-		                    << std::endl;
-	contaminationsfile_.close();
+		// Contaminations: final values at all elements
+		contaminations_file_address_ = contaminations_file_address();
+		contaminationsfile_.open(contaminations_file_address_);
+		contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
+		                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
+		                    << "s" << std::endl;
+		contaminationsfile_ << "element, x, y, z, contamination" << std::endl;
+		contaminationsfile_ << std::scientific;
+		for (int i=0; i < n_elements(); ++i)
+			contaminationsfile_ << (i+1) << ", " << element(i).origin(0) << ", " << element(i).origin(1)
+			                    << ", " << element(i).origin(2) << ", " << element(i).contamination()
+			                    << std::endl;
+		contaminationsfile_.close();
+	} catch (ofstream::failure& e) {
+		if (trackingfile_.is_open()) {
+			trackingfile_.close();
+			if (remove(tracking_file_address_) != 0) {
+				std::cerr << "Failed to remove possible garbage tracking file." << std::endl;
+			}
+		}
+		if (contaminationsfile_.is_open()) {
+			contaminationsfile_.close();
+			if (remove(contaminations_file_address_) != 0) {
+				std::cerr << "Failed to remove possible garbage contaminations file." << std::endl;
+			}
+		}
+	} catch (Errors::LowSimulationAccuracyException& e) {
+		std::cerr << e.what() << std::endl;
+	}
 }
 
 void tds_run::set_units_from_file(const char* units_file_address_) {
@@ -446,7 +492,7 @@ void tds_run::initialise() {
 			
 		}
 	} else {
-		throw MissingInputDataException("No materials found? Is the config name good?");
+		throw Errors::MissingInputDataException("No materials found? Is the config name good?");
 	}
 	// we'll add an error material for when a bad name is given
 	// and source/outgassings materials for the regions which will
@@ -502,8 +548,7 @@ void tds_run::initialise() {
 			std::cout << "Now " << n_sections() << " sections." << std::endl;
 		}
 	} else {
-		std::cerr << "No sections found? Is the model name good?" << std::endl;
-		throw;
+		throw Errors::MissingInputDataException("No sections found? Is the model name good?");
 	}
 	//Next we'll get some nodes in
 	if (std::getline(nodesfile_, line)) {
@@ -539,8 +584,7 @@ void tds_run::initialise() {
 			interrupt_node(_n_id);
 		}
 	} else {
-		std::cerr << "No nodes found? Is the model name good?" << std::endl;
-		throw;
+		throw Errors::MissingInputDataException("No nodes found? Is the model name good?");
 	}
 	//Now finally we'll read the elements
 	if (std::getline(elementsfile_, line)) {
@@ -599,8 +643,7 @@ void tds_run::initialise() {
 			//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
 		}
 	} else {
-		std::cerr << "No elements found? Is the model name good?" << std::endl;
-		throw;
+		throw Errors::MissingInputDataException("No elements found? Is the model name good?");
 	}
 	// std::cout << "gonna close me some files" << std::endl;
 	sectionsfile_.close();
