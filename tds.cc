@@ -446,8 +446,7 @@ void tds_run::initialise() {
 			
 		}
 	} else {
-		std::cerr << "No materials found? Is the config name good?" << std::endl;
-		throw;
+		throw MissingInputDataException("No materials found? Is the config name good?");
 	}
 	// we'll add an error material for when a bad name is given
 	// and source/outgassings materials for the regions which will

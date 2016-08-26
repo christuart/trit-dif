@@ -2,7 +2,6 @@
 #define TDS_HH
 
 #include <typeinfo>
-#include <exception>
 
 #include <list>
 #include <iostream>
@@ -23,6 +22,7 @@
 #include <algorithm>
 #include <iomanip>
 
+#include "exceptions.hh"
 #include "conversions.hh"
 #include "tds_parts.hh"
 #include "vector_ops.hh"
