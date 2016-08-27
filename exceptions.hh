@@ -43,6 +43,10 @@ namespace Errors {
 	public:
 		explicit BadRunFileException(const std::string& what_arg):std::runtime_error("Run file error: " + what_arg) {}
 	};
+	class EarlyRunFileUnitsException : public BadRunFileException {
+	public:
+		explicit EarlyRunFileUnitsException(const std::string& what_arg):BadRunFileException("Cannot interpret without units; need to set the config file before line:\n\t" + what_arg) {}
+	};
 
 	class AnalysisException : public std::runtime_error {
 	public:

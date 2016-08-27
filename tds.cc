@@ -1073,9 +1073,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 			}
 		}
 	} else {
-                std::cerr << "Error at second line of '" << run_file_name
-                          << "'. Expecting  .run file format version." << std::endl;
-                throw;
+                throw Errors::BadRunFileException("No instructions found except run mode.");
         }
 	line_processing.clear();
 	int line_n = 2;
@@ -1083,11 +1081,20 @@ void tds_run::read_run_file(std::string run_file_name) {
 	while (std::getline(run_file_, line)) {
 		line_processing.str(line);
 		++line_n;
+		// This if statement reads in another line of the instruction file
+		// However, it works slightly differently from the lines for mode and
+		// version, because there may be more than three words - the 'value'
+		// could consist of "30 seconds" for example, or even a list of
+		// element IDs for tracking. std::getline(in,out) puts the whole of
+		// rest of the line after just the 'setting' part has been taken out
+		// by the first statement.
 		if (!(line_processing >> setting && std::getline(line_processing,value))) {
                         std::cerr << "Error at line " << line_n << " of '" << run_file_name
                                   << "'." << std::endl;
                         std::cerr << "Line: " << line_processing.str() << std::endl;
                         throw;
+			std::ostringstream oss; oss << "Confused when separating out key and value from line " << line_n << ":\n\t" << line_processing.str();
+			throw Errors::BadRunFileException(oss.str());
 		} else {
 			trim(value);
 			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
@@ -1129,35 +1136,35 @@ void tds_run::read_run_file(std::string run_file_name) {
 		                std::string unit;
 		                interpreter.str(value);
 		                if (!(interpreter >> settings.delta_t >> unit)) {
-			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a value of '" + value + "' for the time step.");
 		                } else {
 			                settings.delta_t = units().convert_time_from(unit,settings.delta_t);
 		                }
 	                } else
-		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "tracking-interval") {
 	                std::cout << "\tSetting the time interval for recording contaminations: " << value << std::endl;
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
 		                if (!(interpreter >> settings.tracking_interval >> unit)) {
-			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a value of '" + value + "' for the tracking interval.");
 		                } else {
 			                settings.tracking_interval = units().convert_time_from(unit,settings.tracking_interval);
 		                }
 	                } else
-		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "simulation-length") {
 	                std::cout << "\tSetting the minimum total simulation time: " << value << std::endl;
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
 		                if (!(interpreter >> settings.simulation_length >> unit)) {
-			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a value of '" + value + "' for the simulation length.");
 		                } else
 			                settings.simulation_length = units().convert_time_from(unit,settings.simulation_length);
 	                } else
-		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "contamination-mode-time") {
 	                std::cout << "\tSetting the contamination mode for time: " << value << std::endl;
 	                settings.contamination_mode_time = value;
@@ -1170,11 +1177,11 @@ void tds_run::read_run_file(std::string run_file_name) {
 		                std::string unit;
 		                interpreter.str(value);
 		                if (!(interpreter >> settings.contamination >> unit)) {
-			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a value of '" + value + "' for the source contamination.");
 		                } else
 			                settings.contamination = units().convert_contamination_from(unit,settings.contamination);
 	                } else
-		                std::cerr << "Trying to set a numeric value before the config has been set - wouldn't know what to do with the units yet!" << std::endl;
+				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "contaminations-file") {
 	                std::cout << "\tSetting the contaminations file name: " << value << std::endl;
 	                settings.contaminations_file = value;
@@ -1188,28 +1195,30 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                std::string file;
 	                interpreter.str(value);
 	                if (!(interpreter >> plugin >> init_only >> file)) {
-		                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a request for '" + value + "' as a plug-in. Remember: \"plugin-name init-only file-name\". Use 'none' if no file required by the plug-in.");
 	                } else {
 		                settings.plugin_files[plugin].file_name = file;
 		                settings.plugin_files[plugin].needed_after_initialisation = (init_only != "init-only");
 	                }
                 } else if (setting == "tracking-mode") {
 	                std::cout << "\tSetting the tracking mode: " << value << std::endl;
+			// Probably want a warning() or exception here if the tracking_mode
+			// doesn't exist.
 	                settings.tracking_mode = value;
                 } else if (setting == "track") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                std::cout << "\tSetting the tracked ids: " << value << std::endl;
 	                interpreter.str(value);
 	                if (settings.tracking_mode == "ids") {
-		                delete settings.tracking_list;
-		                settings.tracking_list = new std::vector<int>();
+		                settings.tracking_list->clear();
 		                int id;
 		                while (interpreter >> id)
 			                settings.tracking_list->push_back(id);
 	                } else {
 		                if (!(interpreter >> settings.tracking_n))
-			                std::cerr << "\t\tThat value didn't work for that setting." << std::endl;
+			                throw Errors::BadRunFileException("Confused by a value of '" + value + "' for the number of elements to track at each end of the elements vector.");
 	                }
                 } else {
+			// this should become a warning()
                         std::cerr << "\t(Didn't know what to do with '" << setting << "'.)" << std::endl;
 		}
                 line_processing.clear();
