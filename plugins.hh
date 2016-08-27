@@ -3,8 +3,22 @@
 
 #include "tds.hh"
 
+/// Enumeration for different plug-ins in the software
+/** This enumeration allows a pointer to a plug-in instance to be requested.
+    Importantly, the enumeration also decides the order in which plug-ins are
+    loaded. Loading is *not* instantiating, which happens in the order they
+    appear in in the .run file. Loading is a call to
+    ```IPlugin.load_plugin()```. Therefore, if PUndefined was ever used, it
+    would want to be first in the list in order to throw an exception as soon
+    as possible. PDefaults wants to be next, so that it can insert values to
+    the plug-in map even while an iterator is in use, and these values will
+    be found and loaded.
+*/
 enum plugin {
+	// Default behaviour is that the first enumerator = 0 and subsequent
+	// enumerators = previous + 1
 	PUndefined,
+	PDefaults,
 	PExample,
 	POutgassing,
 	PDecay

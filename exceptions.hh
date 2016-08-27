@@ -12,6 +12,22 @@ namespace Errors {
 	public:
 		explicit AlgorithmFailedException(const std::string& what_arg):std::logic_error("Algorithm failed: " + what_arg) {}
 	};
+	class PluginException : public std::logic_error {
+	public:
+		explicit PluginException(const std::string& what_arg):std::logic_error("(plugin exception) " + what_arg) {}
+	};
+	class PluginNotInMapException : public PluginException {
+	public:
+		explicit PluginNotInMapException(const std::string& what_arg):PluginException("String does not map to known plug-in: " + what_arg) {}
+	};
+	class PluginNotInSwitchException : public PluginException {
+	public:
+		explicit PluginNotInSwitchException(const std::string& what_arg):PluginException("Mapped plug-in missing constructor call: " + what_arg) {}
+	};
+	class PluginIncompleteImplementationException : public PluginException {
+	public:
+		explicit PluginIncompleteImplementationException(const std::string& what_arg):PluginException("Call to missing implementation in plug-in: " + what_arg) {}
+	};
 	/*
 	  class  : public std::logic_error {
 	  public:
@@ -35,6 +51,11 @@ namespace Errors {
 	class LowSimulationAccuracyException : public AnalysisException {
 	public:
 		explicit LowSimulationAccuracyException(const std::string& what_arg):AnalysisException("Unacceptable inaccuracies: " + what_arg) {};
+	};
+
+	class PluginRuntimeException : public std::runtime_error {
+	public:
+		explicit PluginRuntimeException(const std::string& what_arg):std::runtime_error("(plugin runtime exception) " + what_arg) {};
 	};
 
 	class UIException : public std::runtime_error {

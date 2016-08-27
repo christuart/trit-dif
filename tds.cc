@@ -241,10 +241,8 @@ void tds_run::make_analysis() {
 	
 	std::cout << std::endl;
 	std::cout << "Checking the model..." << std::endl;
-	if ((n_sections() == 0) || (n_elements() == 0) || (n_nodes() == 0)) {
-		std::cerr << "Model is incomplete. Simulation cancelled!" << std::endl;
-		throw;
-	}
+	if ((n_sections() == 0) || (n_elements() == 0) || (n_nodes() == 0))
+		throw Errors::MissingInputDataException("Model was incomplete at simulation start.");
 	
 	std::cout << "Running the model..." << std::endl;
 
@@ -540,7 +538,7 @@ void tds_run::initialise() {
 				interrupt_material(_id);
 			
 			}
-			if (materialsfile_.fail())
+			if (materialsfile_.bad())
 				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(materials_file_address()));
 		} else {
 			throw Errors::MissingInputDataException("No data read from " + std::string(materials_file_address()) + ". Is the config name good?");
@@ -602,7 +600,7 @@ void tds_run::initialise() {
 			
 				std::cout << "Now " << n_sections() << " sections." << std::endl;
 			}
-			if (sectionsfile_.fail())
+			if (sectionsfile_.bad())
 				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(sections_file_address()));
 		} else {
 			throw Errors::MissingInputDataException("No data read from " + std::string(sections_file_address()) + ". Is the model name good?");
@@ -644,7 +642,7 @@ void tds_run::initialise() {
 				_n_id.node = _n;
 				interrupt_node(_n_id);
 			}
-			if (nodesfile_.fail())
+			if (nodesfile_.bad())
 				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(nodes_file_address()));
 		} else {
 			throw Errors::MissingInputDataException("No data read from " + std::string(nodes_file_address()) + ". Is the model name good?");
@@ -708,7 +706,7 @@ void tds_run::initialise() {
 
 				//std::cout << "We obtained some values [" << id << ", " << type << ", " << n_tags << ", " << section_id << ", " << entity_id << "].\n";
 			}
-			if (elementsfile_.fail())
+			if (elementsfile_.bad())
 				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(elements_file_address()));
 		} else {
 			throw Errors::MissingInputDataException("No data read from " + std::string(elements_file_address()) + ". Is the model name good?");
@@ -989,8 +987,7 @@ void tds_run::process_plugins() {
 	for (int i=0; i < settings.activated_plugins.size(); ++i) {
 		std::string plugin_text = settings.activated_plugins.at(i);
 		if (plugin_strings.count(plugin_text) == 0) {
-			std::cerr << "No known plugin '" << plugin_text << "'." << std::endl;
-			continue;
+			throw Errors::PluginNotInMapException(plugin_text);
 		}
 		switch (plugin_strings[plugin_text]) {
 		case PExample:
@@ -998,8 +995,7 @@ void tds_run::process_plugins() {
 		case POutgassing:
 			IPlugin::store_plugin(new Outgassing()); break;
 		default:
-			std::cerr << "Plugin not yet implemented: " << plugin_text << std::endl;
-			throw;
+			throw Errors::PluginNotInSwitchException(plugin_text);
 		}
 	}
 	for (std::map<plugin,IPlugin*>::iterator it = IPlugin::get_plugin_iterator();
@@ -1043,30 +1039,38 @@ void tds_run::read_run_file(std::string run_file_name) {
 	if (std::getline(run_file_, line)) {
 		line_processing.str(line);
 		if (!(line_processing >> setting >> value)) {
-                        std::cerr << "Error at first line of '" << run_file_name
-                                  << "'. Expecting run mode." << std::endl;
-                        std::cerr << "Instead got: " << line << std::endl;
-                        throw;
+			std::ostringstream oss; oss << "Expecting run mode, received:\n\t"
+					       << line << std::endl;
+                        throw Errors::BadRunFileException(oss.str());
 		} else {
 			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
                         std::cout << "\t" << value << std::endl;
+			if (setting != "mode") {
+				throw Errors::BadRunFileException("First instruction was not the run mode, instead found '" + setting + "'.");
+			} else {
+				// Should probably give a warning() or something about the
+				// fact that run mode is not actually used...
+			}
 		}
 	} else {
-                std::cerr << "Error at first line of '" << run_file_name
-                          << "'. Expecting run mode." << std::endl;
-                throw;
-        }
+                throw Errors::BadRunFileException("No instructions found.");
+	}
 	line_processing.clear();
 	if (std::getline(run_file_, line)) {
 		line_processing.str(line);
 		if (!(line_processing >> setting >> value)) {
-                        std::cerr << "Error at second line of '" << run_file_name
-                                  << "'. Expecting .run file format version." << std::endl;
-                        std::cerr << "Instead got: " << line_processing.str() << std::endl;
-                        throw;
+			std::ostringstream oss; oss << "Expecting run file version, received:\n\t"
+					       << line << std::endl;
+                        throw Errors::BadRunFileException(oss.str());
 		} else {
 			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
                         std::cout << "\t" << value << std::endl;
+			if (setting != "version") {
+				throw Errors::BadRunFileException("Second instruction was not the run file version, instead found '" + setting + "'.");
+			} else {
+				// Should give a warning() about the lack of run file
+				// versioning in place
+			}
 		}
 	} else {
                 std::cerr << "Error at second line of '" << run_file_name
