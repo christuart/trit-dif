@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "vector_ops.hh"
 #include "exceptions.hh"
+#include <float.h>
 #include <sstream>
 
 class tds_part;
@@ -102,8 +103,21 @@ public:
 	void add_element_link(tds_element_link* new_element_link);
 	//setters
 	inline void flagAB(bool _AB) { flagAB_ = _AB; }
-	inline void size(double _size) { size_=_size; }
-	inline void contamination(double _contamination) { if(flagAB()) contaminationA_=_contamination; else contaminationB_=_contamination;}
+	inline void size(double _size) {
+		if (_size < 0) {
+			throw Errors::AlgorithmFailedException("Calculated negative size.");
+		} else { size_=_size; }
+	}
+	inline void contamination(double _contamination) {
+		// should check for invalid numbers here
+		if (_contamination < 0) {
+			throw Errors::NegativeContaminationException();
+		} else if (_contamination < DBL_MAX) {
+			if(flagAB()) contaminationA_=_contamination; else contaminationB_=_contamination;
+		} else {
+			throw Errors::InvalidContaminationException();
+		}
+	}
 	inline void origin(double _x, double _y, double _z) { origin_.clear(); origin_.push_back(_x);
 		                                           origin_.push_back(_y); origin_.push_back(_z);  }
 	inline void section(tds_section* _section) { section_=_section; }
@@ -112,15 +126,45 @@ public:
 	inline double size() { return size_; }
 	virtual inline double contamination() { if (flagAB()) return contaminationB_; else return contaminationA_; }
 	virtual inline double contamination(bool _AB) { if (_AB) return contaminationB_; else return contaminationA_; }
-	inline double origin(int i) { return origin_[i]; }
+	inline double origin(int i) {
+		if (i < 3) { return origin_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading origin dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline std::vector<double>& origin() { return origin_; }
 	inline tds_section& section() { return *section_; }
 	inline tds_material& material() { return *material_; }
-	inline tds_node& node(int i) { return *nodes_[i]; }
-	inline void node(int i, tds_node* _node) { nodes_[i] = _node; }
+	inline tds_node& node(int i) {
+		if (i < n_nodes()) { return *nodes_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading element node " << i << " out of " << n_nodes() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
+	inline void node(int i, tds_node* _node) {
+		if (i < n_nodes()) { nodes_[i] = _node; }
+		else {
+			std::ostringstream oss; oss << "Writing element node " << i << " out of " << n_nodes() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline int n_nodes() { return nodes_.size(); }
-	inline tds_element_link& neighbour(int i) { return *neighbours_[i]; }
-	inline void neighbour(int i, tds_element_link* _element_link) { neighbours_[i] = _element_link; }
+	inline tds_element_link& neighbour(int i) {
+		if (i < n_neighbours()) { return *neighbours_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading element neighbour " << i << " out of " << n_neighbours() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
+	inline void neighbour(int i, tds_element_link* _element_link) {
+		if (i < n_neighbours()) { neighbours_[i] = _element_link; }
+		else {
+			std::ostringstream oss; oss << "Writing element neighbour " << i << " out of " << n_neighbours() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline int n_neighbours() { return neighbours_.size(); }
 
 	// Will add the correct quantity to contamination and switch flag
@@ -158,8 +202,18 @@ public:
 	tds_material(std::string _name, double _density, double _diffusion_constant);
 	virtual ~tds_material();
 	//setters
-	inline void density(double _density) { material_density_ = _density; }
-	inline void diffusion_constant(double _diffusion_constant) { material_diffusion_constant_ = _diffusion_constant; }
+	inline void density(double _density) {
+		if (_density > 0.0f) { material_density_ = _density; }
+		else {
+			throw Errors::InvalidMaterialPropertyException("Material density should be positive (" + name() + ")");
+		}
+	}
+	inline void diffusion_constant(double _diffusion_constant) {
+		if (_diffusion_constant > 0.0f) { material_diffusion_constant_ = _diffusion_constant; }
+		else {
+			throw Errors::InvalidMaterialPropertyException("Material density should be positive (" + name() + ")");
+		}
+	}
 	inline void material_density_unit(std::string _unit) { material_density_unit_ = _unit; }
 	inline void material_diffusion_constant_unit(std::string _unit) { material_diffusion_constant_unit_ = _unit; }
 	//getters
@@ -191,7 +245,13 @@ public:
 	inline std::string name() { return name_; }
 	inline tds_material& material() { return *material_; }
 	inline tds_element& element(int i) { return *elements_[i]; }
-	inline void element(int i, tds_element* _new_element) { elements_[i] = _new_element; }
+	inline void element(int i, tds_element* _new_element) {
+		if (i < n_elements()) { elements_[i] = _new_element; }
+		else {
+			std::ostringstream oss; oss << "Writing section element " << i << " out of " << n_elements() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline int n_elements() { return elements_.size(); }
 };
 
@@ -217,9 +277,21 @@ protected:
 		                                                norm_vector(0,_x);
 		                                                norm_vector(1,_y);
 		                                                norm_vector(2,_z); }
-	inline void norm_vector(int i, double _f) { norm_vector_[i]=_f; }
+	inline void norm_vector(int i, double _f) {
+		if (i < 3) { norm_vector_[i]=_f; }
+		else {
+			std::ostringstream oss; oss << "Writing norm vector dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline void flux_vector(std::vector<double>& _flux_vector) { flux_vector(_flux_vector[0],_flux_vector[1],_flux_vector[2]); }
-	inline void flux_vector(int i, double _f) { flux_vector_[i]=_f; }
+	inline void flux_vector(int i, double _f) {
+		if (i < 3) { flux_vector_[i]=_f; }
+		else {
+			std::ostringstream oss; oss << "Writing flux vector dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline void flux_vector(double _x, double _y, double _z) { flux_vector_.resize(3);
 		                                                flux_vector(0,_x);
 		                                                flux_vector(1,_y);
@@ -237,9 +309,21 @@ public:
 	void set_flag_against(tds_element* _element);
 	//getters
 	inline std::vector<double>& norm_vector() { return norm_vector_; }
-	inline double norm_vector(int i) { return norm_vector_[i]; }
+	inline double norm_vector(int i) {
+		if (i < 3) { return norm_vector_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading norm vector dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline std::vector<double>& flux_vector() { return flux_vector_; }
-	inline double flux_vector(int i) { return flux_vector_[i]; }
+	inline double flux_vector(int i) {
+		if (i < 3) { return flux_vector_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading flux vector dimension " << i << ". (x,y,z,???)";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline double interface_area() { return interface_area_; }
 	inline double modMN() { return modMN_; }
 	inline double a_n_dot_eMN_over_modMN() { return a_n_dot_eMN_over_modMN_; }
@@ -252,7 +336,7 @@ public:
 	// positive flow is defined as from N to M, so M's contamination rises
 	virtual short positive_flow(tds_element* whoami);
 	inline tds_element* element(bool m_or_n) { if (m_or_n) return elementN_; else return elementM_; }
-	inline tds_element* neighbour_of(tds_element* whoami) { if (elementM_ == whoami) return elementN_; else return elementM_; }
+	inline tds_element* neighbour_of(tds_element* whoami) { if (elementM_ == whoami) return elementN_; else if (elementN_ == whoami) return elementM_; else throw Errors::NotANeighbourException(); }
 	
 };
 

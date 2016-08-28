@@ -39,6 +39,16 @@ namespace Errors {
 	public:
 		explicit MissingInputDataException(const std::string& what_arg):std::runtime_error("Missing input data: " + what_arg) {}
 	};
+	class BadInputDataException : public std::runtime_error {
+	public:
+		explicit BadInputDataException(const std::string& what_arg):std::runtime_error("Bad input data: " + what_arg) {}
+	};
+	class InvalidMaterialPropertyException : public BadInputDataException {
+		// This exception will later take in the material name and
+		// the invalid value
+	public:
+		explicit InvalidMaterialPropertyException(const std::string& what_arg):BadInputDataException(what_arg) {}
+	};
 	class BadRunFileException : public std::runtime_error {
 	public:
 		explicit BadRunFileException(const std::string& what_arg):std::runtime_error("Run file error: " + what_arg) {}
@@ -56,6 +66,14 @@ namespace Errors {
 	public:
 		explicit LowSimulationAccuracyException(const std::string& what_arg):AnalysisException("Unacceptable inaccuracies: " + what_arg) {};
 	};
+	class NegativeContaminationException : public AnalysisException {
+	public:
+		explicit NegativeContaminationException():AnalysisException("Trying to store a negative contamination. ") {}
+	};
+	class InvalidContaminationException : public AnalysisException {
+	public:
+		explicit InvalidContaminationException():AnalysisException("Trying to store a negative contamination. ") {}
+	};
 
 	class PluginRuntimeException : public std::runtime_error {
 	public:
@@ -71,6 +89,11 @@ namespace Errors {
 	public:
 		explicit VectorOutOfBoundsException(const std::string& what_arg):std::runtime_error("Vector index out of bounds: " + what_arg) {}
 	  };
+	
+	class NotANeighbourException : public std::runtime_error {
+	public:
+		explicit NotANeighbourException():std::runtime_error("Requested the neighbour of an element not belonging to the link.") {}
+	};
 	
 	/*
 	  class  : public std::runtime_error {

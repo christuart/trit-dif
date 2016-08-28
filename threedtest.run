@@ -15,5 +15,4 @@ contamination-mode-space	constant
 contamination 			1 au
 tracking-mode			all
 track				5
-activate-plugin			defaults
 activate-plugin			outgassing

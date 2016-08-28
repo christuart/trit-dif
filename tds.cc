@@ -1089,16 +1089,12 @@ void tds_run::read_run_file(std::string run_file_name) {
 		// rest of the line after just the 'setting' part has been taken out
 		// by the first statement.
 		if (!(line_processing >> setting && std::getline(line_processing,value))) {
-                        std::cerr << "Error at line " << line_n << " of '" << run_file_name
-                                  << "'." << std::endl;
-                        std::cerr << "Line: " << line_processing.str() << std::endl;
-                        throw;
 			std::ostringstream oss; oss << "Confused when separating out key and value from line " << line_n << ":\n\t" << line_processing.str();
 			throw Errors::BadRunFileException(oss.str());
 		} else {
 			trim(value);
-			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
-                        std::cout << "\t" << value << std::endl;
+			//std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
+                        //std::cout << "\t" << value << std::endl;
 		}
 		std::istringstream interpreter;
 		// Following is the list of available instructions in a .run file
@@ -1274,16 +1270,32 @@ void tds_run::add_post_simulation_interrupt(IPlugin* _interrupter) {
 }
 
 void tds_run::change_section_pointer(int _i, tds_section* _new_section) {
-	sections_[_i] = _new_section;
+	if (_i < n_sections()) { sections_[_i] = _new_section; }
+	else {
+		std::ostringstream oss; oss << "Trying to change section pointer " << _i << " out of " << n_sections() << ".";
+		throw Errors::VectorOutOfBoundsException(oss.str());
+	}
 }
 void tds_run::change_material_pointer(int _i, tds_material* _new_material) {
-	materials_[_i] = _new_material;
+	if (_i < n_materials()) { materials_[_i] = _new_material; }
+	else {
+		std::ostringstream oss; oss << "Trying to change material pointer " << _i << " out of " << n_materials() << ".";
+		throw Errors::VectorOutOfBoundsException(oss.str());
+	}
 }
 void tds_run::change_node_pointer(int _i, tds_node* _new_node) {
-	nodes_[_i] = _new_node;
+	if (_i < n_nodes()) { nodes_[_i] = _new_node; }
+	else {
+		std::ostringstream oss; oss << "Trying to change node pointer " << _i << " out of " << n_nodes() << ".";
+		throw Errors::VectorOutOfBoundsException(oss.str());
+	}
 }
 void tds_run::change_element_pointer(int _i, tds_element* _new_element) {
-	elements_[_i] = _new_element;
+	if (_i < n_elements()) { elements_[_i] = _new_element; }
+	else {
+		std::ostringstream oss; oss << "Trying to change element pointer " << _i << " out of " << n_elements() << ".";
+		throw Errors::VectorOutOfBoundsException(oss.str());
+	}
 }
 
 void tds_run::interrupt_material(material_identifier& _new_material) {
