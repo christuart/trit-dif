@@ -49,6 +49,12 @@ namespace Errors {
 	public:
 		explicit InvalidMaterialPropertyException(const std::string& what_arg):BadInputDataException(what_arg) {}
 	};
+	class ConvertingMissingUnitException : public BadInputDataException {
+	public:
+		// This exception will later take in the unknown unit name, the dimension
+		// and a description of where (in the code) it was being converted
+		explicit ConvertingMissingUnitException(const std::string& what_arg):BadInputDataException(what_arg) {}
+	};
 	class BadRunFileException : public std::runtime_error {
 	public:
 		explicit BadRunFileException(const std::string& what_arg):std::runtime_error("Run file error: " + what_arg) {}

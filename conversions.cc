@@ -30,8 +30,7 @@ void conversion::initialise() {
 			continue;			
 		}
 		if (dimensions_.count(_dimension) == 0) {
-			std::cerr << "Invalid dimension was read from unit file (" << _dimension << ") for the unit '" << _unit << "'" << std::endl;
-			continue;
+			throw Errors::BadInputDataException("Invalid dimension '" + _dimension + "' used in the units file (at unit '" + _unit + "').");
 		}
 		std::cout << "\t\tWe obtained three values [" << _dimension << ", " << _unit << ", " << _value << "].\n";
 		
@@ -59,7 +58,7 @@ void conversion::initialise() {
 			contamination_units_[_unit] = _value;
 			break;
 		default:
-			std::cerr << "Unhandled dimension was read from unit file (" << _dimension << ") for the unit '" << _unit << "'" << std::endl;
+			throw Errors::AlgorithmFailedException("Unhandled dimension '" + _dimension + "' processed from the units file (at unit '" + _unit + "').");
 		}
 		
 	}
@@ -69,57 +68,49 @@ void conversion::initialise() {
 
 double conversion::convert_density_from(std::string _unit, double _density) {
 	if (density_units_.count(_unit) == 0) {
-		std::cerr << "No density unit '" << _unit << "' was found." << std::endl;
-		return _density;
+		throw Errors::ConvertingMissingUnitException("Requested density unit '" + _unit + "' was not found.");
 	}
 	return _density * density_units_[_unit];
 }
 double conversion::convert_density_to(std::string _unit, double _density) {
 	if (density_units_.count(_unit) == 0) {
-		std::cerr << "No density unit '" << _unit << "' was found." << std::endl;
-		return _density;
+		throw Errors::ConvertingMissingUnitException("Requested density unit '" + _unit + "' was not found.");
 	}
 	return _density / density_units_[_unit];
 }
 double conversion::convert_diffusion_constant_from(std::string _unit, double _diffusion_constant) {
 	if (diffusion_constant_units_.count(_unit) == 0) {
-		std::cerr << "No diffusion constant unit '" << _unit << "' was found." << std::endl;
-		return _diffusion_constant;
+		throw Errors::ConvertingMissingUnitException("Requested diffusion constant unit '" + _unit + "' was not found.");
 	}
 	return _diffusion_constant * diffusion_constant_units_[_unit];
 }
 double conversion::convert_diffusion_constant_to(std::string _unit, double _diffusion_constant) {
 	if (diffusion_constant_units_.count(_unit) == 0) {
-		std::cerr << "No diffusion_constant unit '" << _unit << "' was found." << std::endl;
-		return _diffusion_constant;
+		throw Errors::ConvertingMissingUnitException("Requested diffusion constant unit '" + _unit + "' was not found.");
 	}
 	return _diffusion_constant / diffusion_constant_units_[_unit];
 }
 double conversion::convert_time_from(std::string _unit, double _time) {
 	if (time_units_.count(_unit) == 0) {
-		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
-		return _time;
+		throw Errors::ConvertingMissingUnitException("Requested time unit '" + _unit + "' was not found.");
 	}
 	return _time * time_units_[_unit];
 }
 double conversion::convert_time_to(std::string _unit, double _time) {
 	if (time_units_.count(_unit) == 0) {
-		std::cerr << "No time unit '" << _unit << "' was found." << std::endl;
-		return _time;
+		throw Errors::ConvertingMissingUnitException("Requested time unit '" + _unit + "' was not found.");
 	}
 	return _time / time_units_[_unit];
 }
 double conversion::convert_contamination_from(std::string _unit, double _contamination) {
 	if (contamination_units_.count(_unit) == 0) {
-		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
-		return _contamination;
+		throw Errors::ConvertingMissingUnitException("Requested contamination unit '" + _unit + "' was not found.");
 	}
 	return _contamination * contamination_units_[_unit];
 }
 double conversion::convert_contamination_to(std::string _unit, double _contamination) {
 	if (contamination_units_.count(_unit) == 0) {
-		std::cerr << "No contamination unit '" << _unit << "' was found." << std::endl;
-		return _contamination;
+		throw Errors::ConvertingMissingUnitException("Requested contamination unit '" + _unit + "' was not found.");
 	}
 	return _contamination / contamination_units_[_unit];
 }

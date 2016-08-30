@@ -17,8 +17,7 @@ void Outgassing::interrupt_section_creation(section_identifier& _new_section) {
 	std::istringstream iss(_new_section.section->name());
 	std::string name_root;
 	if (!(iss >> name_root)) {
-		std::cerr << "(outgassing) Section with an empty name?" << std::endl;
-		throw;
+		throw Errors::OutgassingException("Section with an empty name?");
 	}
 	if (name_root == "outgassing") {
 		std::cout << "Section '" << _new_section.section->name() << "' has had the outgassing material applied." << std::endl;
@@ -45,8 +44,7 @@ void Outgassing::interrupt_element_link_creation(element_link_identifier& _new_e
 	if (materialM == "outgassing") {
 		if (materialN != "outgassing") {
 			if (materialN == "source") {
-				std::cerr << "This model has at least 1 source element touching an outgassing element, which is not allowed." << std::endl;
-				throw;
+				throw Errors::OutgassingException("This model has at least 1 source element touching an outgassing element, which is not allowed.");
 			}
 			tds_outgassing_element_link* replacement_link = new tds_outgassing_element_link(
 				                                                &(_new_element_link.element_link->elementM()),
@@ -58,8 +56,7 @@ void Outgassing::interrupt_element_link_creation(element_link_identifier& _new_e
 		}
 	} else if (materialN == "outgassing") {
 		if (materialM == "source") {
-			std::cerr << "This model has at least 1 source element touching an outgassing element, which is not allowed." << std::endl;
-			throw;
+				throw Errors::OutgassingException("This model has at least 1 source element touching an outgassing element, which is not allowed.");
 		}
 		tds_outgassing_element_link* replacement_link = new tds_outgassing_element_link(
 			                                                &(_new_element_link.element_link->elementM()),
@@ -73,8 +70,7 @@ void Outgassing::interrupt_element_link_creation(element_link_identifier& _new_e
 void Outgassing::interrupt_pre_simulation() {
 	// Outgassing needs to verify that there were some outgassing sections found.
 	if (!outgassing_section_found) {
-		std::cerr << "No outgassing sections were found. If outgassing is not required, please disable the outgassing plug-in." << std::endl;
-		throw;
+		throw Errors::OutgassingException("No outgassing sections were found. If outgassing is not required, please disable the outgassing plug-in.");
 	}
 }
 void Outgassing::interrupt_post_simulation() {
