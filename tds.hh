@@ -101,9 +101,21 @@ public:
 	inline std::string size_z_unit() { return size_z_unit_; }
 	inline conversion& units() { return *units_; }
 	inline int n_sections() { return sections_.size(); }
-	inline tds_section& section(int i) { return *sections_[i]; }
+	inline tds_section& section(int i) {
+		if (i < n_sections()) { return *sections_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading section " << i << " out of " << n_sections() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline int n_materials() { return materials_.size(); }
-	inline tds_material& material(int i) { return *materials_[i]; }
+	inline tds_material& material(int i) {
+		if (i < n_materials()) { return *materials_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading material " << i << " out of " << n_materials() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline tds_material& material(std::string s) {
 		std::map<std::string,tds_material*>::iterator _m = material_map_.find(s);
 		if (_m != material_map_.end()) {
@@ -114,9 +126,21 @@ public:
 		}
 	}
 	inline int n_nodes() { return nodes_.size(); }
-	inline tds_node& node(int i) { return *nodes_[i]; }
+	inline tds_node& node(int i) {
+		if (i < n_nodes()) { return *nodes_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading node " << i << " out of " << n_nodes() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline int n_elements() { return elements_.size(); }
-	inline tds_element& element(int i) { return *elements_[i]; }
+	inline tds_element& element(int i) {
+		if (i < n_elements()) { return *elements_[i]; }
+		else {
+			std::ostringstream oss; oss << "Reading element " << i << " out of " << n_elements() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline bool element_dimensions(int bit_number) { return element_dimensions_.test(bit_number); }
 	inline std::bitset<8> element_dimensions() { return element_dimensions_; }
 
@@ -224,7 +248,7 @@ public:
 	inline void steps(int _steps) { steps_ = _steps; }
 	inline void tracking_interval(double _tracking_interval) { settings.tracking_interval = _tracking_interval; }
 	inline void tracked_elements(std::vector<int>& _tracked_elements) { settings.tracking_list = &_tracked_elements; }
-	inline void tracked_element(int i, int element) { settings.tracking_list->at(i) = element; }
+	inline void tracked_element(int i, int element) { settings.tracking_list->at(i) = element; } // not sure that this method needs to/should exist?
 	//getters
 	inline std::string basename() { return settings.model_name; };
 	inline std::string configname() { return settings.config_name; };
@@ -232,7 +256,13 @@ public:
 	inline double delta_t() { return settings.delta_t; }
 	inline int steps() { return steps_; }
 	inline double tracking_interval() { return settings.tracking_interval; }
-	inline int tracked_element(int i) { return settings.tracking_list->at(i); }
+	inline int tracked_element(int i) {
+		if (i < tracked_elements()->size()) { return settings.tracking_list->at(i); }
+		else {
+			std::ostringstream oss; oss << "Reading tracked element " << i << " out of " << tracked_elements()->size() << ".";
+			throw Errors::VectorOutOfBoundsException(oss.str());
+		}
+	}
 	inline std::vector<int>* tracked_elements() { return settings.tracking_list; }
 	
 	inline const char* units_file_address() { std::string temp = settings.config_directory + configname() + ".units"; return temp.c_str(); }
