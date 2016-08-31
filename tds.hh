@@ -158,6 +158,12 @@ private:
 	std::string basename_;
 	std::string configname_;
 	std::string outputname_;
+
+	// These strings are needed to be stored to work around problem of providing a c_str from
+	// a temporary std::string - the temp string went out of scope and then sometimes the
+	// c_str was available, sometimes it wasn't
+	// std::string units_file_address_, materials_file_address_, sections_file_address_, nodes_file_address_, elements_file_address_, contaminations_file_address_, tracking_file_address_;
+	
 	std::vector<IPlugin*> material_interrupts_;
 	std::vector<IPlugin*> section_interrupts_;
 	std::vector<IPlugin*> node_interrupts_;
@@ -265,13 +271,13 @@ public:
 	}
 	inline std::vector<int>* tracked_elements() { return settings.tracking_list; }
 	
-	inline const char* units_file_address() { std::string temp = settings.config_directory + configname() + ".units"; return temp.c_str(); }
-	inline const char* materials_file_address() { std::string temp = settings.config_directory + configname() + ".materials"; return temp.c_str(); }
-	inline const char* sections_file_address() { std::string temp = settings.model_directory + basename() + ".sections"; return temp.c_str(); }
-	inline const char* nodes_file_address() { std::string temp = settings.model_directory + basename() + ".nodes"; return temp.c_str(); }
-	inline const char* elements_file_address() { std::string temp = settings.model_directory + basename() + ".elements"; return temp.c_str(); }
-	inline const char* contaminations_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; return temp.c_str(); }
-	inline const char* tracking_file_address() { std::string temp = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return temp.c_str(); }
+	inline std::string units_file_address() { std::string units_file_address_ = settings.config_directory + configname() + ".units"; return units_file_address_; }
+	inline std::string materials_file_address() { std::string materials_file_address_ = settings.config_directory + configname() + ".materials"; return materials_file_address_; }
+	inline std::string sections_file_address() { std::string sections_file_address_ = settings.model_directory + basename() + ".sections"; return sections_file_address_; }
+	inline std::string nodes_file_address() { std::string nodes_file_address_ = settings.model_directory + basename() + ".nodes"; return nodes_file_address_; }
+	inline std::string elements_file_address() { std::string elements_file_address_ = settings.model_directory + basename() + ".elements"; return elements_file_address_; }
+	inline std::string contaminations_file_address() { std::string contaminations_file_address_ = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; std::cerr << "*" << contaminations_file_address_ << "* "; return contaminations_file_address_; }
+	inline std::string tracking_file_address() { std::string tracking_file_address_ = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return tracking_file_address_; }
 
 private:
 	void interrupt_material(material_identifier& _new_material);

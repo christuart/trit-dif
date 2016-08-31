@@ -291,12 +291,14 @@ void tds_run::make_analysis() {
 	double time = 0.0;
 	double next_time_recording = tracking_interval();
 
-	const char* tracking_file_address_;
-	const char* contaminations_file_address_;
+	std::string tracking_file_address_;
+	std::string contaminations_file_address_;
+	bool usedTrackingFile = false;
 	try {
 		trackingfile_.exceptions(ofstream::failbit | ofstream::badbit);
-		tracking_file_address_ = tracking_file_address();
-		trackingfile_.open(tracking_file_address_);
+		tracking_file_address_ = std::string(tracking_file_address());
+		trackingfile_.open(tracking_file_address_.c_str());
+		usedTrackingFile = true;
 		trackingfile_ << "element, time, contamination" << std::endl;
 		trackingfile_ << std::scientific;
 		for (int i=0; i < tracked_elements()->size(); ++i)
@@ -428,7 +430,7 @@ void tds_run::make_analysis() {
 		// Contaminations: final values at all elements
 		contaminations_file_address_ = contaminations_file_address();
 		contaminationsfile_.exceptions(ofstream::failbit | ofstream::badbit);
-		contaminationsfile_.open(contaminations_file_address_);
+		contaminationsfile_.open(contaminations_file_address_.c_str());
 		contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
 		                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
 		                    << "s" << std::endl;
@@ -442,16 +444,23 @@ void tds_run::make_analysis() {
 	} catch (ofstream::failure& e) {
 		// These files can only be open if the exception was thrown while they were being built up
 		// so if they are open, we might as well get rid of the incomplete file after we close them.
+		std::cerr << "File exception whilst running simulation:" << std::endl;
 		std::cerr << e.what() << std::endl;
+		if (!usedTrackingFile) {
+			std::cerr << "Error is probably in accessing '" << tracking_file_address_ << "'." << std::endl;
+		}
+		else {
+			std::cerr << "Error is probably in accessing '" << contaminations_file_address_ << "'." <<std::endl;
+		}
 		if (trackingfile_.is_open()) {
 			trackingfile_.close();
-			if (remove(tracking_file_address_) != 0) {
+			if (remove(tracking_file_address_.c_str()) != 0) {
 				std::cerr << "Failed to remove possible garbage tracking file." <<   std::endl;
 			}
 		}
 		if (contaminationsfile_.is_open()) {
 			contaminationsfile_.close();
-			if (remove(contaminations_file_address_) != 0) {
+			if (remove(contaminations_file_address_.c_str()) != 0) {
 				std::cerr << "Failed to remove possible garbage contaminations file." << std::endl;
 			}
 		}
@@ -476,7 +485,7 @@ void tds_run::initialise() {
 
 	// Before we can read in any data, we should look for
 	// any settings about (measurement) units we can find
-	set_units_from_file(units_file_address());
+	set_units_from_file(units_file_address().c_str());
 	// cout << "7.85 g/cm^3 in SI units is: " << units().convert_density_from("g/cm^3",7.85f) << std::endl;
 	
 	// Now read in data
@@ -1122,7 +1131,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                settings.config_name = value;
 	                config_given = true;
 	                std::cout << "\tSetting the units from " << units_file_address() << std::endl;
-	                set_units_from_file(units_file_address());
+	                set_units_from_file(units_file_address().c_str());
                 } else if (setting == "output-name") {
 	                std::cout << "\tSetting the output name: " << value << std::endl;
 	                settings.output_name = value;
