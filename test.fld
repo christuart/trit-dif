@@ -17,6 +17,9 @@ decl {\#include <FL/Fl_GIF_Image.H>} {public local
 decl {\#include <FL/Enumerations.H>} {public local
 } 
 
+decl {\#include <FL/fl_ask.H>} {public local
+} 
+
 decl {\#include "Cartesian.h"} {public local
 } 
 
@@ -24,6 +27,9 @@ decl {void userAction(Fl_Widget* target);} {public local
 } 
 
 decl {void userAction(selection sel, Ca_Canvas* sender);} {public local
+} 
+
+decl {void mark_data_dirty();} {public local
 } 
 
 decl {void reduce_all();} {public local
@@ -35,26 +41,167 @@ class UserInterface {open
   } {
     Fl_Window main_window {
       label {Tritium Diffusion Software - v0.1 - Chris Stuart} open
-      xywh {776 364 900 510} type Double size_range {900 510 900 510} visible
+      xywh {403 376 1225 520} type Double align 80 size_range {1225 520 1225 520} visible
     } {
-      Fl_Group grp_run_file {open
-        xywh {12 99 505 404} box DOWN_BOX
+      Fl_Group grp_run_file {
+        xywh {825 20 385 90} box DOWN_BOX
       } {
         Fl_Text_Display txdsp_run_file_name {
           label {Current run file:}
-          xywh {17 123 390 23} box UP_FRAME align 5
+          xywh {835 43 265 23} box UP_FRAME align 5
           code0 {txdsp_run_file_name->scrollbar_align(0);}
           code1 {txdsp_run_file_name->scroll(0,1);}
-        }
-        Fl_Text_Editor txedt_run_file_contents {selected
-          xywh {17 152 495 345} box DOWN_BOX
-          code0 {txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);}
         }
         Fl_Button btn_open_run_file {
           label {Open...}
           callback {userAction(btn_open_run_file);}
-          xywh {412 122 100 25}
+          xywh {1105 42 98 25}
         }
+        Fl_Button btn_save_run_file {
+          label {Save Changes}
+          callback {userAction(btn_save_run_file);}
+          xywh {1073 75 130 25}
+        }
+        Fl_Button btn_preview_run_file {
+          label Preview
+          callback {userAction(btn_preview_run_file);}
+          xywh {973 79 95 21}
+        }
+        Fl_Button btn_revert_run_file {
+          label Revert
+          callback {userAction(btn_revert_run_file);}
+          xywh {893 79 75 21}
+        }
+      }
+      Fl_Group grp_current_files {
+        label {Current files}
+        xywh {825 385 385 120} box DOWN_FRAME align 5
+      } {
+        Fl_Text_Display txdsp_model_dir {
+          label {Model Directory}
+          xywh {920 400 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 when 6 textsize 10
+          code0 {txdsp_model_dir->hide_cursor();}
+          code1 {txdsp_model_dir->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Text_Display txdsp_model_name {
+          label {Model Name}
+          xywh {1100 400 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 textsize 10
+          code0 {txdsp_model_name->hide_cursor();}
+          code1 {txdsp_model_name->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Text_Display txdsp_settings_dir {
+          label {Settings Directory}
+          xywh {920 422 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 textsize 10
+          code0 {txdsp_settings_dir->hide_cursor();}
+          code1 {txdsp_settings_dir->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Text_Display txdsp_settings_name {
+          label {Settings Name}
+          xywh {1100 422 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 textsize 10
+          code0 {txdsp_settings_name->hide_cursor();}
+          code1 {txdsp_settings_name->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Text_Display txdsp_output_dir {
+          label {Output Directory}
+          xywh {920 444 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 textsize 10
+          code0 {txdsp_output_dir->hide_cursor();}
+          code1 {txdsp_output_dir->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Text_Display txdsp_output_name {
+          label {Output Name}
+          xywh {1100 444 100 18} box THIN_DOWN_FRAME color 49 labelsize 9 align 4 textsize 10
+          code0 {txdsp_output_name->hide_cursor();}
+          code1 {txdsp_output_name->scrollbar_align(FL_ALIGN_CLIP);}
+        }
+        Fl_Button btn_new_files {
+          label {New files...}
+          callback {userAction(btn_new_files);}
+          xywh {945 470 190 25}
+        }
+      }
+      Fl_Text_Editor txedt_run_file_contents {
+        xywh {825 129 385 221} box DOWN_BOX textfont 4 textsize 9
+        code0 {txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);}
+      }
+      Fl_Group grp_simulation {open selected
+        xywh {25 20 790 485} box DOWN_BOX
+      } {
+        Fl_Browser brwsr_run_output {
+          label {Console Output:}
+          xywh {35 45 770 320} align 5
+        }
+      }
+    }
+    Fl_Window wndw_run_file {
+      label {View Run File} open
+      xywh {1051 227 575 365} type Double visible
+    } {
+      Fl_Browser brwsr_run_file_preview {
+        xywh {0 0 575 365} type Select textfont 4 textsize 13
+      }
+    }
+    Fl_Window wndw_new_files {
+      label {Change Simulation Files} open
+      xywh {990 165 540 430} type Double hide modal
+    } {
+      Fl_Group grp_new_model {
+        label Model open
+        xywh {15 30 250 285} box THIN_DOWN_BOX align 5
+      } {
+        Fl_Text_Display txdsp_new_model_dir {
+          xywh {27 43 190 25} color 49 align 5
+        }
+        Fl_Button btn_change_model_dir {
+          label {...}
+          callback {userAction(btn_change_model_dir);}
+          xywh {224 43 30 25}
+        }
+        Fl_Browser brwsr_model_name {
+          xywh {27 78 228 224}
+        }
+      }
+      Fl_Group grp_new_settings {
+        label Settings open
+        xywh {280 30 250 285} box THIN_DOWN_BOX align 5
+      } {
+        Fl_Text_Display txdsp_new_settings_dir {
+          xywh {292 43 190 25} color 49 align 5
+        }
+        Fl_Button btn_change_settings_dir {
+          label {...}
+          callback {userAction(btn_change_settings_dir);}
+          xywh {489 43 30 25}
+        }
+        Fl_Browser brwsr_settings_name {
+          xywh {292 78 228 224}
+        }
+      }
+      Fl_Group grp_new_output {
+        label Output open
+        xywh {15 340 340 80} box THIN_DOWN_BOX align 5
+      } {
+        Fl_Text_Display txdsp_new_output_dir {
+          xywh {27 353 281 25} color 49 align 5
+        }
+        Fl_Button btn_change_output_dir {
+          label {...}
+          callback {userAction(btn_change_output_dir);}
+          xywh {315 353 30 25}
+        }
+        Fl_Text_Editor txedt_new_output_name {
+          callback {mark_data_dirty();}
+          xywh {27 385 320 25} box DOWN_BOX
+        }
+      }
+      Fl_Button btn_save_new_files {
+        label Close
+        callback {userAction(btn_save_new_files);}
+        xywh {400 350 130 29}
+      }
+      Fl_Button btn_revert_new_files {
+        label Revert
+        callback {userAction(btn_revert_new_files);}
+        xywh {425 388 105 25} labelsize 13
       }
     }
   }
@@ -63,5 +210,10 @@ class UserInterface {open
     code {make_window();
 //ChnButton[0]=Chn0;
 main_window->show();} {}
+  }
+  Function {start_showing_window()} {open
+  } {
+    code {Fl::scheme("gtk+");
+show();} {}
   }
 } 

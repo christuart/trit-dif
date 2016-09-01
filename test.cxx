@@ -3,6 +3,7 @@
 #include "test.h"
 void userAction(Fl_Widget* target); 
 void userAction(selection sel, Ca_Canvas* sender); 
+void mark_data_dirty(); 
 void reduce_all(); 
 
 void UserInterface::cb_btn_open_run_file_i(Fl_Button*, void*) {
@@ -12,34 +13,256 @@ void UserInterface::cb_btn_open_run_file(Fl_Button* o, void* v) {
   ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_open_run_file_i(o,v);
 }
 
+void UserInterface::cb_btn_save_run_file_i(Fl_Button*, void*) {
+  userAction(btn_save_run_file);
+}
+void UserInterface::cb_btn_save_run_file(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_save_run_file_i(o,v);
+}
+
+void UserInterface::cb_btn_preview_run_file_i(Fl_Button*, void*) {
+  userAction(btn_preview_run_file);
+}
+void UserInterface::cb_btn_preview_run_file(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_preview_run_file_i(o,v);
+}
+
+void UserInterface::cb_btn_revert_run_file_i(Fl_Button*, void*) {
+  userAction(btn_revert_run_file);
+}
+void UserInterface::cb_btn_revert_run_file(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_revert_run_file_i(o,v);
+}
+
+void UserInterface::cb_btn_new_files_i(Fl_Button*, void*) {
+  userAction(btn_new_files);
+}
+void UserInterface::cb_btn_new_files(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_new_files_i(o,v);
+}
+
+void UserInterface::cb_btn_change_model_dir_i(Fl_Button*, void*) {
+  userAction(btn_change_model_dir);
+}
+void UserInterface::cb_btn_change_model_dir(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_change_model_dir_i(o,v);
+}
+
+void UserInterface::cb_btn_change_settings_dir_i(Fl_Button*, void*) {
+  userAction(btn_change_settings_dir);
+}
+void UserInterface::cb_btn_change_settings_dir(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_change_settings_dir_i(o,v);
+}
+
+void UserInterface::cb_btn_change_output_dir_i(Fl_Button*, void*) {
+  userAction(btn_change_output_dir);
+}
+void UserInterface::cb_btn_change_output_dir(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_change_output_dir_i(o,v);
+}
+
+void UserInterface::cb_txedt_new_output_name_i(Fl_Text_Editor*, void*) {
+  mark_data_dirty();
+}
+void UserInterface::cb_txedt_new_output_name(Fl_Text_Editor* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_txedt_new_output_name_i(o,v);
+}
+
+void UserInterface::cb_btn_save_new_files_i(Fl_Button*, void*) {
+  userAction(btn_save_new_files);
+}
+void UserInterface::cb_btn_save_new_files(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->user_data()))->cb_btn_save_new_files_i(o,v);
+}
+
+void UserInterface::cb_btn_revert_new_files_i(Fl_Button*, void*) {
+  userAction(btn_revert_new_files);
+}
+void UserInterface::cb_btn_revert_new_files(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->user_data()))->cb_btn_revert_new_files_i(o,v);
+}
+
 Fl_Double_Window* UserInterface::make_window() {
-  { main_window = new Fl_Double_Window(900, 510, "Tritium Diffusion Software - v0.1 - Chris Stuart");
+  { main_window = new Fl_Double_Window(1225, 520, "Tritium Diffusion Software - v0.1 - Chris Stuart");
     main_window->user_data((void*)(this));
-    { grp_run_file = new Fl_Group(12, 99, 505, 404);
+    main_window->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
+    { grp_run_file = new Fl_Group(825, 20, 385, 90);
       grp_run_file->box(FL_DOWN_BOX);
-      { txdsp_run_file_name = new Fl_Text_Display(17, 123, 390, 23, "Current run file:");
+      { txdsp_run_file_name = new Fl_Text_Display(835, 43, 265, 23, "Current run file:");
         txdsp_run_file_name->box(FL_UP_FRAME);
         txdsp_run_file_name->align(Fl_Align(FL_ALIGN_TOP_LEFT));
         txdsp_run_file_name->scrollbar_align(0);
         txdsp_run_file_name->scroll(0,1);
       } // Fl_Text_Display* txdsp_run_file_name
-      { txedt_run_file_contents = new Fl_Text_Editor(17, 152, 495, 345);
-        txedt_run_file_contents->box(FL_DOWN_BOX);
-        txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);
-      } // Fl_Text_Editor* txedt_run_file_contents
-      { btn_open_run_file = new Fl_Button(412, 122, 100, 25, "Open...");
+      { btn_open_run_file = new Fl_Button(1105, 42, 98, 25, "Open...");
         btn_open_run_file->callback((Fl_Callback*)cb_btn_open_run_file);
       } // Fl_Button* btn_open_run_file
+      { btn_save_run_file = new Fl_Button(1073, 75, 130, 25, "Save Changes");
+        btn_save_run_file->callback((Fl_Callback*)cb_btn_save_run_file);
+      } // Fl_Button* btn_save_run_file
+      { btn_preview_run_file = new Fl_Button(973, 79, 95, 21, "Preview");
+        btn_preview_run_file->callback((Fl_Callback*)cb_btn_preview_run_file);
+      } // Fl_Button* btn_preview_run_file
+      { btn_revert_run_file = new Fl_Button(893, 79, 75, 21, "Revert");
+        btn_revert_run_file->callback((Fl_Callback*)cb_btn_revert_run_file);
+      } // Fl_Button* btn_revert_run_file
       grp_run_file->end();
     } // Fl_Group* grp_run_file
-    main_window->size_range(900, 510, 900, 510);
+    { grp_current_files = new Fl_Group(825, 385, 385, 120, "Current files");
+      grp_current_files->box(FL_DOWN_FRAME);
+      grp_current_files->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      { txdsp_model_dir = new Fl_Text_Display(920, 400, 100, 18, "Model Directory");
+        txdsp_model_dir->box(FL_THIN_DOWN_FRAME);
+        txdsp_model_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_model_dir->labelsize(9);
+        txdsp_model_dir->textsize(10);
+        txdsp_model_dir->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_model_dir->when(FL_WHEN_RELEASE_ALWAYS);
+        txdsp_model_dir->hide_cursor();
+        txdsp_model_dir->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_model_dir
+      { txdsp_model_name = new Fl_Text_Display(1100, 400, 100, 18, "Model Name");
+        txdsp_model_name->box(FL_THIN_DOWN_FRAME);
+        txdsp_model_name->color(FL_BACKGROUND_COLOR);
+        txdsp_model_name->labelsize(9);
+        txdsp_model_name->textsize(10);
+        txdsp_model_name->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_model_name->hide_cursor();
+        txdsp_model_name->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_model_name
+      { txdsp_settings_dir = new Fl_Text_Display(920, 422, 100, 18, "Settings Directory");
+        txdsp_settings_dir->box(FL_THIN_DOWN_FRAME);
+        txdsp_settings_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_settings_dir->labelsize(9);
+        txdsp_settings_dir->textsize(10);
+        txdsp_settings_dir->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_settings_dir->hide_cursor();
+        txdsp_settings_dir->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_settings_dir
+      { txdsp_settings_name = new Fl_Text_Display(1100, 422, 100, 18, "Settings Name");
+        txdsp_settings_name->box(FL_THIN_DOWN_FRAME);
+        txdsp_settings_name->color(FL_BACKGROUND_COLOR);
+        txdsp_settings_name->labelsize(9);
+        txdsp_settings_name->textsize(10);
+        txdsp_settings_name->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_settings_name->hide_cursor();
+        txdsp_settings_name->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_settings_name
+      { txdsp_output_dir = new Fl_Text_Display(920, 444, 100, 18, "Output Directory");
+        txdsp_output_dir->box(FL_THIN_DOWN_FRAME);
+        txdsp_output_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_output_dir->labelsize(9);
+        txdsp_output_dir->textsize(10);
+        txdsp_output_dir->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_output_dir->hide_cursor();
+        txdsp_output_dir->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_output_dir
+      { txdsp_output_name = new Fl_Text_Display(1100, 444, 100, 18, "Output Name");
+        txdsp_output_name->box(FL_THIN_DOWN_FRAME);
+        txdsp_output_name->color(FL_BACKGROUND_COLOR);
+        txdsp_output_name->labelsize(9);
+        txdsp_output_name->textsize(10);
+        txdsp_output_name->align(Fl_Align(FL_ALIGN_LEFT));
+        txdsp_output_name->hide_cursor();
+        txdsp_output_name->scrollbar_align(FL_ALIGN_CLIP);
+      } // Fl_Text_Display* txdsp_output_name
+      { btn_new_files = new Fl_Button(945, 470, 190, 25, "New files...");
+        btn_new_files->callback((Fl_Callback*)cb_btn_new_files);
+      } // Fl_Button* btn_new_files
+      grp_current_files->end();
+    } // Fl_Group* grp_current_files
+    { txedt_run_file_contents = new Fl_Text_Editor(825, 129, 385, 221);
+      txedt_run_file_contents->box(FL_DOWN_BOX);
+      txedt_run_file_contents->textfont(4);
+      txedt_run_file_contents->textsize(9);
+      txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);
+    } // Fl_Text_Editor* txedt_run_file_contents
+    { grp_simulation = new Fl_Group(25, 20, 790, 485);
+      grp_simulation->box(FL_DOWN_BOX);
+      { brwsr_run_output = new Fl_Browser(35, 45, 770, 320, "Console Output:");
+        brwsr_run_output->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      } // Fl_Browser* brwsr_run_output
+      grp_simulation->end();
+    } // Fl_Group* grp_simulation
+    main_window->size_range(1225, 520, 1225, 520);
     main_window->end();
   } // Fl_Double_Window* main_window
-  return main_window;
+  { wndw_run_file = new Fl_Double_Window(575, 365, "View Run File");
+    wndw_run_file->user_data((void*)(this));
+    { brwsr_run_file_preview = new Fl_Browser(0, 0, 575, 365);
+      brwsr_run_file_preview->type(1);
+      brwsr_run_file_preview->textfont(4);
+      brwsr_run_file_preview->textsize(13);
+    } // Fl_Browser* brwsr_run_file_preview
+    wndw_run_file->end();
+  } // Fl_Double_Window* wndw_run_file
+  { wndw_new_files = new Fl_Double_Window(540, 430, "Change Simulation Files");
+    wndw_new_files->user_data((void*)(this));
+    { grp_new_model = new Fl_Group(15, 30, 250, 285, "Model");
+      grp_new_model->box(FL_THIN_DOWN_BOX);
+      grp_new_model->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      { txdsp_new_model_dir = new Fl_Text_Display(27, 43, 190, 25);
+        txdsp_new_model_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_new_model_dir->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      } // Fl_Text_Display* txdsp_new_model_dir
+      { btn_change_model_dir = new Fl_Button(224, 43, 30, 25, "...");
+        btn_change_model_dir->callback((Fl_Callback*)cb_btn_change_model_dir);
+      } // Fl_Button* btn_change_model_dir
+      { brwsr_model_name = new Fl_Browser(27, 78, 228, 224);
+      } // Fl_Browser* brwsr_model_name
+      grp_new_model->end();
+    } // Fl_Group* grp_new_model
+    { grp_new_settings = new Fl_Group(280, 30, 250, 285, "Settings");
+      grp_new_settings->box(FL_THIN_DOWN_BOX);
+      grp_new_settings->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      { txdsp_new_settings_dir = new Fl_Text_Display(292, 43, 190, 25);
+        txdsp_new_settings_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_new_settings_dir->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      } // Fl_Text_Display* txdsp_new_settings_dir
+      { btn_change_settings_dir = new Fl_Button(489, 43, 30, 25, "...");
+        btn_change_settings_dir->callback((Fl_Callback*)cb_btn_change_settings_dir);
+      } // Fl_Button* btn_change_settings_dir
+      { brwsr_settings_name = new Fl_Browser(292, 78, 228, 224);
+      } // Fl_Browser* brwsr_settings_name
+      grp_new_settings->end();
+    } // Fl_Group* grp_new_settings
+    { grp_new_output = new Fl_Group(15, 340, 340, 80, "Output");
+      grp_new_output->box(FL_THIN_DOWN_BOX);
+      grp_new_output->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      { txdsp_new_output_dir = new Fl_Text_Display(27, 353, 281, 25);
+        txdsp_new_output_dir->color(FL_BACKGROUND_COLOR);
+        txdsp_new_output_dir->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+      } // Fl_Text_Display* txdsp_new_output_dir
+      { btn_change_output_dir = new Fl_Button(315, 353, 30, 25, "...");
+        btn_change_output_dir->callback((Fl_Callback*)cb_btn_change_output_dir);
+      } // Fl_Button* btn_change_output_dir
+      { txedt_new_output_name = new Fl_Text_Editor(27, 385, 320, 25);
+        txedt_new_output_name->box(FL_DOWN_BOX);
+        txedt_new_output_name->callback((Fl_Callback*)cb_txedt_new_output_name);
+      } // Fl_Text_Editor* txedt_new_output_name
+      grp_new_output->end();
+    } // Fl_Group* grp_new_output
+    { btn_save_new_files = new Fl_Button(400, 350, 130, 29, "Close");
+      btn_save_new_files->callback((Fl_Callback*)cb_btn_save_new_files);
+    } // Fl_Button* btn_save_new_files
+    { btn_revert_new_files = new Fl_Button(425, 388, 105, 25, "Revert");
+      btn_revert_new_files->labelsize(13);
+      btn_revert_new_files->callback((Fl_Callback*)cb_btn_revert_new_files);
+    } // Fl_Button* btn_revert_new_files
+    wndw_new_files->set_modal();
+    wndw_new_files->end();
+  } // Fl_Double_Window* wndw_new_files
+  return wndw_new_files;
 }
 
 void UserInterface::show() {
   make_window();
   //ChnButton[0]=Chn0;
   main_window->show();
+}
+
+void UserInterface::start_showing_window() {
+  Fl::scheme("gtk+");
+  show();
 }

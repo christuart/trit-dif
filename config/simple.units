@@ -10,6 +10,7 @@ time days 86400
 time weeks 604800
 time months 2630016
 time decades 315567360
+time centuries 3155673600
 time ms 0.001
 time us 0.000001
 time ns 0.000000001

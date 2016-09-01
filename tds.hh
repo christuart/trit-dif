@@ -1,6 +1,8 @@
 #ifndef TDS_HH
 #define TDS_HH
 
+#define RUN_FILE_KEY_WIDTH 30
+
 #include <typeinfo>
 #include <exception>
 
@@ -124,8 +126,9 @@ public:
 };
 
 class tds_run: public tds {
-public:
+public:	
 private:
+protected:
 	std::ifstream materialsfile_;
 	std::ifstream sectionsfile_;
 	std::ifstream nodesfile_;
@@ -164,6 +167,7 @@ private:
 		               simulation_length(31556736.0),
 		               contamination_mode_time("constant"),
 		               contamination_mode_space("constant"),
+		               contamination(1),
 		               tracking_mode("all"),
 		               tracking_interval(604800.0) {
 			activated_plugins.resize(0);
@@ -190,8 +194,7 @@ private:
 		int tracking_n;
 		double tracking_interval;
 	} settings;
-		
-protected:
+	
 public:
 	tds_run();
 	virtual ~tds_run();
@@ -201,6 +204,7 @@ public:
 	void set_units_from_file(const char* units_file_address_);
 	void initialise();
 	void read_run_file(std::string run_file_name);
+	std::string generate_run_file();
 	void process_plugins();
 	
 	void add_material_interrupt(IPlugin* _interrupter);
@@ -263,18 +267,82 @@ private:
 	UserInterface *GUI_;
 	std::vector<double> X_, Y_;//for the timelines
 	std::vector<std::string> text_;
-	const char *filename_;
-	Fl_Text_Buffer FRunFileName;
-	Fl_Text_Buffer FRunFileContents;
+	Fl_Text_Buffer FRunFileName,
+		FRunFileContents,
+		FModelDirectory,
+		FModelName,
+		FSettingsDirectory,
+		FSettingsName,
+		FOutputDirectory,
+		FOutputName;
 	std::string e_info_,tl_info_;
-protected:
+	std::string temp_unprocessed_; // this variable in use while GUI implementation is WIP
+	struct FilesSettingsMemento {
+		std::string model_directory;
+		std::string model_name;
+		std::string config_directory;
+		std::string config_name;
+		std::string output_directory;
+		std::string output_name;
+		bool data_clean;
+	} files_memento;
+	bool data_is_clean_;
+	
 	void open_run_file_dialog();
+	void save_run_file();
+	void preview_run_file();
+	void revert_run_file();
+	void change_files();
+	void finish_changing_files();
 	void load_event();
 	void load_section(int chnum);
 	void load_section(unsigned int c, int chnum);
 	void resize_plot(int section);
 	void makeZoomBox(selection sel,int event,int section);
-	bool previous_settings_were_saved();
+protected:
+	// GUI actions (view)
+	// GUI actions (controller)
+	void populate_from_run_file();
+	void prettify_run_file();
+	void generate_files_memento();
+	void restore_files_memento();
+	void update_gui_for_cleanliness();
+	void populate_preview_browser(std::string source);
+	
+	// Setting Getters
+	inline std::string run_file() { return std::string(FRunFileName.text()); }
+	inline std::string backup_run_file() { return std::string(FRunFileName.text()) + ".bak"; }
+	inline std::string model_directory() { return std::string(FModelDirectory.text()); }
+	inline std::string model_name() { return std::string(FModelName.text()); }
+	inline std::string config_directory() { return std::string(FSettingsDirectory.text()); }
+	inline std::string config_name() { return std::string(FSettingsName.text()); }
+	inline std::string output_directory() { return std::string(FOutputDirectory.text()); }
+	inline std::string output_name() { return std::string(FOutputName.text()); }
+	// Setting Setters
+	inline void run_file(std::string _run_file) {
+		FRunFileName.text(_run_file.c_str());
+	}
+	inline void model_directory(std::string _model_directory) {
+		FModelDirectory.text(_model_directory.c_str());
+	}
+	inline void model_name(std::string _model_name) {
+		FModelName.text(_model_name.c_str());
+	}
+	inline void config_directory(std::string _config_directory) {
+		FSettingsDirectory.text(_config_directory.c_str());
+	}
+	inline void config_name(std::string _config_name) {
+		FSettingsName.text(_config_name.c_str());
+	}
+	inline void output_directory(std::string _output_directory) {
+		FOutputDirectory.text(_output_directory.c_str());
+	}
+	inline void output_name(std::string _output_name) {
+		FOutputName.text(_output_name.c_str());
+	}
+	
+	inline void mark_data_clean() { data_is_clean_ = true; update_gui_for_cleanliness(); }
+	inline bool previous_settings_were_saved() { return data_is_clean_; }
 public:
 	tds_display(UserInterface *gui);
 	virtual ~tds_display();
@@ -285,11 +353,10 @@ public:
 	//Setters
 	inline void display_e_info(std::string e_comment) { e_info_=e_comment; }
 	inline void display_tl_info(std::string tl_comment) { tl_info_=tl_comment; }
-	inline void filename(const char *f_name) { filename_=f_name; }
+	inline void mark_data_dirty() { data_is_clean_ = false; update_gui_for_cleanliness(); }
 	//Getters
 	inline std::string display_e_info() { return e_info_; }
 	inline std::string display_tl_info() { return tl_info_; }
-	inline const char *filename() { return filename_; }
 }; 
 
 class tds_batch: public tds_run {

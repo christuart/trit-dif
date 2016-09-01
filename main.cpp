@@ -15,6 +15,7 @@ tds_run* tds_r=NULL;
 void userAction(Fl_Widget* sender){ tds->action(sender); }
 void userAction(selection sel, Ca_Canvas *sender){ tds->action(sel,sender); }
 //selection as xmin,xmax,ymin,ymax
+void mark_data_dirty(){ tds->mark_data_dirty(); }
 /*===========================================================================*/
 
 void show_preamble();
@@ -204,9 +205,8 @@ int main(int nArg, char** vArg){
 			//std::cout<<"start at file "<<start_from<<" up to "<<end_at<<std::endl;
 			return 0;
 		} else if (v >= 0) {
-			Fl::scheme("gtk+");
 			UI = new UserInterface();
-			UI->show();
+			UI->start_showing_window();
 			tds = new tds_display(UI);
 			int err=Fl::run();
 			return err;

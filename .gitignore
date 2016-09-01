@@ -39,6 +39,7 @@ trit-dif
 *.geo
 *.contaminations
 *.tracking
+*.bak
 
 # Emacs
 *~
