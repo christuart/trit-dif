@@ -1,6 +1,6 @@
 #include <time.h>
 #include <string>
-#include "gui.h"
+#include "test.h"
 #include <iostream>
 #include "exceptions.hh"
 #include "tds.hh"
@@ -16,6 +16,7 @@ tds_run* tds_r=NULL;
 void userAction(Fl_Widget* sender){ tds->action(sender); }
 void userAction(selection sel, Ca_Canvas *sender){ tds->action(sel,sender); }
 //selection as xmin,xmax,ymin,ymax
+void mark_data_dirty(){ tds->mark_data_dirty(); }
 /*===========================================================================*/
 
 void show_preamble();
@@ -49,6 +50,8 @@ int main(int nArg, char** vArg){
 				try {
 					tds_r = new tds_run();
 					tds_r->read_run_file(cl[2].arg);
+					tds_r->process_plugins();
+					tds_r->initialise();
 					tds_r->make_analysis();
 					return 0;
 				}

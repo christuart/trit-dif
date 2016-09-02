@@ -482,6 +482,10 @@ void tds_run::set_units_from_file(const char* units_file_address_) {
 }
 
 void tds_run::initialise() {
+	
+	int progress;
+	uint64 now;
+	uint64 checkmark = GetTimeMs64();
 
 	// Before we can read in any data, we should look for
 	// any settings about (measurement) units we can find
@@ -974,6 +978,9 @@ void tds_run::initialise() {
 			settings.tracking_list->push_back(i);
 		}
 	}
+	now = GetTimeMs64();
+	progress = (now - checkmark)/1000;
+	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
 }
 
 void tds_run::process_plugins() {
@@ -1033,7 +1040,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	settings.tracking_list = new std::vector<int>();
 	
 	
-	std::cout << "Run file reading not yet fully implemented!" << std::endl;
+	//Run file reading not yet fully implemented!
 
 	// most importantly, the checks to make sure that the user has
 	// specified all the required fields in their .run file before
@@ -1228,9 +1235,6 @@ void tds_run::read_run_file(std::string run_file_name) {
 		}
                 line_processing.clear();
 	}
-
-	// Process the plugins, which have been stored as a list of string plugin names and file names
-	process_plugins();
 	
 	// Set the number of simulation steps from the step size and simulation length
 	steps(ceil(settings.simulation_length/settings.delta_t));
@@ -1239,15 +1243,60 @@ void tds_run::read_run_file(std::string run_file_name) {
 
 	now = GetTimeMs64();
 	progress = (now - checkmark)/1000;
-	std::cout << "Instructions read in " << progress << " seconds. Initialising..." << std::endl;
-	checkmark = now;
-	this->initialise();
-	now = GetTimeMs64();
-	progress = (now - checkmark)/1000;
-	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
+	std::cout << "Instructions read in " << progress << " seconds." << std::endl;
 	
 
 	
+}
+std::string tds_run::generate_run_file() {
+	std::ostringstream oss;
+	oss << std::left;
+	// First two lines are always the mode (unused) and version (currently writing "one"...)
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "mode" << "simulation" << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "version" << "1" << std::endl;
+	// Now let's put in the directories
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "models-directory" << settings.model_directory << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "config-directory" << settings.config_directory << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "output-directory" << settings.output_directory << std::endl;
+	// Now the file names
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "model-name" << settings.model_name << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "config-name" << settings.config_name << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "output-name" << settings.output_name << std::endl;
+	// Now put in the data that every run file includes
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "delta-t"
+	    << units().generate_appropriate_time_input_string(settings.delta_t) << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "tracking-interval"
+	    << units().generate_appropriate_time_input_string(settings.tracking_interval) << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "simulation-length"
+	    << units().generate_appropriate_time_input_string(settings.simulation_length) << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "contamination-mode-time" << settings.contamination_mode_time << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "contamination-mode-space" << settings.contamination_mode_space << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "contamination"
+	    << units().generate_appropriate_contamination_input_string(settings.contamination) << std::endl;
+	// Now put in the lines which depend on how many plugins are in use
+	for (int i=0; i < settings.activated_plugins.size(); ++i) {
+		oss << std::setw(RUN_FILE_KEY_WIDTH) << "activate-plugin" << settings.activated_plugins.at(i) << std::endl;
+		if (settings.plugin_files.count(settings.activated_plugins.at(i)) == 1) {
+			oss << std::setw(RUN_FILE_KEY_WIDTH) << "plugin-file"
+			    << settings.activated_plugins.at(i) << " "
+			    << (settings.plugin_files[settings.activated_plugins.at(i)].needed_after_initialisation ? "always" : "init-only" ) << " "
+			    << settings.plugin_files[settings.activated_plugins.at(i)].file_name
+			    << std::endl;
+		}
+	}
+	// Now put in the tracking mode information
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "tracking-mode" << settings.tracking_mode << std::endl;
+	oss << std::setw(RUN_FILE_KEY_WIDTH) << "track";
+	if (settings.tracking_mode == "ids") {
+		for (int i=0; i < settings.tracking_list->size(); ++i) {
+			oss << settings.tracking_list->at(i) << " ";
+		}
+		oss << std::endl;
+	} else {
+		oss << settings.tracking_n << std::endl;
+	}
+	// Now convert it to a string to return
+	return oss.str();
 }
 
 void tds_run::add_material_interrupt(IPlugin* _interrupter) {
@@ -1363,45 +1412,105 @@ void tds_run::interrupt_post_simulation() {
 
 
 tds_display::tds_display(UserInterface *gui):GUI_(gui){
-	GUI_->RootfileComment->buffer(FRootfileComments);
-	GUI_->TimelineComment->buffer(TimelineComment);
-	GUI_->RootfileName->buffer(FRootfileName);
-	FRootfileComments.text("\n \n \t Choose a file");
+
+	// Set buffers etc in main window
+	GUI_->txdsp_run_file_name->buffer(FRunFileName);
+	GUI_->txedt_run_file_contents->buffer(FRunFileContents);
+	GUI_->txdsp_model_dir->buffer(FModelDirectory);
+	GUI_->txdsp_model_name->buffer(FModelName);
+	GUI_->txdsp_settings_dir->buffer(FSettingsDirectory);
+	GUI_->txdsp_settings_name->buffer(FSettingsName);
+	GUI_->txdsp_output_dir->buffer(FOutputDirectory);
+	GUI_->txdsp_output_name->buffer(FOutputName);
+	// Set buffers etc in new files window
+	GUI_->txdsp_new_model_dir->buffer(FModelDirectory);
+	GUI_->txdsp_new_settings_dir->buffer(FSettingsDirectory);
+	GUI_->txdsp_new_output_dir->buffer(FOutputDirectory);
+	GUI_->txedt_new_output_name->buffer(FOutputName);
+	// read in previously used file name (probably from config file)
+	std::string run_file_name = "example.run";
+	run_file(run_file_name.c_str());
+
+	populate_from_run_file();
+	
 }
 
 tds_display::~tds_display(){
-	GUI_->plotH->clear();
+	// GUI_->plotH->clear();
 }
 
-void tds_display::dialog_open(){
-	const char *filePtr=fl_file_chooser("Input File",NULL,"",0);
-	if(filePtr){
-		std::cout<<"open"<<std::endl;
-		filename(filePtr);
-		load_section(0);
-		FRootfileName.text(filePtr);
+void tds_display::open_run_file_dialog(){
+	if (!previous_settings_were_saved()) {
+		switch (fl_choice("The current settings are not saved in a '.run' file. Are you sure you wish to overwrite them by loading a new '.run' file?","No, cancel","Yes, overwrite",0)) {
+		case 1:
+			break;
+		default:
+			return;
+		}
+	}
+	const char *filePtr = fl_file_chooser("Input File","Run Files (*.run)","",0);
+	if(filePtr) {
 		if (!get_file_exists(std::string(filePtr))) {
 			// either needs a warning() or to change back to previous result, showing
 			// an error box in the UI
 			std::cerr << "Chosen file can no longer be found." << std::endl;
+		} else {
+			run_file(filePtr);
+			populate_from_run_file();
 		}
 	}
 }
+void tds_display::save_run_file() {
+	if (previous_settings_were_saved()) {
+		fl_alert("No changes have been made");
+	} else {
+		FRunFileContents.savefile(run_file().c_str());
+		mark_data_clean();
+	}
+}
+void tds_display::preview_run_file() {
+	// This will actually be used to show the run file window which will
+	// contain a table with all the fields and values in, but for now,
+	// it is creating the run file and putting it in the text editor in
+	// the main window.
+	std::string new_run_file = generate_run_file();
+	FRunFileContents.text(new_run_file.c_str());
+	populate_preview_browser(new_run_file);
+	GUI_->wndw_run_file->show();
+}
+void tds_display::revert_run_file() {
+	if (!previous_settings_were_saved()) {
+		switch (fl_choice("The current settings are not saved in a '.run' file. Are you sure you wish to overwrite them by reverting to the original '.run' file?","No, cancel","Yes, overwrite",0)) {
+		case 1:
+			break;
+		default:
+			return;
+		}
+	}
+	populate_from_run_file();
+}
+void tds_display::change_files() {
+	generate_files_memento();
+	GUI_->wndw_new_files->show();
+}
+void tds_display::finish_changing_files() {
+	GUI_->wndw_new_files->hide();
+}
 
 void tds_display::load_event(){
-	int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
-	std::cout<<"event to load = "<<e_number<<std::endl;
+	// int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
+	// std::cout<<"event to load = "<<e_number<<std::endl;
 }
 
 void tds_display::load_section(int chnum){
-	int c_number = int(GUI_->channel->value());
-	std::cout<<"loading a section"<<std::endl;
-	load_section(c_number,chnum);
+	// int c_number = int(GUI_->channel->value());
+	// std::cout<<"loading a section"<<std::endl;
+	// load_section(c_number,chnum);
 }
 
 void tds_display::load_section(unsigned int ch_n, int chnum){
-	std::cout<<"load section"<<std::endl;
-	FRootfileComments.text(display_tl_info().c_str());
+	// std::cout<<"load section"<<std::endl;
+	// FRootfileComments.text(display_tl_info().c_str());
 }
 
 void tds_display::resize_plot(int c){
@@ -1416,12 +1525,108 @@ void tds_display::makeZoomBox(selection sel,int event,int section){
 	std::cout<<"zoom in"<<std::endl;
 }
 
+void tds_display::populate_from_run_file() {
+	FRunFileContents.loadfile(run_file().c_str());
+	FRunFileContents.savefile(backup_run_file().c_str());
+	prettify_run_file();
+	read_run_file(run_file());
+	model_directory(settings.model_directory); // using run_file_name instead until run file parsing written
+	model_name(settings.model_name);
+	config_directory(settings.config_directory);
+	config_name(settings.config_name);
+	output_directory(settings.output_directory);
+	output_name(settings.output_name);
+	mark_data_clean();
+}
+void tds_display::prettify_run_file() {
+	std::istringstream i_file, i_line;
+	std::ostringstream o;
+	std::string line, start, end;
+	i_file.str(std::string(FRunFileContents.text()));
+	o << std::left;
+	while (std::getline(i_file,line)) {
+		i_line.str(line);
+		i_line >> start;
+		std::getline(i_line,end);
+		trim(end);
+		o << std::setw(RUN_FILE_KEY_WIDTH) << start << end << std::endl;
+		i_line.clear();
+	}
+	FRunFileContents.text(o.str().c_str());
+}
+void tds_display::generate_files_memento() {
+	files_memento.model_directory = model_directory();
+	files_memento.model_name = model_name();
+	files_memento.config_directory = config_directory();
+	files_memento.config_name = config_name();
+	files_memento.output_directory = output_directory();
+	files_memento.output_name = output_name();
+	files_memento.data_clean = previous_settings_were_saved();
+}	
+void tds_display::restore_files_memento() {
+	model_directory(files_memento.model_directory);
+	model_name(files_memento.model_name);
+	config_directory(files_memento.config_directory);
+	config_name(files_memento.config_name);
+	output_directory(files_memento.output_directory);
+	output_name(files_memento.output_name);
+	if (files_memento.data_clean) {
+		mark_data_clean();
+	} else {
+		mark_data_dirty();
+	}
+}
+void tds_display::update_gui_for_cleanliness() {
+	std::vector<Fl_Widget*> only_dirty_buttons;
+	only_dirty_buttons.push_back(GUI_->btn_save_run_file);
+	only_dirty_buttons.push_back(GUI_->btn_revert_run_file);
+	for (int i=0; i < only_dirty_buttons.size(); ++i) {
+		if (previous_settings_were_saved()) {
+			only_dirty_buttons.at(i)->deactivate();
+		} else {
+			only_dirty_buttons.at(i)->activate();
+		}
+	}	
+}
+void tds_display::populate_preview_browser(std::string source) {
+	std::istringstream iss;
+	std::string line;
+	iss.str(source);
+	
+	GUI_->brwsr_run_file_preview->clear();
+	while (std::getline(iss,line)) {
+		GUI_->brwsr_run_file_preview->add(line.c_str());
+	}
+}
+
 void tds_display::action(selection sel, Fl_Widget *sender){
 	std::cout<<"un zoom"<<std::endl;
 }
 
 void tds_display::action(Fl_Widget *sender){
 	std::cout<<"display action"<<std::endl;
+	if (sender == GUI_->btn_open_run_file) {
+		std::cout << "\tOpen run file..." << std::endl;
+		open_run_file_dialog();
+	} else if (sender == GUI_->btn_save_run_file) {
+		std::cout << "\tSave run file..." << std::endl;
+		save_run_file();
+	} else if (sender == GUI_->btn_preview_run_file) {
+		std::cout << "\tGenerate run file preview..." << std::endl;
+		preview_run_file();
+	} else if (sender == GUI_->btn_revert_run_file) {
+		std::cout << "\tRevert to run file..." << std::endl;
+		revert_run_file();
+	} else if (sender == GUI_->btn_new_files) {
+		std::cout << "\tChange files/directories..." << std::endl;
+		change_files();
+	} else if (sender == GUI_->btn_revert_new_files) {
+		std::cout << "\tRevert files/directories..." << std::endl;
+		restore_files_memento();
+	} else if (sender == GUI_->btn_save_new_files) {
+		std::cout << "\tAccept new files/directories..." << std::endl;
+		finish_changing_files();
+	}
 }
 
 

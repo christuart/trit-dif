@@ -1,12 +1,15 @@
 #ifndef CONVERSION_HH
 #define CONVERSION_HH
 
+#define LOG_TIME_ACCURACY 0.1f
+
 #include <map>
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include "exceptions.hh"
+#include <cmath>
 
 typedef enum {
     DIM_LENGTH,
@@ -52,6 +55,8 @@ class conversion {
 	double convert_volume_to(std::string _unit, double _volume);
 	double convert_contamination_from(std::string _unit, double _contamination);
 	double convert_contamination_to(std::string _unit, double _contamination);
+	std::string generate_appropriate_time_input_string(double _time);
+	std::string generate_appropriate_contamination_input_string(double _contamination);
 	void initialise();
 
 };

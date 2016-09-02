@@ -114,4 +114,27 @@ double conversion::convert_contamination_to(std::string _unit, double _contamina
 	}
 	return _contamination / contamination_units_[_unit];
 }
-
+std::string conversion::generate_appropriate_time_input_string(double _time) {
+	std::ostringstream oss;
+	double ltime = log10(_time);
+	typedef std::map<std::string,double>::iterator it_type;
+	it_type best_choice = time_units_.end();
+	for (it_type it = time_units_.begin(); it != time_units_.end(); ++it) {
+		if (log10(it->second) - ltime < LOG_TIME_ACCURACY) {
+			if (best_choice == time_units_.end() || log10(it->second) - log10(best_choice->second) > LOG_TIME_ACCURACY) {
+				best_choice = it;
+			}
+		}
+	}
+	if (best_choice != time_units_.end()) {
+		oss << (_time / best_choice->second) << " " << best_choice->first;
+	} else {
+		oss << _time << " seconds";
+	}
+	return oss.str();
+}
+std::string conversion::generate_appropriate_contamination_input_string(double _contamination) {
+	std::ostringstream oss;
+	oss << _contamination << " au";
+	return oss.str();
+}

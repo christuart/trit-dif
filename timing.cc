@@ -52,7 +52,7 @@ std::string format_time(double time) {
 
 	int reductions = 0;
 	// time is submitted in seconds
-	if (time > 90.0) {
+	if (time > 60.0) {
 		time /= 60.0; // to minutes
 		++reductions;
 		if (time > 60.0) {
@@ -61,16 +61,12 @@ std::string format_time(double time) {
 			if (time > 24.0) {
 				time /= 24.0; // to days
 				++reductions;
-				if (time > 31.0) { // to months
+				if (time > 30.437) { // to months
 					time /= 30.436666666666667;
 					++reductions;
-					if (time > 65.0) { // to months
-						time /= 30.436666666666667;
+					if (time > 12.0) { // to years
+						time /= 12.0;
 						++reductions;
-						if (time > 24.0) { // to years
-							time /= 12.0;
-							++reductions;
-						}
 					}
 				}
 			}
