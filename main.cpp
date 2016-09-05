@@ -11,6 +11,15 @@ tds_batch* tds_b=NULL;
 tds_run* tds_t=NULL;
 tds_run* tds_r=NULL;
 
+// Global Message Buffers
+MessageBuffer exceptions = MessageBuffer(MBUnhandledException, "EXCEPTION   ");
+MessageBuffer warnings = MessageBuffer(MBWarnings, "WARNING     ");
+DebugMessageBuffer debugging = DebugMessageBuffer(MBDebug, "DEBUG       ");
+// Global Message Listeners
+standard_cout_listener console_out = standard_cout_listener();
+standard_cerr_listener console_err = standard_cerr_listener();
+error_log_listener error_log;
+
 /*===========================================================================*/
 // GUI (FLUID) INTERFACE PROCEDURES.
 void userAction(Fl_Widget* sender){ tds->action(sender); }
@@ -23,6 +32,7 @@ void show_preamble();
 void show_usage();
 
 int main(int nArg, char** vArg){
+	
 	try {
 		show_preamble();
 
@@ -35,7 +45,9 @@ int main(int nArg, char** vArg){
 		// for (unsigned i=0; i < cl.size(); ++i) {
 		// 	std::cout << "Argument " << i+1 << ": " << cl[i].arg << std::endl;
 		// }
-	
+
+		debugging.add_listener(&console_err);
+		
 		int t = cl.flag("t|test");
 		int b = cl.flag("b|batch");
 		int v = cl.flag("v|viewer");
@@ -66,7 +78,7 @@ int main(int nArg, char** vArg){
 		} else {
 			if (v >= 0) {
 				try {
-					UI = new UserInterface(); UI->show();
+					UI = new UserInterface(); UI->start_showing_window();
 					tds = new tds_display(UI);
 					int err=Fl::run();
 					return err;
@@ -230,7 +242,7 @@ int main(int nArg, char** vArg){
 		}
 	}
 	catch (std::exception& e){
-		std::cerr << "(unhandled exception) " << e.what() << std::endl;
+		LOG(exceptions,"(unhandled exception) " << e.what());
 	}
 	delete tds;
 	delete tds_r;

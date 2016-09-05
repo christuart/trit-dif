@@ -1,6 +1,10 @@
 #include "tds.hh"
 #include "plugins.hh"
 
+extern MessageBuffer exceptions;
+extern MessageBuffer warnings;
+extern DebugMessageBuffer debugging;
+
 /******************** TDS METHODS ********************/
 
 
@@ -1414,19 +1418,29 @@ void tds_run::interrupt_post_simulation() {
 tds_display::tds_display(UserInterface *gui):GUI_(gui){
 
 	// Set buffers etc in main window
-	GUI_->txdsp_run_file_name->buffer(FRunFileName);
-	GUI_->txedt_run_file_contents->buffer(FRunFileContents);
-	GUI_->txdsp_model_dir->buffer(FModelDirectory);
-	GUI_->txdsp_model_name->buffer(FModelName);
-	GUI_->txdsp_settings_dir->buffer(FSettingsDirectory);
-	GUI_->txdsp_settings_name->buffer(FSettingsName);
-	GUI_->txdsp_output_dir->buffer(FOutputDirectory);
-	GUI_->txdsp_output_name->buffer(FOutputName);
+	GUI_->txdsp_run_file_name->buffer(BRunFileName);
+	GUI_->txedt_run_file_contents->buffer(BRunFileContents);
+	GUI_->txdsp_model_dir->buffer(BModelDirectory);
+	GUI_->txdsp_model_name->buffer(BModelName);
+	GUI_->txdsp_settings_dir->buffer(BSettingsDirectory);
+	GUI_->txdsp_settings_name->buffer(BSettingsName);
+	GUI_->txdsp_output_dir->buffer(BOutputDirectory);
+	GUI_->txdsp_output_name->buffer(BOutputName);
+	GUI_->txdsp_status_bar->buffer(BStatusBar); // just while testing don't kill me!
+	GUI_->txdsp_data_dirty->buffer(BDataDirty);
 	// Set buffers etc in new files window
-	GUI_->txdsp_new_model_dir->buffer(FModelDirectory);
-	GUI_->txdsp_new_settings_dir->buffer(FSettingsDirectory);
-	GUI_->txdsp_new_output_dir->buffer(FOutputDirectory);
-	GUI_->txedt_new_output_name->buffer(FOutputName);
+	GUI_->txdsp_new_model_dir->buffer(BModelDirectory);
+	GUI_->txdsp_new_settings_dir->buffer(BSettingsDirectory);
+	GUI_->txdsp_new_output_dir->buffer(BOutputDirectory);
+	GUI_->txedt_new_output_name->buffer(BOutputName);
+
+	// Prepare the tds_display messaging systems
+	gui_status.add_listener(&BStatusBar);
+	warnings.add_listener(&BStatusBar);
+	exceptions.add_listener(&BStatusBar);
+	LOG(gui_status,"Status bar initiated");
+	
+	
 	// read in previously used file name (probably from config file)
 	std::string run_file_name = "example.run";
 	run_file(run_file_name.c_str());
@@ -1464,7 +1478,7 @@ void tds_display::save_run_file() {
 	if (previous_settings_were_saved()) {
 		fl_alert("No changes have been made");
 	} else {
-		FRunFileContents.savefile(run_file().c_str());
+		BRunFileContents.savefile(run_file().c_str());
 		mark_data_clean();
 	}
 }
@@ -1474,7 +1488,7 @@ void tds_display::preview_run_file() {
 	// it is creating the run file and putting it in the text editor in
 	// the main window.
 	std::string new_run_file = generate_run_file();
-	FRunFileContents.text(new_run_file.c_str());
+	BRunFileContents.text(new_run_file.c_str());
 	populate_preview_browser(new_run_file);
 	GUI_->wndw_run_file->show();
 }
@@ -1526,8 +1540,8 @@ void tds_display::makeZoomBox(selection sel,int event,int section){
 }
 
 void tds_display::populate_from_run_file() {
-	FRunFileContents.loadfile(run_file().c_str());
-	FRunFileContents.savefile(backup_run_file().c_str());
+	BRunFileContents.loadfile(run_file().c_str());
+	BRunFileContents.savefile(backup_run_file().c_str());
 	prettify_run_file();
 	read_run_file(run_file());
 	model_directory(settings.model_directory); // using run_file_name instead until run file parsing written
@@ -1537,12 +1551,13 @@ void tds_display::populate_from_run_file() {
 	output_directory(settings.output_directory);
 	output_name(settings.output_name);
 	mark_data_clean();
+	mark_struct_up_to_date();
 }
 void tds_display::prettify_run_file() {
 	std::istringstream i_file, i_line;
 	std::ostringstream o;
 	std::string line, start, end;
-	i_file.str(std::string(FRunFileContents.text()));
+	i_file.str(std::string(BRunFileContents.text()));
 	o << std::left;
 	while (std::getline(i_file,line)) {
 		i_line.str(line);
@@ -1552,7 +1567,7 @@ void tds_display::prettify_run_file() {
 		o << std::setw(RUN_FILE_KEY_WIDTH) << start << end << std::endl;
 		i_line.clear();
 	}
-	FRunFileContents.text(o.str().c_str());
+	BRunFileContents.text(o.str().c_str());
 }
 void tds_display::generate_files_memento() {
 	files_memento.model_directory = model_directory();
@@ -1577,7 +1592,7 @@ void tds_display::restore_files_memento() {
 	}
 }
 void tds_display::update_gui_for_cleanliness() {
-	std::vector<Fl_Widget*> only_dirty_buttons;
+	std::vector<Fl_Widget*> only_dirty_buttons; // buttons which can only be used if dirty
 	only_dirty_buttons.push_back(GUI_->btn_save_run_file);
 	only_dirty_buttons.push_back(GUI_->btn_revert_run_file);
 	for (int i=0; i < only_dirty_buttons.size(); ++i) {
@@ -1586,7 +1601,8 @@ void tds_display::update_gui_for_cleanliness() {
 		} else {
 			only_dirty_buttons.at(i)->activate();
 		}
-	}	
+	}
+	BDataDirty.text((previous_settings_were_saved()) ? "" : "*unsaved changes");
 }
 void tds_display::populate_preview_browser(std::string source) {
 	std::istringstream iss;

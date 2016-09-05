@@ -84,7 +84,7 @@ void UserInterface::cb_btn_revert_new_files(Fl_Button* o, void* v) {
 }
 
 Fl_Double_Window* UserInterface::make_window() {
-  { main_window = new Fl_Double_Window(1225, 520, "Tritium Diffusion Software - v0.1 - Chris Stuart");
+  { main_window = new Fl_Double_Window(1225, 560, "Tritium Diffusion Software - v0.1 - Chris Stuart");
     main_window->user_data((void*)(this));
     main_window->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
     { grp_run_file = new Fl_Group(825, 20, 385, 90);
@@ -185,7 +185,25 @@ Fl_Double_Window* UserInterface::make_window() {
       } // Fl_Browser* brwsr_run_output
       grp_simulation->end();
     } // Fl_Group* grp_simulation
-    main_window->size_range(1225, 520, 1225, 520);
+    { grp_status_bar = new Fl_Group(-5, 532, 1235, 36);
+      grp_status_bar->box(FL_ENGRAVED_FRAME);
+      { txdsp_status_bar = new Fl_Text_Display(5, 537, 1097, 19);
+        txdsp_status_bar->box(FL_THIN_DOWN_FRAME);
+        txdsp_status_bar->color(FL_BACKGROUND_COLOR);
+        txdsp_status_bar->textfont(13);
+        txdsp_status_bar->textsize(11);
+        txdsp_status_bar->deactivate();
+      } // Fl_Text_Display* txdsp_status_bar
+      { txdsp_data_dirty = new Fl_Text_Display(1105, 537, 117, 19);
+        txdsp_data_dirty->box(FL_THIN_DOWN_FRAME);
+        txdsp_data_dirty->color(FL_BACKGROUND_COLOR);
+        txdsp_data_dirty->textfont(13);
+        txdsp_data_dirty->textsize(11);
+        txdsp_data_dirty->deactivate();
+      } // Fl_Text_Display* txdsp_data_dirty
+      grp_status_bar->end();
+    } // Fl_Group* grp_status_bar
+    main_window->size_range(1225, 560, 1225, 560);
     main_window->end();
   } // Fl_Double_Window* main_window
   { wndw_run_file = new Fl_Double_Window(575, 365, "View Run File");

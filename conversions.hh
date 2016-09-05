@@ -11,7 +11,7 @@
 #include "exceptions.hh"
 #include <cmath>
 
-typedef enum {
+enum enum_dimensions {
     DIM_LENGTH,
     DIM_TIME, // cannot reuse name time
     DIM_DENSITY,
@@ -19,7 +19,7 @@ typedef enum {
     DIM_AREA,
     DIM_VOLUME,
     DIM_CONTAMINATION
-} enum_dimensions;
+};
 
 class conversion {
 	public:

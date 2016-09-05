@@ -10,6 +10,7 @@
 #include <FL/Enumerations.H>
 #include <FL/fl_ask.H>
 #include "Cartesian.h"
+#include "messaging.hh"
 extern void userAction(Fl_Widget* target); 
 extern void userAction(selection sel, Ca_Canvas* sender); 
 extern void mark_data_dirty(); 
@@ -62,6 +63,9 @@ public:
   Fl_Text_Editor *txedt_run_file_contents;
   Fl_Group *grp_simulation;
   Fl_Browser *brwsr_run_output;
+  Fl_Group *grp_status_bar;
+  Fl_Text_Display *txdsp_status_bar;
+  Fl_Text_Display *txdsp_data_dirty;
   Fl_Double_Window *wndw_run_file;
   Fl_Browser *brwsr_run_file_preview;
   Fl_Double_Window *wndw_new_files;

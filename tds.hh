@@ -60,6 +60,8 @@ protected:
 	double size_,size_x_,size_y_,size_z_;
 	int dimensions;
 
+	MessageBuffer tds_log;
+
 public:
 	tds();
 	virtual ~tds();
@@ -170,6 +172,9 @@ protected:
 	// a temporary std::string - the temp string went out of scope and then sometimes the
 	// c_str was available, sometimes it wasn't
 	// std::string units_file_address_, materials_file_address_, sections_file_address_, nodes_file_address_, elements_file_address_, contaminations_file_address_, tracking_file_address_;
+
+	MessageBuffer run_file_processing_output;
+	MessageBuffer simulation_output;
 	
 	std::vector<IPlugin*> material_interrupts_;
 	std::vector<IPlugin*> section_interrupts_;
@@ -302,18 +307,26 @@ private:
 class tds_display: public tds_run {
 private:
 	UserInterface *GUI_;
-	std::vector<double> X_, Y_;//for the timelines
-	std::vector<std::string> text_;
-	Fl_Text_Buffer FRunFileName,
-		FRunFileContents,
-		FModelDirectory,
-		FModelName,
-		FSettingsDirectory,
-		FSettingsName,
-		FOutputDirectory,
-		FOutputName;
-	std::string e_info_,tl_info_;
-	std::string temp_unprocessed_; // this variable in use while GUI implementation is WIP
+	
+	Fl_Text_Buffer BRunFileName,
+		BRunFileContents,
+		BModelDirectory,
+		BModelName,
+		BSettingsDirectory,
+		BSettingsName,
+		BOutputDirectory,
+		BOutputName,
+		BDataDirty;
+	
+	// confusing naming because this is a Fl_Text_Buffer but an
+	// IMessageHandler, not an IMessageBuffer...
+	gui_status_bar_messages BStatusBar;
+	
+	MessageBuffer gui_status;
+	MessageBuffer gui_alerts;
+	
+	std::vector<double> X_, Y_; //for the timelines
+	std::vector<std::string> text_; 
 	struct FilesSettingsMemento {
 		std::string model_directory;
 		std::string model_name;
@@ -323,7 +336,11 @@ private:
 		std::string output_name;
 		bool data_clean;
 	} files_memento;
-	bool data_is_clean_;
+	
+	bool data_is_clean_; // Let's the user know if the saved file matches what they see
+	bool struct_matches_gui_; // Let's the software know if the tds_run matches what the user sees
+	
+	std::string e_info_,tl_info_;
 	
 	void open_run_file_dialog();
 	void save_run_file();
@@ -347,39 +364,41 @@ protected:
 	void populate_preview_browser(std::string source);
 	
 	// Setting Getters
-	inline std::string run_file() { return std::string(FRunFileName.text()); }
-	inline std::string backup_run_file() { return std::string(FRunFileName.text()) + ".bak"; }
-	inline std::string model_directory() { return std::string(FModelDirectory.text()); }
-	inline std::string model_name() { return std::string(FModelName.text()); }
-	inline std::string config_directory() { return std::string(FSettingsDirectory.text()); }
-	inline std::string config_name() { return std::string(FSettingsName.text()); }
-	inline std::string output_directory() { return std::string(FOutputDirectory.text()); }
-	inline std::string output_name() { return std::string(FOutputName.text()); }
+	inline std::string run_file() { return std::string(BRunFileName.text()); }
+	inline std::string backup_run_file() { return std::string(BRunFileName.text()) + ".bak"; }
+	inline std::string model_directory() { return std::string(BModelDirectory.text()); }
+	inline std::string model_name() { return std::string(BModelName.text()); }
+	inline std::string config_directory() { return std::string(BSettingsDirectory.text()); }
+	inline std::string config_name() { return std::string(BSettingsName.text()); }
+	inline std::string output_directory() { return std::string(BOutputDirectory.text()); }
+	inline std::string output_name() { return std::string(BOutputName.text()); }
 	// Setting Setters
 	inline void run_file(std::string _run_file) {
-		FRunFileName.text(_run_file.c_str());
+		BRunFileName.text(_run_file.c_str());
 	}
 	inline void model_directory(std::string _model_directory) {
-		FModelDirectory.text(_model_directory.c_str());
+		BModelDirectory.text(_model_directory.c_str());
 	}
 	inline void model_name(std::string _model_name) {
-		FModelName.text(_model_name.c_str());
+		BModelName.text(_model_name.c_str());
 	}
 	inline void config_directory(std::string _config_directory) {
-		FSettingsDirectory.text(_config_directory.c_str());
+		BSettingsDirectory.text(_config_directory.c_str());
 	}
 	inline void config_name(std::string _config_name) {
-		FSettingsName.text(_config_name.c_str());
+		BSettingsName.text(_config_name.c_str());
 	}
 	inline void output_directory(std::string _output_directory) {
-		FOutputDirectory.text(_output_directory.c_str());
+		BOutputDirectory.text(_output_directory.c_str());
 	}
 	inline void output_name(std::string _output_name) {
-		FOutputName.text(_output_name.c_str());
+		BOutputName.text(_output_name.c_str());
 	}
 	
 	inline void mark_data_clean() { data_is_clean_ = true; update_gui_for_cleanliness(); }
+	inline void mark_struct_up_to_date() { struct_matches_gui_ = true; }
 	inline bool previous_settings_were_saved() { return data_is_clean_; }
+	inline bool struct_is_up_to_date() { return struct_matches_gui_; }
 public:
 	tds_display(UserInterface *gui);
 	virtual ~tds_display();
@@ -390,7 +409,7 @@ public:
 	//Setters
 	inline void display_e_info(std::string e_comment) { e_info_=e_comment; }
 	inline void display_tl_info(std::string tl_comment) { tl_info_=tl_comment; }
-	inline void mark_data_dirty() { data_is_clean_ = false; update_gui_for_cleanliness(); }
+	inline void mark_data_dirty() { data_is_clean_ = false; struct_matches_gui_ = false; update_gui_for_cleanliness(); }
 	//Getters
 	inline std::string display_e_info() { return e_info_; }
 	inline std::string display_tl_info() { return tl_info_; }

@@ -12,6 +12,10 @@ namespace Errors {
 	public:
 		explicit AlgorithmFailedException(const std::string& what_arg):std::logic_error("Algorithm failed: " + what_arg) {}
 	};
+	class MessagingException : public std::logic_error {
+	public:
+		explicit MessagingException(const std::string& what_arg):std::logic_error("Messaging exception: " + what_arg) {}
+	};
 	class PluginException : public std::logic_error {
 	public:
 		explicit PluginException(const std::string& what_arg):std::logic_error("(plugin exception) " + what_arg) {}
