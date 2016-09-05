@@ -10,15 +10,19 @@ void IMessageListener::add_buffer(IMessageBuffer* _new_listener) { _new_listener
 standard_cout_listener::standard_cout_listener() {}
 standard_cout_listener::~standard_cout_listener() {}
 bool standard_cout_listener::handle_message(std::string msg, IMessageBuffer* sending_buffer, MessageType M) {
-	if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
-		msg = ">\n" + sending_buffer->tag() + "<" + msg;
-	}
 	switch (M) {
 	case MTMessage:
 	case MTMultiline:
+		msg = sending_buffer->tag() + "> " + msg;
+		if (last_message_buffer_type != sending_buffer->type()) {
+			msg = "\n" + msg;
+		}
 		std::cout << msg << std::endl;
 		break;
 	case MTPhrase:
+		if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
+			msg = "\n" + sending_buffer->tag() + "> " + msg;
+		}
 		std::cout << msg;
 		break;
 	default:
@@ -35,7 +39,7 @@ standard_cerr_listener::standard_cerr_listener() {}
 standard_cerr_listener::~standard_cerr_listener() {}
 bool standard_cerr_listener::handle_message(std::string msg, IMessageBuffer* sending_buffer, MessageType M) {
 	if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
-		msg = ">\n" + sending_buffer->tag() + "<" + msg;
+		msg = "\n" + sending_buffer->tag() + "> " + msg;
 	}
 	switch (M) {
 	case MTMessage:
@@ -56,18 +60,18 @@ bool standard_cerr_listener::handle_message(std::string msg, MessageContext, IMe
 }
 
 error_log_listener::error_log_listener() {
-	error_log_file.open("error.log");
+	error_log_file.open("error.log", std::ios_base::app); // ofstream will add ios_base::out
 	if (error_log_file.good()) {
-		error_log_file << "### Error recording starts" << std::endl
-		               << "### " << get_timestamp() << std::endl << std::endl;
+		error_log_file << "###==========================================================" << std::endl
+		               << "### Error recording starts " << get_timestamp() << std::endl << std::endl;
 	} else {
 		LOG(warnings,"Error log failed to make start entry.");
 	}
 }
 error_log_listener::~error_log_listener() {
 	if (error_log_file.is_open() && error_log_file.good()) {
-		error_log_file << "### Error recording ends" << std::endl
-		               << "### " << get_timestamp() << std::endl << std::endl;
+		error_log_file << "### Error recording ends " << get_timestamp() << std::endl
+		               << "###==========================================================" << std::endl << std::endl;
 		error_log_file.close();
 	} else {
 		LOG(warnings,"Error log failed to make finish entry.");

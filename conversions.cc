@@ -10,6 +10,7 @@ conversion::conversion(std::string _units_file):units_file_(_units_file) {
 	dimensions_["contamination"] = DIM_CONTAMINATION;
 	initialise();
 }
+conversion::~conversion() {}
 
 void conversion::initialise() {
 	std::ifstream units_file_stream (units_file().c_str());

@@ -237,6 +237,7 @@ public:
 	
 	void check_coincidence();
 	void make_analysis();
+	void clear_units();
 	void set_units_from_file(const char* units_file_address_);
 	void initialise();
 	void read_run_file(std::string run_file_name);

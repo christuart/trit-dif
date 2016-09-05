@@ -36,6 +36,7 @@ class conversion {
 	protected:
 	public:
 	conversion(std::string _units_file);
+	~conversion();
 	//setters
 	inline void units_file(std::string _units_file) { units_file_ = _units_file; }
 	//getters

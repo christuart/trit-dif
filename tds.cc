@@ -4,6 +4,9 @@
 extern MessageBuffer exceptions;
 extern MessageBuffer warnings;
 extern DebugMessageBuffer debugging;
+extern standard_cout_listener console_out;
+extern standard_cerr_listener console_err;
+extern error_log_listener error_log;
 
 /******************** TDS METHODS ********************/
 
@@ -214,7 +217,10 @@ void tds::register_element_type(int element_type) {
 
 
 
-tds_run::tds_run():tds(){
+tds_run::tds_run():tds(),units_set_(false){
+	run_file_processing_output = MessageBuffer(MBRunFileProcessing, "RUNFILE     ");
+	simulation_output = MessageBuffer(MBSimulationOutput, "SIMULATION  ");
+	run_file_processing_output.add_listener(&console_out);
 }
 
 tds_run::~tds_run(){
@@ -473,6 +479,12 @@ void tds_run::make_analysis() {
 	}
 }
 
+void tds_run::clear_units() {
+	if (units_set_) {
+		delete(&units());
+		units_set_ = false;
+	}
+}
 void tds_run::set_units_from_file(const char* units_file_address_) {
 
 	if (!units_set_) {
@@ -1029,10 +1041,8 @@ void tds_run::read_run_file(std::string run_file_name) {
 	uint64 checkmark = GetTimeMs64();
 	uint64 now;
 	int progress;
-	
 	ensure_ending(run_file_name,".run");
-        
-	std::cout << "Using instruction file: '" << run_file_name << "'" << std::endl;
+        LOG(run_file_processing_output,"Using instruction file: '" << run_file_name << "'");
 
 	// Set defaults before reading from the file
 	settings.model_name = "simple2d";
@@ -1063,8 +1073,8 @@ void tds_run::read_run_file(std::string run_file_name) {
 					       << line << std::endl;
                         throw Errors::BadRunFileException(oss.str());
 		} else {
-			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
-                        std::cout << "\t" << value << std::endl;
+			LOG(run_file_processing_output,"Found request for setting '" << setting << "' with:");
+                        LOG(run_file_processing_output,"\t" << value);
 			if (setting != "mode") {
 				throw Errors::BadRunFileException("First instruction was not the run mode, instead found '" + setting + "'.");
 			} else {
@@ -1083,8 +1093,8 @@ void tds_run::read_run_file(std::string run_file_name) {
 					       << line << std::endl;
                         throw Errors::BadRunFileException(oss.str());
 		} else {
-			std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
-                        std::cout << "\t" << value << std::endl;
+			LOG(run_file_processing_output,"Found request for setting '" << setting << "' with:");
+                        LOG(run_file_processing_output,"\t" << value);
 			if (setting != "version") {
 				throw Errors::BadRunFileException("Second instruction was not the run file version, instead found '" + setting + "'.");
 			} else {
@@ -1113,41 +1123,40 @@ void tds_run::read_run_file(std::string run_file_name) {
 			throw Errors::BadRunFileException(oss.str());
 		} else {
 			trim(value);
-			//std::cout << "Found request for setting '" << setting << "' with:" << std::endl;
-                        //std::cout << "\t" << value << std::endl;
 		}
 		std::istringstream interpreter;
 		// Following is the list of available instructions in a .run file
                 if (setting == "models-directory") {
 	                ensure_ending(value, "/");
-	                std::cout << "\tSetting the models directory: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the models directory: " << value);
 	                settings.model_directory = value;
                 } else if (setting == "config-directory") {
 	                ensure_ending(value, "/");
-	                std::cout << "\tSetting the config directory: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the config directory: " << value);
 	                settings.config_directory = value;
                 } else if (setting == "output-directory") {
 	                ensure_ending(value, "/");
-	                std::cout << "\tSetting the output directory: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the output directory: " << value);
 	                settings.output_directory = value;
                 } else if (setting == "gmsh-bin-directory") {
 	                ensure_ending(value, "/");
-	                std::cout << "\tSetting the gmsh directory: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the gmsh directory: " << value);
 	                settings.gmsh_bin_directory = value;
                 } else if (setting == "model-name") {
-	                std::cout << "\tSetting the model name: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the model name: " << value);
 	                settings.model_name = value;
                 } else if (setting == "config-name") {
-	                std::cout << "\tSetting the config name: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the config name: " << value);
 	                settings.config_name = value;
 	                config_given = true;
-	                std::cout << "\tSetting the units from " << units_file_address() << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the units from " << units_file_address());  
+	                clear_units();
 	                set_units_from_file(units_file_address().c_str());
                 } else if (setting == "output-name") {
-	                std::cout << "\tSetting the output name: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the output name: " << value);
 	                settings.output_name = value;
                 } else if (setting == "delta-t") {
-	                std::cout << "\tSetting the time step: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the time step: " << value);
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
@@ -1159,7 +1168,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                } else
 				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "tracking-interval") {
-	                std::cout << "\tSetting the time interval for recording contaminations: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the time interval for recording contaminations: " << value);
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
@@ -1171,7 +1180,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                } else
 				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "simulation-length") {
-	                std::cout << "\tSetting the minimum total simulation time: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the minimum total simulation time: " << value);
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
@@ -1182,13 +1191,13 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                } else
 				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "contamination-mode-time") {
-	                std::cout << "\tSetting the contamination mode for time: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the contamination mode for time: " << value);
 	                settings.contamination_mode_time = value;
                 } else if (setting == "contamination-mode-space") {
-	                std::cout << "\tSetting the contamination mode for space: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the contamination mode for space: " << value);
 	                settings.contamination_mode_space = value;
                 } else if (setting == "contamination") {
-	                std::cout << "\tSetting the basic contamination: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the basic contamination: " << value);
 	                if (config_given) {
 		                std::string unit;
 		                interpreter.str(value);
@@ -1199,13 +1208,13 @@ void tds_run::read_run_file(std::string run_file_name) {
 	                } else
 				throw Errors::EarlyRunFileUnitsException(line);
                 } else if (setting == "contaminations-file") {
-	                std::cout << "\tSetting the contaminations file name: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the contaminations file name: " << value);
 	                settings.contaminations_file = value;
                 } else if (setting == "activate-plugin") {
-	                std::cout << "\tAdding a plug-in to activate: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tAdding a plug-in to activate: " << value);
 	                settings.activated_plugins.push_back(value);
                 } else if (setting == "plugin-file") {
-	                std::cout << "\tSetting the file for a plugin: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the file for a plugin: " << value);
 	                std::string plugin;
 	                std::string init_only;
 	                std::string file;
@@ -1217,12 +1226,12 @@ void tds_run::read_run_file(std::string run_file_name) {
 		                settings.plugin_files[plugin].needed_after_initialisation = (init_only != "init-only");
 	                }
                 } else if (setting == "tracking-mode") {
-	                std::cout << "\tSetting the tracking mode: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the tracking mode: " << value);
 			// Probably want a warning() or exception here if the tracking_mode
 			// doesn't exist.
 	                settings.tracking_mode = value;
                 } else if (setting == "track") {
-	                std::cout << "\tSetting the tracked ids: " << value << std::endl;
+	                LOG(run_file_processing_output,"\tSetting the tracked ids: " << value);
 	                interpreter.str(value);
 	                if (settings.tracking_mode == "ids") {
 		                settings.tracking_list->clear();
@@ -1247,7 +1256,7 @@ void tds_run::read_run_file(std::string run_file_name) {
 
 	now = GetTimeMs64();
 	progress = (now - checkmark)/1000;
-	std::cout << "Instructions read in " << progress << " seconds." << std::endl;
+	LOG(run_file_processing_output,"Instructions read in " << progress << " seconds.");
 	
 
 	
@@ -1436,6 +1445,7 @@ tds_display::tds_display(UserInterface *gui):GUI_(gui){
 
 	// Prepare the tds_display messaging systems
 	gui_status.add_listener(&BStatusBar);
+	gui_status.add_listener(&console_out);
 	warnings.add_listener(&BStatusBar);
 	exceptions.add_listener(&BStatusBar);
 	LOG(gui_status,"Status bar initiated");

@@ -16,8 +16,8 @@ MessageBuffer exceptions = MessageBuffer(MBUnhandledException, "EXCEPTION   ");
 MessageBuffer warnings = MessageBuffer(MBWarnings, "WARNING     ");
 DebugMessageBuffer debugging = DebugMessageBuffer(MBDebug, "DEBUG       ");
 // Global Message Listeners
-standard_cout_listener console_out = standard_cout_listener();
-standard_cerr_listener console_err = standard_cerr_listener();
+standard_cout_listener console_out;
+standard_cerr_listener console_err;
 error_log_listener error_log;
 
 /*===========================================================================*/
@@ -46,7 +46,9 @@ int main(int nArg, char** vArg){
 		// 	std::cout << "Argument " << i+1 << ": " << cl[i].arg << std::endl;
 		// }
 
-		debugging.add_listener(&console_err);
+		debugging.add_listener(&console_out);
+		exceptions.add_listener(&console_err);
+		warnings.add_listener(&console_err);
 		
 		int t = cl.flag("t|test");
 		int b = cl.flag("b|batch");
