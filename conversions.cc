@@ -1,6 +1,6 @@
 #include "conversions.hh"
 
-conversion::conversion(std::string _units_file):units_file_(_units_file) {
+conversion::conversion(std::string _units_file, IMessageBuffer* _output):units_file_(_units_file),output_buffer_(_output) {
 	dimensions_["length"] = DIM_LENGTH;
 	dimensions_["time"] = DIM_TIME;
 	dimensions_["density"] = DIM_DENSITY;
@@ -27,13 +27,13 @@ void conversion::initialise() {
 		double _value;
 		
 		if (!(iss >> _dimension >> _unit >> _value)) {
-			std::cerr << "\t\tInvalid line, skipping.\n";
+			LOG((*output_buffer_),"Invalid line, skipping.");
 			continue;			
 		}
 		if (dimensions_.count(_dimension) == 0) {
 			throw Errors::BadInputDataException("Invalid dimension '" + _dimension + "' used in the units file (at unit '" + _unit + "').");
 		}
-		std::cout << "\t\tWe obtained three values [" << _dimension << ", " << _unit << ", " << _value << "].\n";
+		LOG((*output_buffer_),"Processing new unit: [" << _dimension << ", " << _unit << ", " << _value << "].");
 		
 		int dim_code = dimensions_[_dimension];
 		switch (dim_code) {

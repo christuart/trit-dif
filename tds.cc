@@ -20,6 +20,8 @@ extern error_log_listener error_log;
 
 tds::tds():sections_() {
 	element_dimensions_ = 0x0;
+	tds_log = MessageBuffer(MBTdsLog,"MODEL       ");
+	tds_log.add_listener(&console_out);
 }
 
 tds::~tds(){
@@ -218,9 +220,11 @@ void tds::register_element_type(int element_type) {
 
 
 tds_run::tds_run():tds(),units_set_(false){
-	run_file_processing_output = MessageBuffer(MBRunFileProcessing, "RUNFILE     ");
+	run_file_processing_output = MessageBuffer(MBRunFileProcessing, "RUN FILE    ");
+	units_processing_output = MessageBuffer(MBUnitsProcessing, "UNITS       ");
 	simulation_output = MessageBuffer(MBSimulationOutput, "SIMULATION  ");
 	run_file_processing_output.add_listener(&console_out);
+	units_processing_output.add_listener(&console_out);
 }
 
 tds_run::~tds_run(){
@@ -488,8 +492,7 @@ void tds_run::clear_units() {
 void tds_run::set_units_from_file(const char* units_file_address_) {
 
 	if (!units_set_) {
-		//conversion _conversion(units_file_address_);
-		units(new conversion(units_file_address_));
+		units(new conversion(units_file_address_,&units_processing_output));
 		units_set_ = true;
 	} else {
 		std::cerr << "Units have already been set, but the program has asked to set them again. Request ignored." << std::endl;
@@ -998,6 +1001,9 @@ void tds_run::initialise() {
 	progress = (now - checkmark)/1000;
 	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
 }
+void tds_run::direct_simulation_output_to_cout() {
+	simulation_output.add_listener(&console_out);
+}
 
 void tds_run::process_plugins() {
 	
@@ -1045,6 +1051,7 @@ void tds_run::read_run_file(std::string run_file_name) {
         LOG(run_file_processing_output,"Using instruction file: '" << run_file_name << "'");
 
 	// Set defaults before reading from the file
+	settings = run_settings();
 	settings.model_name = "simple2d";
 	settings.config_name = "simple";
 	settings.output_name = "output";
@@ -1426,6 +1433,7 @@ tds_display::tds_display(UserInterface *gui):GUI_(gui){
 	// Initialise buffers
 	gui_status = MessageBuffer(MBGuiStatus,"STATUS      ");
 	gui_alerts = MessageBuffer(MBGuiStatus,"ALERTS      ");
+	gui_actions = MessageBuffer(MBGuiActions,"GUI         ");
 	
 	// Set buffers etc in main window
 	GUI_->txdsp_run_file_name->buffer(BRunFileName);
@@ -1451,13 +1459,17 @@ tds_display::tds_display(UserInterface *gui):GUI_(gui){
 	gui_status.add_listener(&BStatusBar);
 	gui_status.add_listener(&console_out);
 	gui_status.add_listener(&gui_console);
+	gui_alerts.add_listener(&console_out);
 	gui_alerts.add_listener(&gui_console);
+        gui_actions.add_listener(&console_out);
 	//   - those stored in tds_run
 	run_file_processing_output.add_listener(&gui_console);
+	units_processing_output.add_listener(&gui_console);
 	simulation_output.add_listener(&gui_console);
 	//   - those stored globally
 	warnings.add_listener(&BStatusBar);
 	warnings.add_listener(&gui_console);
+	warnings.add_listener(&console_err);
 	exceptions.add_listener(&BStatusBar);
 	exceptions.add_listener(&gui_console);
 	debugging.add_listener(&gui_console);
@@ -1576,6 +1588,7 @@ void tds_display::populate_from_run_file() {
 	output_name(settings.output_name);
 	mark_data_clean();
 	mark_struct_up_to_date();
+	LOG(gui_status, "Finished loading from '" << run_file() << "'");
 }
 void tds_display::prettify_run_file() {
 	std::istringstream i_file, i_line;
@@ -1646,25 +1659,25 @@ void tds_display::action(selection sel, Fl_Widget *sender){
 void tds_display::action(Fl_Widget *sender){
 	std::cout<<"display action"<<std::endl;
 	if (sender == GUI_->btn_open_run_file) {
-		std::cout << "\tOpen run file..." << std::endl;
+		LOG(gui_actions,"Opening run file.");
 		open_run_file_dialog();
 	} else if (sender == GUI_->btn_save_run_file) {
-		std::cout << "\tSave run file..." << std::endl;
+		LOG(gui_actions,"Saving run file.");
 		save_run_file();
 	} else if (sender == GUI_->btn_preview_run_file) {
-		std::cout << "\tGenerate run file preview..." << std::endl;
+		LOG(gui_actions,"Generating run file preview.");
 		preview_run_file();
 	} else if (sender == GUI_->btn_revert_run_file) {
-		std::cout << "\tRevert to run file..." << std::endl;
+		LOG(gui_actions,"Reverting to run file.");
 		revert_run_file();
 	} else if (sender == GUI_->btn_new_files) {
-		std::cout << "\tChange files/directories..." << std::endl;
+		LOG(gui_actions,"Changing files/directories.");
 		change_files();
 	} else if (sender == GUI_->btn_revert_new_files) {
-		std::cout << "\tRevert files/directories..." << std::endl;
+		LOG(gui_actions,"Reverting files/directories.");
 		restore_files_memento();
 	} else if (sender == GUI_->btn_save_new_files) {
-		std::cout << "\tAccept new files/directories..." << std::endl;
+		LOG(gui_actions,"Accepting new files/directories.");
 		finish_changing_files();
 	}
 }

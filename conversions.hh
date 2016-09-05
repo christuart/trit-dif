@@ -10,6 +10,7 @@
 #include <sstream>
 #include "exceptions.hh"
 #include <cmath>
+#include "messaging.hh"
 
 enum enum_dimensions {
     DIM_LENGTH,
@@ -25,6 +26,7 @@ class conversion {
 	public:
 	private:
 	std::string units_file_;
+	IMessageBuffer* output_buffer_;
 	std::map<std::string,double> length_units_;
 	std::map<std::string,double> time_units_;
 	std::map<std::string,double> density_units_;
@@ -35,7 +37,7 @@ class conversion {
 	std::map<std::string,int> dimensions_;
 	protected:
 	public:
-	conversion(std::string _units_file);
+	conversion(std::string _units_file, IMessageBuffer* _output);
 	~conversion();
 	//setters
 	inline void units_file(std::string _units_file) { units_file_ = _units_file; }

@@ -174,6 +174,7 @@ protected:
 	// std::string units_file_address_, materials_file_address_, sections_file_address_, nodes_file_address_, elements_file_address_, contaminations_file_address_, tracking_file_address_;
 
 	MessageBuffer run_file_processing_output;
+	MessageBuffer units_processing_output;
 	MessageBuffer simulation_output;
 	
 	std::vector<IPlugin*> material_interrupts_;
@@ -240,6 +241,7 @@ public:
 	void clear_units();
 	void set_units_from_file(const char* units_file_address_);
 	void initialise();
+	void direct_simulation_output_to_cout();
 	void read_run_file(std::string run_file_name);
 	std::string generate_run_file();
 	void process_plugins();
@@ -327,6 +329,7 @@ private:
 	
 	MessageBuffer gui_status;
 	MessageBuffer gui_alerts;
+	MessageBuffer gui_actions;
 	
 	std::vector<double> X_, Y_; //for the timelines
 	std::vector<std::string> text_; 

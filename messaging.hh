@@ -35,9 +35,11 @@ enum MessageBufferType {
 	MBUnknown,
 	MBGuiStatus,
 	MBGuiAlerts,
+	MBGuiActions,
 	MBTdsLog,
 	MBUnhandledException,
 	MBRunFileProcessing,
+	MBUnitsProcessing,
 	MBWarnings,
 	MBDebug,
 	MBSimulationOutput

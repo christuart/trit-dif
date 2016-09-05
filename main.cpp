@@ -66,6 +66,7 @@ int main(int nArg, char** vArg){
 					tds_r->read_run_file(cl[2].arg);
 					tds_r->process_plugins();
 					tds_r->initialise();
+					tds_r->direct_simulation_output_to_cout();
 					tds_r->make_analysis();
 					return 0;
 				}
