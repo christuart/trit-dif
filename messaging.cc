@@ -98,15 +98,52 @@ bool error_log_listener::handle_message(std::string msg, MessageContext context,
 	return false;
 }
 
-gui_status_bar_messages::gui_status_bar_messages() {
-	buffer()->text("test status");
-}
+gui_status_bar_messages::gui_status_bar_messages() {}
 gui_status_bar_messages::~gui_status_bar_messages() {}
 bool gui_status_bar_messages::handle_message(std::string msg, IMessageBuffer*, MessageType M) {
 	buffer()->text(msg.c_str()); return true;
 }
 bool gui_status_bar_messages::handle_message(std::string msg, MessageContext, IMessageBuffer*, MessageType M) {
 	buffer()->text(msg.c_str()); return true;
+}
+
+gui_console_messages::gui_console_messages():console_browser_(NULL) {}
+gui_console_messages::~gui_console_messages() {}
+bool gui_console_messages::handle_message(std::string msg, IMessageBuffer* sending_buffer, MessageType M) {
+	if (browser_is_assigned()) {
+		int n = browser().size();
+		if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
+			browser().add("");
+			++n;
+		}
+		switch (M) {
+		case MTMessage:
+		case MTMultiline:
+			msg = sending_buffer->tag() + "> " + msg;
+			browser().add("");
+			++n;
+			browser().text(n,msg.c_str());
+			break;
+		case MTPhrase:
+			if (browser().text(n) == "") {
+				msg = sending_buffer->tag() + "> " + msg;
+			} else {
+				msg = browser().text(n) + msg;
+			}
+			browser().text(n,msg.c_str());
+			break;
+		default:
+			throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
+		}
+		last_message_buffer_type = sending_buffer->type();
+		browser().bottomline(browser().size());
+		return true;
+	} else {
+		return false;
+	}
+}
+bool gui_console_messages::handle_message(std::string msg, MessageContext context, IMessageBuffer* sending_buffer, MessageType M) {
+	return handle_message(msg, sending_buffer, M);
 }
 
 IMessageBuffer::IMessageBuffer(MessageBufferType _type, std::string _tag):message_buffer_type_(_type),message_buffer_tag_(_tag) {}

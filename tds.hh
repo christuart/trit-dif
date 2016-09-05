@@ -320,8 +320,10 @@ private:
 		BDataDirty;
 	
 	// confusing naming because this is a Fl_Text_Buffer but an
-	// IMessageHandler, not an IMessageBuffer...
+	// IMessageListener, not an IMessageBuffer...
 	gui_status_bar_messages BStatusBar;
+	
+	gui_console_messages gui_console;
 	
 	MessageBuffer gui_status;
 	MessageBuffer gui_alerts;

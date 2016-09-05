@@ -11,6 +11,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Browser.H>
 #include "utilities.hh"
 #include "exceptions.hh"
 
@@ -149,14 +150,29 @@ public:
 };
 
 class gui_status_bar_messages : public IMessageListener, public Fl_Text_Buffer {
-private:
-	Fl_Text_Buffer buffer_;
 public:
 	gui_status_bar_messages();
 	~gui_status_bar_messages();
 	bool handle_message(std::string, IMessageBuffer*, MessageType M=MTMessage);
 	bool handle_message(std::string, MessageContext, IMessageBuffer*, MessageType M=MTMessage);
 	inline Fl_Text_Buffer* buffer() { return static_cast<Fl_Text_Buffer*>(this); }
+};
+
+class gui_console_messages : public IMessageListener {
+private:
+	MessageBufferType last_message_buffer_type;
+	Fl_Browser* console_browser_;
+private:
+	inline bool browser_is_assigned() { return (console_browser_ != NULL); }
+public:
+	gui_console_messages();
+	~gui_console_messages();
+	bool handle_message(std::string, IMessageBuffer*, MessageType M=MTMessage);
+	bool handle_message(std::string, MessageContext, IMessageBuffer*, MessageType M=MTMessage);
+	// Setters
+	inline void browser(Fl_Browser* _browser) { console_browser_ = _browser; }
+	// Getters
+	inline Fl_Browser& browser() { return *(console_browser_); }
 };
 
 #endif

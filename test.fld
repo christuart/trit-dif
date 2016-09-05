@@ -44,7 +44,7 @@ class UserInterface {open
   } {
     Fl_Window main_window {
       label {Tritium Diffusion Software - v0.1 - Chris Stuart} open
-      xywh {663 64 1225 560} type Double align 80 size_range {1225 560 1225 560} visible
+      xywh {140 67 1225 560} type Double align 80 size_range {1225 560 1225 560} visible
     } {
       Fl_Group grp_run_file {
         xywh {825 20 385 90} box DOWN_BOX
@@ -130,11 +130,11 @@ class UserInterface {open
         xywh {25 20 790 485} box DOWN_BOX
       } {
         Fl_Browser brwsr_run_output {
-          label {Console Output:}
-          xywh {35 45 770 320} align 5
+          label {Console Output:} selected
+          xywh {35 45 770 320} type Multi align 5 textfont 13 textsize 11
         }
       }
-      Fl_Group grp_status_bar {open selected
+      Fl_Group grp_status_bar {open
         xywh {-5 532 1235 36} box ENGRAVED_FRAME
       } {
         Fl_Text_Display txdsp_status_bar {

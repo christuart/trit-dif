@@ -181,6 +181,9 @@ Fl_Double_Window* UserInterface::make_window() {
     { grp_simulation = new Fl_Group(25, 20, 790, 485);
       grp_simulation->box(FL_DOWN_BOX);
       { brwsr_run_output = new Fl_Browser(35, 45, 770, 320, "Console Output:");
+        brwsr_run_output->type(3);
+        brwsr_run_output->textfont(13);
+        brwsr_run_output->textsize(11);
         brwsr_run_output->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       } // Fl_Browser* brwsr_run_output
       grp_simulation->end();
