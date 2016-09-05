@@ -122,24 +122,30 @@ public:
 	virtual bool handle_message(std::string msg, IMessageBuffer* _originator, MessageType M=MTMessage)=0;
 	virtual bool handle_message(std::string msg, MessageContext context, IMessageBuffer* _originator, MessageType M=MTMessage)=0;
 };
-
+class standard_cerr_listener;
 class standard_cout_listener : public IMessageListener {
 private:
 	MessageBufferType last_message_buffer_type;
+	standard_cerr_listener* error_listener_;
 public:
 	standard_cout_listener();
 	~standard_cout_listener();
 	bool handle_message(std::string, IMessageBuffer*, MessageType M=MTMessage);
 	bool handle_message(std::string, MessageContext, IMessageBuffer*, MessageType M=MTMessage);
+	void set_last_message_buffer_type(MessageBufferType _mbt, bool first = true);
+	inline void error_listener(standard_cerr_listener* _error_listener) { error_listener_ = _error_listener; }
 };
 class standard_cerr_listener : public IMessageListener {
 private:
 	MessageBufferType last_message_buffer_type;
+	standard_cout_listener* out_listener_;
 public:
 	standard_cerr_listener();
 	~standard_cerr_listener();
 	bool handle_message(std::string, IMessageBuffer*, MessageType M=MTMessage);
 	bool handle_message(std::string, MessageContext, IMessageBuffer*, MessageType M=MTMessage);
+	void set_last_message_buffer_type(MessageBufferType _mbt, bool first = true);
+	inline void out_listener(standard_cout_listener* _out_listener) { out_listener_ = _out_listener; }
 };
 class error_log_listener : public IMessageListener {
 private:

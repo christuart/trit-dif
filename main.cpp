@@ -46,6 +46,9 @@ int main(int nArg, char** vArg){
 		// 	std::cout << "Argument " << i+1 << ": " << cl[i].arg << std::endl;
 		// }
 
+		console_out.error_listener(&console_err);
+		console_err.out_listener(&console_out);
+		
 		debugging.add_listener(&console_out);
 		exceptions.add_listener(&console_err);
 		warnings.add_listener(&console_err);

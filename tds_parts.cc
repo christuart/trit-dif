@@ -1,4 +1,12 @@
 #include "tds_parts.hh"
+
+extern MessageBuffer exceptions;
+extern MessageBuffer warnings;
+extern DebugMessageBuffer debugging;
+extern standard_cout_listener console_out;
+extern standard_cerr_listener console_err;
+extern error_log_listener error_log;
+
 #define TOLERANCE 0.00001f
 tds_part::tds_part() {}
 tds_part::~tds_part() {}
@@ -192,7 +200,9 @@ void tds_element::set_origin_from_nodes() {
 		z /= n_nodes;
 		break;
 	default:
-		std::cerr << "!!! Looking for origin of " << nodes_.size() << " noded element, not programmed yet " << std::endl;
+		std::ostringstream oss;
+		oss << "Looking for origin of " << nodes_.size() << " noded element, not programmed yet.";
+		throw Errors::FutureImplementationException(oss.str());
 	}
 	
 	origin(x,y,z);
@@ -640,7 +650,7 @@ void tds_element_link::initialise() {
 		norm_vector(flux_vector());
 		norm_vector_ *= (1.0f/modMN());
 		if (norm_vector(1) != 0.0f || norm_vector(2) != 0.0f) {
-			std::cout << "!!! non 1-D elements had a 1 node interface -- not physically accurate" << std::endl;
+			LOG(warnings, "Non 1-D elements had a 1 node interface -- not physically accurate");
 		}
 		interface_area(1.0f);
 	} else if (shared_nodes_.size() == 2) {
@@ -656,7 +666,7 @@ void tds_element_link::initialise() {
 		//           << "," << norm_vector(1) << " i.e. magnitude "
 		//           << magnitude(norm_vector()) << std::endl;
 		if (shared_node(0).position(2) != 0.0f || shared_node(1).position(2) != 0.0f) {
-			std::cout << "!!! non 2-D elements had a 2 node interface -- not physically accurate" << std::endl;
+			LOG(warnings, "Non 2-D elements had a 2 node interface -- not physically accurate");
 		}
 		// make use of this rotated vector as a measure of interface length, then normalise it
 		// std::cout << "norm_vector().size() = " << norm_vector().size() << std::endl;
@@ -676,8 +686,7 @@ void tds_element_link::initialise() {
 		interface_area(fabs(get_3Dplanar_area(shared_nodes_,norm_vector())));
 		// std::cerr << "!!! haven't implemented 3d element link initialisation" << std::endl;
 	} else {
-		std::cerr << "Trying to initialise element link between two elements with no known common nodes." << std::endl;
-		throw;
+		throw Errors::BadInputDataException("Trying to initialise element link between two elements with no known common nodes.");
 	}
 	
 	// calculate the geometry multiplier to turn D * (diff in contamination) into flow rate

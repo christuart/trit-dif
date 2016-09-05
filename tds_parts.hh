@@ -6,6 +6,7 @@
 #include "exceptions.hh"
 #include <float.h>
 #include <sstream>
+#include "messaging.hh"
 
 class tds_part;
 class tds_node;

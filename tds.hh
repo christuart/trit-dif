@@ -32,6 +32,7 @@
 #include "identifiers.hh"
 #include "pluginfwd.hh"
 
+extern MessageBuffer warnings;
 
 class tds;
 class tds_run;
@@ -125,7 +126,7 @@ public:
 		if (_m != material_map_.end()) {
 			return *(_m->second);
 		} else {
-			std::cerr << "Undefined material '" << s << "' replaced with 'error'" << std::endl;
+			LOG(warnings, "Undefined material '" << s << "' replaced with 'error'");
 			return *material_map_["error"];
 		}
 	}
@@ -292,7 +293,7 @@ public:
 	inline std::string sections_file_address() { std::string sections_file_address_ = settings.model_directory + basename() + ".sections"; return sections_file_address_; }
 	inline std::string nodes_file_address() { std::string nodes_file_address_ = settings.model_directory + basename() + ".nodes"; return nodes_file_address_; }
 	inline std::string elements_file_address() { std::string elements_file_address_ = settings.model_directory + basename() + ".elements"; return elements_file_address_; }
-	inline std::string contaminations_file_address() { std::string contaminations_file_address_ = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; std::cerr << "*" << contaminations_file_address_ << "* "; return contaminations_file_address_; }
+	inline std::string contaminations_file_address() { std::string contaminations_file_address_ = settings.output_directory + outputname() + "-" + get_timestamp() + ".contaminations"; return contaminations_file_address_; }
 	inline std::string tracking_file_address() { std::string tracking_file_address_ = settings.output_directory + outputname() + "-" + get_timestamp() + ".tracking"; return tracking_file_address_; }
 
 private:

@@ -32,23 +32,21 @@ tds::~tds(){
 }
 
 int tds::add_section(tds_section* new_section) {
-	std::cout<<"adding a new section"<<std::endl;
+	LOG(tds_log,"adding a new section");
 	sections_.push_back(new_section);
 	return sections_.size()-1;
 }
 int tds::add_material(tds_material* new_material) {
-	std::cout << "adding a new material: " << (*new_material).name() << std::endl;
+	LOG(tds_log,"adding a new material: " << (*new_material).name());
 	material_map_[(*new_material).name()] = new_material;
 	materials_.push_back(new_material);
 	return materials_.size()-1;
 }
 int tds::add_node(tds_node* new_node) {
-	// std::cout<<"adding a new node"<<std::endl;
 	nodes_.push_back(new_node);
 	return nodes_.size()-1;
 }
 int tds::add_element(tds_element* new_element) {
-	// std::cout<<"adding a new element"<<std::endl;
 	elements_.push_back(new_element);
 	return elements_.size()-1;
 }
@@ -80,16 +78,11 @@ void tds::clean_inactive_elements() {
 		// and need to access 5 using index 3, not index 5.
 		// So whilst looking for how many to delete, i doesn't change,
 		// and j does.
-		// std::cout << i << std::flush;
 		while (j < elements_.size() && element(j).n_neighbours() == 0) {
 			++j;
-			// std::cout << ", " << j << std::flush;
 		}
 		if (j > i) {
-			// std::cout << " bad " << std::flush;
 			elements_.erase(elements_.begin()+i,elements_.begin()+j); // start inclusive end exclusive
-		} else {
-			// std::cout << " good " << std::flush;
 		}
 	}
 }
@@ -124,56 +117,59 @@ void tds::expected_nodes(int _n) { nodes_.reserve(_n); }
 void tds::expected_elements(int _n) { elements_.reserve(_n); }
 
 void tds::output_model_summary(bool show_materials, bool show_sections, bool show_elements, bool show_element_links, bool show_nodes) {
-	std::cout << std::endl << "We now have " << n_materials() << " materials, " << n_sections() << " sections, "
-	          << n_elements() << " elements and " << n_nodes() << " nodes." << std::endl;
+	LOG(tds_log,"We now have " << n_materials() << " materials, " << n_sections() << " sections, "
+	    << n_elements() << " elements and " << n_nodes() << " nodes.");
 	if (show_materials) {
-		for (int i = 0; i < n_materials(); i++) {
-			std::cout << "Material " << (i+1) << ": " << material(i).name() << " - "
-			          << material(i).density() << "kg/m^3 - " << material(i).diffusion_constant()
-			          << "m^2/s" << std::endl;
+		for (int i = 0; i < n_materials(); ++i) {
+			LOG(tds_log, "Material " << (i+1) << ": " << material(i).name() << " - "
+			    << material(i).density() << "kg/m^3 - " << material(i).diffusion_constant()
+			    << "m^2/s");
 		}
 	}
 	if (show_sections) {
-		for (int i = 0; i < n_sections(); i++) {
-			// std::cout << "Section " << (i+1) << " address:" << &section(i) << std::endl;
-			// std::cout << "Section " << (i+1) << " material address:" << &(section(i).material()) << std::endl;
-			std::cout << "Section " << (i+1) << ": " << section(i).material().name()
-			          << " - " << section(i).n_elements() << " elements" << std::endl;
+		for (int i = 0; i < n_sections(); ++i) {
+			LOG(tds_log, "Section " << (i+1) << ": " << section(i).material().name()
+			    << " - " << section(i).n_elements() << " elements");
 		}
 	}
 	if (show_elements) {
-		for (int i = 0; i < n_elements(); i++) {
-			std::cout << "Element " << (i+1) << " (" << &element(i) << "): " << element(i).material().name()
-			          << " - " << element(i).n_nodes() << " nodes - "
-			          << element(i).n_neighbours() << " neighbours - contamination at "
-			          << element(i).contamination() << std::endl;
-			std::cout << "\tOrigin at [" << element(i).origin(0) << ", " << element(i).origin(1)
-			          << ", " << element(i).origin(2) << "]" << std::endl;
-			for (int j = 0; j < element(i).n_nodes(); j++) {
-				std::cout << "\tNode " << (j+1) << ": "
-				          << &(element(i).node(j))
-				          << std::endl;
+		for (int i = 0; i < n_elements(); ++i) {
+			std::ostringstream oss;
+			oss <<"Element " << (i+1) << " (" << &element(i) << "): " << element(i).material().name()
+			    << " - " << element(i).n_nodes() << " nodes - "
+			    << element(i).n_neighbours() << " neighbours - contamination at "
+			    << element(i).contamination() << std::endl
+			    << "Origin at [" << element(i).origin(0) << ", " << element(i).origin(1)
+			    << ", " << element(i).origin(2) << "]" << std::endl;
+			int j;
+			for (j = 0; j < element(i).n_nodes()-1; j++) {
+				oss << "Node " << (j+1) << ": "
+				    << &(element(i).node(j))
+				    << std::endl;
 			}
+			if (element(i).n_nodes() > 0)
+				oss << "Node " << (j+1) << ": "
+				    << &(element(i).node(j));
 			if (show_element_links) {
-				for (int j = 0; j < element(i).n_neighbours(); j++) {
-					std::cout << "\tNeighbour " << (j+1) << ": "
-					          << (element(i).neighbour(j).neighbour_of(&element(i)))
-					          << " area " << (element(i).neighbour(j).interface_area())
-					          << " multiplier " << (element(i).neighbour(j).a_n_dot_eMN_over_modMN())
-					          << std::endl;
+				for (j = 0; j < element(i).n_neighbours(); ++j) {
+					oss << std::endl
+					    << "\tNeighbour " << (j+1) << ": "
+					    << (element(i).neighbour(j).neighbour_of(&element(i)))
+					    << " area " << (element(i).neighbour(j).interface_area())
+					    << " multiplier " << (element(i).neighbour(j).a_n_dot_eMN_over_modMN());
 				}
 			}
+			LOGMULTI(tds_log,oss.str());
 		}
 	}
 	if (show_nodes) {
 		for (int i = 0; i < n_nodes(); i++) {
-			std::cout << "Node " << (i+1) << " (" << &node(i) << "):" << std::endl;
-			std::cout << "[" << node(i).position(0) << ","
-			          << node(i).position(1) << "," << node(i).position(2) << "]" << std::endl;
-			std::cout << node(i).n_elements() << " elements" << std::endl;
+			LOGMULTI(tds_log,"Node " << (i+1) << " (" << &node(i) << "):" << std::endl
+				 << "[" << node(i).position(0) << ","
+			         << node(i).position(1) << "," << node(i).position(2) << "]" << std::endl
+				 << node(i).n_elements() << " elements");
 		}
 	}
-	std::cout << std::endl;
 	
 }
 
@@ -193,11 +189,11 @@ void tds::register_element_type(int element_type) {
 		element_dimensions_.set(three_d);
 		break;
 	case 15: // 1 node point
-		std::cerr << "Detected a single node point 'element' :/" << std::endl;
+		LOG(warnings,"Detected a single node point 'element'.");
 		break;
 	default: // non-linear elements
 		element_dimensions_.set(second_order_or_worse);
-		std::cerr << "Detected non-linear elements :(" << std::endl;
+		LOG(warnings,"Detected non-linear elements.");
 	}
 }
 
@@ -252,13 +248,12 @@ tds_run::~tds_run(){
 // }
 
 void tds_run::make_analysis() {
-	
-	std::cout << std::endl;
-	std::cout << "Checking the model..." << std::endl;
+
+	LOG(simulation_output, "Checking the model...");
 	if ((n_sections() == 0) || (n_elements() == 0) || (n_nodes() == 0))
 		throw Errors::MissingInputDataException("Model was incomplete at simulation start.");
 	
-	std::cout << "Running the model..." << std::endl;
+	LOG(simulation_output, "Running the model...");
 
 	// This is a very basic implementation of 'make_analysis' which has constant
 	// even source and no outgassing
@@ -284,7 +279,7 @@ void tds_run::make_analysis() {
 		double source_contamination = settings.contamination;
 		for (int i=0; i < n_sections(); ++i) {
 			if (section(i).material().is_source()) {
-				std::cout << "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination." << std::endl;
+				LOG(simulation_output, "Section " << i << " has " << section(i).n_elements() << " elements and is getting fed the initial contamination.");
 				for (int j=0; j < section(i).n_elements(); ++j) {
 					section(i).element(j).debug_contamination();
 					section(i).element(j).contamination(source_contamination);
@@ -292,7 +287,7 @@ void tds_run::make_analysis() {
 					section(i).element(j).contamination(source_contamination);
 					section(i).element(j).flagAB(!section(i).element(j).flagAB());
 				}
-				std::cout << "Contaminations set." << std::endl;
+				LOG(simulation_output, "Contaminations set.");
 			}
 		}
 	}
@@ -407,18 +402,17 @@ void tds_run::make_analysis() {
 				  std::cout << "remaining_time = " << 1.5 * (0.001) * average_historic_time(step_times, history_count) * ((steps() - step) * n_elements()) << std::endl;
 				*/
 				
-				std::cout << "Step: "
-				          << std::right << std::setw(12) << (step+1) << "/"
-				          << std::left << std::setw(12) << steps() << std::left
-				          << "        sim time: "
-				          << std::setw(13) << format_time(time)
-				          << "        elapsed: "
-				          << std::setw(13) << format_time(elapsed_time)
-				          << "        remaining (est.): "
-				          << std::setw(13) << format_time(remaining_time)
-				          << "        total (est.): "
-				          << std::setw(13) << format_time(elapsed_time+remaining_time)
-				          << std::endl;
+				LOG(simulation_output, "Step: "
+				    << std::right << std::setw(12) << (step+1) << "/"
+				    << std::left << std::setw(12) << steps() << std::left
+				    << "        sim time: "
+				    << std::setw(13) << format_time(time)
+				    << "        elapsed: "
+				    << std::setw(13) << format_time(elapsed_time)
+				    << "        remaining (est.): "
+				    << std::setw(13) << format_time(remaining_time)
+				    << "        total (est.): "
+				    << std::setw(13) << format_time(elapsed_time+remaining_time));
 
 				// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
 				double r = (now - last_checkmark)/2000.0;
@@ -437,7 +431,7 @@ void tds_run::make_analysis() {
 
 		// Show how long the entire simulation took
 		double elapsed_time = (GetTimeMs64() - start_checkmark)*1e-3;
-		std::cout << "Total elapsed time: " << format_time(elapsed_time) << std::endl;
+		LOG(simulation_output, "Total elapsed time: " << format_time(elapsed_time));;
 	
 		trackingfile_.close();
 
@@ -458,28 +452,28 @@ void tds_run::make_analysis() {
 	} catch (ofstream::failure& e) {
 		// These files can only be open if the exception was thrown while they were being built up
 		// so if they are open, we might as well get rid of the incomplete file after we close them.
-		std::cerr << "File exception whilst running simulation:" << std::endl;
-		std::cerr << e.what() << std::endl;
+		LOGMULTI(warnings, "File exception whilst running simulation:" << std::endl
+		    << e.what());
 		if (!usedTrackingFile) {
-			std::cerr << "Error is probably in accessing '" << tracking_file_address_ << "'." << std::endl;
+			LOG(warnings, "Error is probably in accessing '" << tracking_file_address_ << "'.");
 		}
 		else {
-			std::cerr << "Error is probably in accessing '" << contaminations_file_address_ << "'." <<std::endl;
+			LOG(warnings, "Error is probably in accessing '" << contaminations_file_address_ << "'.");
 		}
 		if (trackingfile_.is_open()) {
 			trackingfile_.close();
 			if (remove(tracking_file_address_.c_str()) != 0) {
-				std::cerr << "Failed to remove possible garbage tracking file." <<   std::endl;
+				LOG(warnings, "Failed to remove possible garbage tracking file.");;
 			}
 		}
 		if (contaminationsfile_.is_open()) {
 			contaminationsfile_.close();
 			if (remove(contaminations_file_address_.c_str()) != 0) {
-				std::cerr << "Failed to remove possible garbage contaminations file." << std::endl;
+				LOG(warnings, "Failed to remove possible garbage contaminations file.");
 			}
 		}
 	} catch (Errors::LowSimulationAccuracyException& e) {
-		std::cerr << e.what() << std::endl;
+		LOG(warnings, e.what());
 	}
 }
 
@@ -495,7 +489,7 @@ void tds_run::set_units_from_file(const char* units_file_address_) {
 		units(new conversion(units_file_address_,&units_processing_output));
 		units_set_ = true;
 	} else {
-		std::cerr << "Units have already been set, but the program has asked to set them again. Request ignored." << std::endl;
+		LOG(warnings,"Units have already been set, but the program has asked to set them again. Request ignored.");
 	}
 	
 }
@@ -533,7 +527,6 @@ void tds_run::initialise() {
 
 		int materials_count, sections_count, elements_count, nodes_count;
 	
-		//std::cout << "gonna read me some files" << std::endl;
 		std::string line;
 		
 		//Let's start off by populating tds with some materials
@@ -541,11 +534,11 @@ void tds_run::initialise() {
 			std::istringstream sizess(line);
 			if (!(sizess >> materials_count)) {
 				// This doesn't require a throw, should probabling be in a warning() method
-				std::cerr << "Materials count not found, segmentation violations will occur after "
-				          << "vector expands to accommodate many materials." << std::endl;
+				LOG(warnings, "Materials count not found, segmentation violations will occur after "
+				    << "vector expands to accommodate many materials.");
 			} else {
-				std::cout << "Expanding materials vector to accommodate " << materials_count
-				          << " materials." << std::endl;
+				LOG(run_file_processing_output, "Expanding materials vector to accommodate " << materials_count
+				    << " materials.");
 				expected_materials(materials_count+3); // not forgetting error, source and outgassing = +3
 			}
 			while (std::getline(materialsfile_, line)) {
@@ -554,7 +547,7 @@ void tds_run::initialise() {
 				double _density, _diffusion_constant;
 		
 				if (!(iss >> _name >> _density >> _density_unit >> _diffusion_constant >> _diffusion_constant_unit)) {
-					std::cerr << "Invalid line, skipping. (material)\n";
+					LOG(tds_log, "Invalid line, skipping. (material)");
 					continue;
 				}
 
@@ -589,12 +582,11 @@ void tds_run::initialise() {
 		if (std::getline(sectionsfile_, line)) {
 			std::istringstream sizess(line);
 			if (!(sizess >> sections_count)) {
-				// Requires a warning()
-				std::cerr << "Sections count not found, segmentation violations will occur after "
-				          << "vector expands to accommodate many sections." << std::endl;
+				LOG(warnings,"Sections count not found, segmentation violations will occur after "
+				    << "vector expands to accommodate many sections.");
 			} else {
-				std::cout << "Expanding sections vector to accommodate " << sections_count
-				          << " sections." << std::endl;
+				LOG(tds_log, "Expanding sections vector to accommodate "
+				    << sections_count << " sections.");
 				expected_sections(sections_count);
 			}
 			while (std::getline(sectionsfile_, line)) {
@@ -603,7 +595,7 @@ void tds_run::initialise() {
 				std::string _name;
 		
 				if (!(iss >> _dim >> _id >> _name)) {
-					std::cerr << "Invalid line, skipping. (section)\n";
+					LOG(tds_log, "Invalid line, skipping. (section)");
 					continue;
 				}
 				{
@@ -612,25 +604,20 @@ void tds_run::initialise() {
 						_name += " " + _extra;
 					}
 				}
-
-				//std::cout << "We obtained three values [" << _dim << ", " << _id << ", " << _name << "].\n";
 		
 				// Get rid of the double quotes Gmsh puts in, and put to lower case
 				_name.erase(_name.end()-1); _name.erase(_name.begin());
 				std::transform(_name.begin(), _name.end(), _name.begin(), ::tolower);
 
-				if (_id != n_sections()+1) {
-					std::cerr << "Section ordering invalid - are you adding the same file a second time?" << std::endl;
-					continue;
-				}
-				// std::cout << "Currently " << n_sections() << " sections. Adding another." << std::endl;
+				if (_id != n_sections()+1)
+					throw Errors::BadInputDataException("Section ordering invalid - maybe adding the same file twice.");
 				tds_section* _s = new tds_section(_name, &material(_name));
 				section_identifier _s_id;
 				_s_id.section_id = add_section(_s);
 				_s_id.section = _s;
 				interrupt_section(_s_id);
 			
-				std::cout << "Now " << n_sections() << " sections." << std::endl;
+				LOG(tds_log, "Now " << n_sections() << " sections.");
 			}
 			if (sectionsfile_.bad())
 				throw Errors::MissingInputDataException("Error occurred during reading from " + std::string(sections_file_address()));
@@ -645,11 +632,11 @@ void tds_run::initialise() {
 			std::istringstream sizess(line);
 			if (!(sizess >> nodes_count)) {
 				// This requires a warning()
-				std::cerr << "Nodes count not found, segmentation violations will occur after "
-				          << "vector expands to accommodate many nodes." << std::endl;
+				LOG(warnings, "Nodes count not found, segmentation violations will occur after "
+				    << "vector expands to accommodate many nodes.");
 			} else {
-				std::cout << "Expanding nodes vector to accommodate " << nodes_count
-				          << " nodes." << std::endl;
+				LOG(tds_log, "Expanding nodes vector to accommodate "
+				    << nodes_count << " nodes.");
 				expected_nodes(nodes_count);
 			}
 			while (std::getline(nodesfile_, line)) {
@@ -658,16 +645,14 @@ void tds_run::initialise() {
 				double _x, _y, _z;
 		
 				if (!(iss >> id >> _x >> _y >> _z)) {
-					std::cerr << "Invalid line, skipping. (node)\n";
+					LOG(tds_log, "Invalid line, skipping. (node)");
 					continue;
 				}
 
 				//std::cout << "We obtained four values [" << id << ", " << _x << ", " << _y << ", " << _z << "].\n";
 
-				if (id != n_nodes()+1) {
-					std::cerr << "Node ordering invalid - are you adding the same file a second time?" << std::endl;
-					continue;
-				}
+				if (id != n_nodes()+1)
+					throw Errors::BadInputDataException("Node ordering invalid - maybe adding the same file twice.");
 				tds_node* _n = new tds_node(_x,_y,_z);
 				node_identifier _n_id;
 				_n_id.node_id = add_node(_n);
@@ -686,11 +671,11 @@ void tds_run::initialise() {
 		if (std::getline(elementsfile_, line)) {
 			std::istringstream sizess(line);
 			if (!(sizess >> elements_count)) {
-				std::cerr << "Elements count not found, segmentation violations will occur after "
-				          << "vector expands to accommodate many elements." << std::endl;
+				LOG(warnings, "Elements count not found, segmentation violations will occur after "
+				    << "vector expands to accommodate many elements.");
 			} else {
-				std::cout << "Expanding elements vector to accommodate " << elements_count
-				          << " elements." << std::endl;
+				LOG(tds_log, "Expanding elements vector to accommodate "
+				    << elements_count << " elements.");
 				expected_elements(elements_count);
 			}
 			while (std::getline(elementsfile_, line)) {
@@ -699,25 +684,22 @@ void tds_run::initialise() {
 				std::ostringstream extra_tags;
 		
 				if (!(iss >> id >> type >> n_tags)) {
-					std::cerr << "Invalid line, skipping. (element)\n";
+					LOG(tds_log, "Invalid line, skipping. (element)");
 					continue;
 				}
 				register_element_type(type);
-				if (id != n_elements()+1) {
-					std::cerr << "Element ordering invalid - are you adding the same file a second time?" << std::endl;
-					continue;
-				}
+				if (id != n_elements()+1)
+					throw Errors::BadInputDataException("Element ordering invalid - maybe adding the same file twice");
 				int tags_processed = 0;
 				iss >> section_id >> entity_id;
 				for (int tags_processed = 2; tags_processed < n_tags; tags_processed++) {
 					extra_tags << iss << " ";
 				}
 				if (extra_tags.str().length() > 0)
-					std::cerr << "Unprocessed tags: " << extra_tags.str() << std::endl;
+					LOG(warnings,"Unprocessed node tags: " << extra_tags.str());
 				tds_nodes _element_nodes;
 				int this_node;
 				while (iss >> this_node) {
-					//std::cout << "Found that element " << id << " includes node " << this_node << std::endl;
 					_element_nodes.push_back(&(node(this_node-1))); // don't forget that msh is 1-indexed and arrays are 0-indexed
 				}
 				tds_element* new_element = new tds_element(_element_nodes,&(section(section_id-1)),0.0);
@@ -757,9 +739,8 @@ void tds_run::initialise() {
 	// the list of elements, adding links and removing from
 	// each node's list of elements as we go
 	
-	std::cout << "Producing element links" << std::endl;
+	LOG(tds_log, "Producing element links");
 	int element_link_count = 0;
-	std::cout << "Discovered dimensions bitset is: " << element_dimensions() << std::endl;
 	if (!(element_dimensions(two_d) || element_dimensions(three_d) || element_dimensions(second_order_or_worse)) &&
 	    (element_dimensions(one_d))
 	    ) {
@@ -776,9 +757,6 @@ void tds_run::initialise() {
 					m = section(s).element(i).n_nodes();
 					for (int j=0; j < m; j++) {
 						o = section(s).element(i).node(j).n_elements();
-						// std::cout << "Source element " << &section(s).element(i) << " links to node "
-						//           << &(section(s).element(i).node(j)) << " which currently links to "
-						//           << o << " more elements." << std::endl;
 						for (int k=o; k > 0; k--) {
 							if (section(s).element(i).node(j).element(k-1).material().is_source()) {
 								// std::cout << "No need to give a link from source to source, skipping." << std::endl;
@@ -835,8 +813,8 @@ void tds_run::initialise() {
 				}
 			}
 		}
-		std::cout << t << " elements trawled for links." << std::endl;
-		std::cout << "Made " << element_link_count << " element link objects." << std::endl;
+		LOG(tds_log, t << " elements trawled for links.");
+		LOG(tds_log, "Made " << element_link_count << " element link objects.");
 	} else if (!(element_dimensions(three_d) || element_dimensions(second_order_or_worse)) &&
 	           (element_dimensions(two_d))
 	           ) {
@@ -846,7 +824,7 @@ void tds_run::initialise() {
 		
 		int n, m, o, p, t = 0, c;
 		for (int s = 0; s < n_sections(); s++ ) {
-			std::cout << "Starting section " << s << " (" << section(s).name() << ")" << std::endl;
+			LOG(tds_log, "Starting section " << s << " (" << section(s).name() << ")");
 			n = section(s).n_elements();
 			t += n;
 			//if (section(s).material().is_source()) {
@@ -912,7 +890,7 @@ void tds_run::initialise() {
 
 		int n, m, o, p, t = 0, c;
 		for (int s = 0; s < n_sections(); s++ ) {
-			std::cout << "Starting section " << s << " (" << section(s).name() << ")" << std::endl;
+			LOG(tds_log, "Starting section " << s << " (" << section(s).name() << ")");
 			n = section(s).n_elements();
 			t += n;
 			for (int i=0; i < n; ++i) {
@@ -968,7 +946,7 @@ void tds_run::initialise() {
 		}
 		
 	} else {
-		std::cout << "Element links could not be made, only linear in 1-D, 2-D and 3-D programmed." << std::endl;
+		throw Errors::BadInputDataException("Element links could not be made, only linear in 1-D, 2-D and 3-D programmed.");
 	}
 
 	// There will be some elements which have not produced any links. These will not take
@@ -999,7 +977,7 @@ void tds_run::initialise() {
 	}
 	now = GetTimeMs64();
 	progress = (now - checkmark)/1000;
-	std::cout << "Initialisation took " << progress << " seconds." << std::endl;
+	LOG(run_file_processing_output, "Initialisation took " << progress << " seconds.");
 }
 void tds_run::direct_simulation_output_to_cout() {
 	simulation_output.add_listener(&console_out);

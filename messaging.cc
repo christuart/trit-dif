@@ -28,35 +28,47 @@ bool standard_cout_listener::handle_message(std::string msg, IMessageBuffer* sen
 	default:
 		throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
 	}
-	last_message_buffer_type = sending_buffer->type();
+	set_last_message_buffer_type(sending_buffer->type());
 	return true;
 }
 bool standard_cout_listener::handle_message(std::string msg, MessageContext, IMessageBuffer* sending_buffer, MessageType M) {
 	handle_message(msg, sending_buffer, M);
 }
+void standard_cout_listener::set_last_message_buffer_type(MessageBufferType _mbt, bool first) {
+	last_message_buffer_type = _mbt;
+	if (first) error_listener_->set_last_message_buffer_type(_mbt,false);
+}
 
 standard_cerr_listener::standard_cerr_listener() {}
 standard_cerr_listener::~standard_cerr_listener() {}
 bool standard_cerr_listener::handle_message(std::string msg, IMessageBuffer* sending_buffer, MessageType M) {
-	if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
-		msg = "\n" + sending_buffer->tag() + "> " + msg;
-	}
 	switch (M) {
 	case MTMessage:
 	case MTMultiline:
+		msg = sending_buffer->tag() + "> " + msg;
+		if (last_message_buffer_type != sending_buffer->type()) {
+			msg = "\n" + msg;
+		}
 		std::cerr << msg << std::endl;
 		break;
 	case MTPhrase:
+		if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
+			msg = "\n" + sending_buffer->tag() + "> " + msg;
+		}
 		std::cerr << msg;
 		break;
 	default:
 		throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
 	}
-	last_message_buffer_type = sending_buffer->type();
+	set_last_message_buffer_type(sending_buffer->type());
 	return true;
 }
 bool standard_cerr_listener::handle_message(std::string msg, MessageContext, IMessageBuffer* sending_buffer, MessageType M) {
 	handle_message(msg, sending_buffer, M);
+}
+void standard_cerr_listener::set_last_message_buffer_type(MessageBufferType _mbt, bool first) {
+	last_message_buffer_type = _mbt;
+	if (first) out_listener_->set_last_message_buffer_type(_mbt,false);
 }
 
 error_log_listener::error_log_listener() {
