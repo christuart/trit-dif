@@ -224,7 +224,7 @@ tds_run::tds_run():tds(),units_set_(false){
 }
 
 tds_run::~tds_run(){
-	//tdsfile_close();
+	std::cout << std::endl << std::endl; // ensures that next console line displays cleanly
 }
 
 // void tds_run::tdsfile_close(){
@@ -1240,8 +1240,6 @@ void tds_run::read_run_file(std::string run_file_name) {
 	progress = (now - checkmark)/1000;
 	LOG(run_file_processing_output,"Instructions read in " << progress << " seconds.");
 	
-
-	
 }
 std::string tds_run::generate_run_file() {
 	std::ostringstream oss;
@@ -1524,6 +1522,11 @@ void tds_display::change_files() {
 void tds_display::finish_changing_files() {
 	GUI_->wndw_new_files->hide();
 }
+void tds_display::close_application() {
+	GUI_->wndw_new_files->hide();
+	GUI_->wndw_run_file->hide();
+	GUI_->main_window->hide();
+}
 
 void tds_display::load_event(){
 	// int e_number = int(GUI_->event->value()), c_number = int(GUI_->channel->value());
@@ -1635,28 +1638,30 @@ void tds_display::action(selection sel, Fl_Widget *sender){
 }
 
 void tds_display::action(Fl_Widget *sender){
-	std::cout<<"display action"<<std::endl;
 	if (sender == GUI_->btn_open_run_file) {
-		LOG(gui_actions,"Opening run file.");
+		LOG(gui_actions, "Opening run file.");
 		open_run_file_dialog();
 	} else if (sender == GUI_->btn_save_run_file) {
-		LOG(gui_actions,"Saving run file.");
+		LOG(gui_actions, "Saving run file.");
 		save_run_file();
 	} else if (sender == GUI_->btn_preview_run_file) {
-		LOG(gui_actions,"Generating run file preview.");
+		LOG(gui_actions, "Generating run file preview.");
 		preview_run_file();
 	} else if (sender == GUI_->btn_revert_run_file) {
-		LOG(gui_actions,"Reverting to run file.");
+		LOG(gui_actions, "Reverting to run file.");
 		revert_run_file();
 	} else if (sender == GUI_->btn_new_files) {
-		LOG(gui_actions,"Changing files/directories.");
+		LOG(gui_actions, "Changing files/directories.");
 		change_files();
 	} else if (sender == GUI_->btn_revert_new_files) {
-		LOG(gui_actions,"Reverting files/directories.");
+		LOG(gui_actions, "Reverting files/directories.");
 		restore_files_memento();
 	} else if (sender == GUI_->btn_save_new_files) {
-		LOG(gui_actions,"Accepting new files/directories.");
+		LOG(gui_actions, "Accepting new files/directories.");
 		finish_changing_files();
+	} else if (sender == GUI_->main_window) {
+		LOG(gui_actions, "Closing application.");
+		close_application();
 	}
 }
 

@@ -26,6 +26,10 @@ class UserInterface {
 public:
   Fl_Double_Window* make_window();
   Fl_Double_Window *main_window;
+private:
+  inline void cb_main_window_i(Fl_Double_Window*, void*);
+  static void cb_main_window(Fl_Double_Window*, void*);
+public:
   Fl_Group *grp_run_file;
   Fl_Text_Display *txdsp_run_file_name;
   Fl_Button *btn_open_run_file;
@@ -109,5 +113,6 @@ private:
 public:
   void show();
   void start_showing_window();
+  void main_window_callback(Fl_Widget*, void*);
 };
 #endif

@@ -355,6 +355,7 @@ private:
 	void revert_run_file();
 	void change_files();
 	void finish_changing_files();
+	void close_application();
 	void load_event();
 	void load_section(int chnum);
 	void load_section(unsigned int c, int chnum);

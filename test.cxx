@@ -6,6 +6,13 @@ void userAction(selection sel, Ca_Canvas* sender);
 void mark_data_dirty(); 
 void reduce_all(); 
 
+void UserInterface::cb_main_window_i(Fl_Double_Window*, void*) {
+  userAction(main_window);
+}
+void UserInterface::cb_main_window(Fl_Double_Window* o, void* v) {
+  ((UserInterface*)(o->user_data()))->cb_main_window_i(o,v);
+}
+
 void UserInterface::cb_btn_open_run_file_i(Fl_Button*, void*) {
   userAction(btn_open_run_file);
 }
@@ -85,7 +92,7 @@ void UserInterface::cb_btn_revert_new_files(Fl_Button* o, void* v) {
 
 Fl_Double_Window* UserInterface::make_window() {
   { main_window = new Fl_Double_Window(1225, 560, "Tritium Diffusion Software - v0.1 - Chris Stuart");
-    main_window->user_data((void*)(this));
+    main_window->callback((Fl_Callback*)cb_main_window, (void*)(this));
     main_window->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
     { grp_run_file = new Fl_Group(825, 20, 385, 90);
       grp_run_file->box(FL_DOWN_BOX);
@@ -181,9 +188,6 @@ Fl_Double_Window* UserInterface::make_window() {
     { grp_simulation = new Fl_Group(25, 20, 790, 485);
       grp_simulation->box(FL_DOWN_BOX);
       { brwsr_run_output = new Fl_Browser(35, 45, 770, 320, "Console Output:");
-        brwsr_run_output->type(2);
-        brwsr_run_output->textfont(13);
-        brwsr_run_output->textsize(11);
         brwsr_run_output->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       } // Fl_Browser* brwsr_run_output
       grp_simulation->end();

@@ -10,6 +10,7 @@ tds_display* tds=NULL;
 tds_batch* tds_b=NULL;
 tds_run* tds_t=NULL;
 tds_run* tds_r=NULL;
+void clear_pointers();
 
 // Global Message Buffers
 MessageBuffer exceptions = MessageBuffer(MBUnhandledException, "EXCEPTION   ");
@@ -71,6 +72,7 @@ int main(int nArg, char** vArg){
 					tds_r->initialise();
 					tds_r->direct_simulation_output_to_cout();
 					tds_r->make_analysis();
+					clear_pointers();
 					return 0;
 				}
 				catch (Errors::BadRunFileException& e) {
@@ -79,6 +81,7 @@ int main(int nArg, char** vArg){
 				catch (Errors::AnalysisException& e) {
 					std::cout << e.what() << std::endl;
 				}
+				clear_pointers();
 				return 0;
 			}
 		} else {
@@ -87,11 +90,14 @@ int main(int nArg, char** vArg){
 					UI = new UserInterface(); UI->start_showing_window();
 					tds = new tds_display(UI);
 					int err=Fl::run();
+					clear_pointers();
 					return err;
 				}
 				catch (Errors::UIException& e) {
 					std::cerr << e.what() << std::endl;
 				}
+				clear_pointers();
+				return 0;
 			} else if (t>=0) {
 				// looks like we're testing functionality rather than using the display or batch processing
 				std::string basename = "simple2d";
@@ -156,6 +162,7 @@ int main(int nArg, char** vArg){
 				tds_t->tracking_interval(recording_interval);
 				tds_t->tracked_elements(element_ids);
 				tds_t->make_analysis();
+				clear_pointers();
 				return 0;
 			} else if (b >= 0) {
 				//std::string textfile(vArg[2]);
@@ -250,12 +257,16 @@ int main(int nArg, char** vArg){
 	catch (std::exception& e){
 		LOG(exceptions,"(unhandled exception) " << e.what());
 	}
+	clear_pointers();
+};
+
+void clear_pointers() {
 	delete tds;
 	delete tds_r;
 	delete tds_t;
 	delete tds_b;
 	delete UI;
-};
+}
 
 void show_preamble() {
 	

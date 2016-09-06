@@ -17,13 +17,13 @@ bool standard_cout_listener::handle_message(std::string msg, IMessageBuffer* sen
 		if (last_message_buffer_type != sending_buffer->type()) {
 			msg = "\n" + msg;
 		}
-		std::cout << msg << std::endl;
+		std::cout << std::endl << msg << std::flush;
 		break;
 	case MTPhrase:
 		if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
 			msg = "\n" + sending_buffer->tag() + "> " + msg;
 		}
-		std::cout << msg;
+		std::cout << msg << std::flush;
 		break;
 	default:
 		throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
@@ -49,7 +49,7 @@ bool standard_cerr_listener::handle_message(std::string msg, IMessageBuffer* sen
 		if (last_message_buffer_type != sending_buffer->type()) {
 			msg = "\n" + msg;
 		}
-		std::cerr << msg << std::endl;
+		std::cerr << std::endl << msg;
 		break;
 	case MTPhrase:
 		if (sending_buffer->type() == MBUnknown || last_message_buffer_type != sending_buffer->type()) {
@@ -148,7 +148,7 @@ bool gui_console_messages::handle_message(std::string msg, IMessageBuffer* sendi
 			throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
 		}
 		last_message_buffer_type = sending_buffer->type();
-		browser().bottomline(browser().size());
+		browser().bottomline(browser().size()-1);
 		return true;
 	} else {
 		return false;
