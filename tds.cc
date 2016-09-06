@@ -1005,14 +1005,21 @@ void tds_run::process_plugins() {
 		if (plugin_strings.count(plugin_text) == 0) {
 			throw Errors::PluginNotInMapException(plugin_text);
 		}
+		IPlugin* new_plugin;
 		switch (plugin_strings[plugin_text]) {
 		case PExample:
-			IPlugin::store_plugin(new Example()); break;
+			new_plugin = new Example(); break;
 		case POutgassing:
-			IPlugin::store_plugin(new Outgassing()); break;
+			new_plugin = new Outgassing(); break;
+		case PDecay:
+			new_plugin = new Decay(); break;
 		default:
 			throw Errors::PluginNotInSwitchException(plugin_text);
 		}
+		if (settings.plugin_files.count(plugin_text) > 0) {
+			new_plugin->set_plugin_file(settings.plugin_files[plugin_text]);
+		}
+		IPlugin::store_plugin(new_plugin);
 	}
 	for (std::map<plugin,IPlugin*>::iterator it = IPlugin::get_plugin_iterator();
 	     it!=IPlugin::get_plugin_iterator_end();

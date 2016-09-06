@@ -193,10 +193,6 @@ protected:
 	int steps_;
 	double tracking_interval_;
 	std::vector<int>* tracked_elements_;
-	struct plugin_file {
-		std::string file_name;
-		bool needed_after_initialisation;
-	};
 	struct run_settings {
 		run_settings():model_directory("models/"),
 		               config_directory("config/"),

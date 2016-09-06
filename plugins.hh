@@ -27,6 +27,7 @@ enum plugin {
 class IPlugin {
 
 private:
+	plugin_file plugin_file_;
 	static tds_run* tds_run_;
 	static std::map<plugin,IPlugin*> plugin_map_;
 public:
@@ -45,6 +46,9 @@ public:
 	virtual void interrupt_start_step(int _step, double _time);
 	virtual void interrupt_end_step(int _step, double _time);
 	virtual void interrupt_post_simulation();
+	
+	inline void set_plugin_file(plugin_file _plugin_file) { plugin_file_ = _plugin_file; }
+	inline plugin_file get_plugin_file() { return plugin_file_; }
 
 	static void replace_material(material_identifier& _old_material, tds_material* _new_material);
 	static void replace_section(section_identifier& _old_section, tds_section* _new_section);
@@ -64,5 +68,6 @@ public:
 
 #include "plugin-example.hh"
 #include "plugin-outgassing.hh"
+#include "plugin-decay.hh"
 
 #endif

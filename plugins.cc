@@ -72,15 +72,17 @@ void IPlugin::replace_element_link(element_link_identifier& _old_element_link, t
 void IPlugin::store_plugin(IPlugin* _plugin) {
 	plugin plugin_type = _plugin->plugin_identifier();
 	if (plugin_loaded(plugin_type)) {
-		std::cerr << "Tried to store multiple of same plugin type: " << plugin_type << std::endl;
-		throw;
+		std::ostringstream oss;
+		oss << "Tried to store multiple of same plugin type: " << plugin_type;
+		throw Errors::PluginException(oss.str());
 	}
 	IPlugin::plugin_map_.insert(std::pair<plugin,IPlugin*>(plugin_type,_plugin));
 }
 IPlugin* IPlugin::get_plugin(plugin _plugin_type) {
 	if (!plugin_loaded(_plugin_type)) {
-		std::cerr << "Requested unloaded plugin type: " << _plugin_type << std::endl;
-		throw;
+		std::ostringstream oss;
+		oss << "Requested unloaded plugin type: " << _plugin_type;
+		throw Errors::PluginException(oss.str());
 	}
 	return IPlugin::plugin_map_.at(_plugin_type);
 }
