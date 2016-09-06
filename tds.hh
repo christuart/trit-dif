@@ -31,6 +31,7 @@
 #include "timing.hh"
 #include "identifiers.hh"
 #include "pluginfwd.hh"
+#include "file_handler.hh"
 
 extern MessageBuffer warnings;
 

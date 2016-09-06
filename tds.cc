@@ -223,9 +223,7 @@ tds_run::tds_run():tds(),units_set_(false){
 	units_processing_output.add_listener(&console_out);
 }
 
-tds_run::~tds_run(){
-	std::cout << std::endl << std::endl; // ensures that next console line displays cleanly
-}
+tds_run::~tds_run(){}
 
 // void tds_run::tdsfile_close(){
 //	std::cout<<"close tds file"<<std::endl;
