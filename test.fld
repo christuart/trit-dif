@@ -43,8 +43,9 @@ class UserInterface {open
   Function {make_window()} {open
   } {
     Fl_Window main_window {
-      label {Tritium Diffusion Software - v0.1 - Chris Stuart} open
-      xywh {140 67 1225 560} type Double align 80 size_range {1225 560 1225 560} visible
+      label {Tritium Diffusion Software - v0.1 - Chris Stuart}
+      callback {userAction(main_window);} selected
+      xywh {663 64 1225 560} type Double align 80 size_range {1225 560 1225 560} visible
     } {
       Fl_Group grp_run_file {
         xywh {825 20 385 90} box DOWN_BOX
@@ -130,8 +131,8 @@ class UserInterface {open
         xywh {25 20 790 485} box DOWN_BOX
       } {
         Fl_Browser brwsr_run_output {
-          label {Console Output:} selected
-          xywh {35 45 770 320} type Multi align 5 textfont 13 textsize 11
+          label {Console Output:}
+          xywh {35 45 770 320} align 5
         }
       }
       Fl_Group grp_status_bar {open
@@ -146,7 +147,7 @@ class UserInterface {open
       }
     }
     Fl_Window wndw_run_file {
-      label {View Run File} open
+      label {View Run File}
       xywh {1051 227 575 365} type Double hide
     } {
       Fl_Browser brwsr_run_file_preview {
@@ -154,7 +155,7 @@ class UserInterface {open
       }
     }
     Fl_Window wndw_new_files {
-      label {Change Simulation Files} open
+      label {Change Simulation Files}
       xywh {990 165 540 430} type Double hide modal
     } {
       Fl_Group grp_new_model {
@@ -218,15 +219,15 @@ class UserInterface {open
       }
     }
   }
-  Function {show()} {open
-  } {
+  Function {show()} {} {
     code {make_window();
 //ChnButton[0]=Chn0;
 main_window->show();} {}
   }
-  Function {start_showing_window()} {open
-  } {
+  Function {start_showing_window()} {} {
     code {Fl::scheme("gtk+");
 show();} {}
   }
+  Function {main_window_callback(Fl_Widget*, void*)} {open
+  } {}
 } 

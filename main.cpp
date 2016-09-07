@@ -34,7 +34,6 @@ void show_preamble();
 void show_usage();
 
 int main(int nArg, char** vArg){
-	
 	try {
 		show_preamble();
 
@@ -265,11 +264,11 @@ int main(int nArg, char** vArg){
 };
 
 void clear_pointers() {
-	delete tds;
-	delete tds_r;
-	delete tds_t;
-	delete tds_b;
-	delete UI;
+	delete tds; tds=NULL;
+	delete tds_r; tds_r=NULL;
+	delete tds_t; tds_t=NULL;
+	delete tds_b; tds_b=NULL;
+	delete UI; UI=NULL;
 	std::cout << std::endl << std::endl; // ensures that next console line displays cleanly
 }
 
