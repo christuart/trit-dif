@@ -64,7 +64,10 @@ void tds::clean_nodes() {
 	nodes_.resize(0);
 }
 void tds::clean_elements() {
-	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
+	for (int i=0; i<elements_.size(); ++i) {
+		
+		delete elements_[i];
+	}
 	elements_.resize(0);
 }
 void tds::clean_inactive_elements() {
@@ -79,6 +82,7 @@ void tds::clean_inactive_elements() {
 		// So whilst looking for how many to delete, i doesn't change,
 		// and j does.
 		while (j < elements_.size() && element(j).n_neighbours() == 0) {
+			delete elements_[j];
 			++j;
 		}
 		if (j > i) {
@@ -223,9 +227,7 @@ tds_run::tds_run():tds(),units_set_(false){
 	units_processing_output.add_listener(&console_out);
 }
 
-tds_run::~tds_run(){
-	std::cout << std::endl << std::endl; // ensures that next console line displays cleanly
-}
+tds_run::~tds_run(){}
 
 // void tds_run::tdsfile_close(){
 //	std::cout<<"close tds file"<<std::endl;

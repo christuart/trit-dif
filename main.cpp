@@ -2,6 +2,7 @@
 #include <string>
 #include "test.h"
 #include <iostream>
+#include <iomanip>
 #include "exceptions.hh"
 #include "tds.hh"
 
@@ -33,7 +34,6 @@ void show_preamble();
 void show_usage();
 
 int main(int nArg, char** vArg){
-	
 	try {
 		show_preamble();
 
@@ -57,9 +57,12 @@ int main(int nArg, char** vArg){
 		int t = cl.flag("t|test");
 		int b = cl.flag("b|batch");
 		int v = cl.flag("v|viewer");
+		int version_flag = cl.flag("version");
 		int run = cl.flag("run");
 
-		if (run >= 0) {
+		if (version_flag >= 0) {
+			return 0;
+		} else if (run >= 0) {
 			if (cl.size() != 3) {
 				// output usage information
 				show_usage();
@@ -261,11 +264,12 @@ int main(int nArg, char** vArg){
 };
 
 void clear_pointers() {
-	delete tds;
-	delete tds_r;
-	delete tds_t;
-	delete tds_b;
-	delete UI;
+	delete tds; tds=NULL;
+	delete tds_r; tds_r=NULL;
+	delete tds_t; tds_t=NULL;
+	delete tds_b; tds_b=NULL;
+	delete UI; UI=NULL;
+	std::cout << std::endl << std::endl; // ensures that next console line displays cleanly
 }
 
 void show_preamble() {
@@ -277,7 +281,7 @@ void show_preamble() {
 	std::cout << "***  trit-dif program written by Chris Stuart" << std::endl;
 	std::cout << "***  Supervised by Anthony Hollingsworth at CCFE" << std::endl;
 	std::cout << "***" << std::endl;
-	std::cout << "***  This version: an early one..." << std::endl;
+	std::cout << "***  This version: " << VERSION << std::endl;
 	std::cout << "***" << std::endl;
 	std::cout << "***  Find out more on the GitHub repository at " << std::endl;
 	std::cout << "***  http://github.com/christuart/trit-dif/" << std::endl;
@@ -290,10 +294,11 @@ void show_preamble() {
 void show_usage() {
 
 	std::cout << std::endl;
-	std::cout << "Usage: trit-dif [[--run <instruction file> ] | [-h|--help ]]" << std::endl;
-	std::cout << std::endl;
-	std::cout << "--run\t\tProvide the program with a set of instructions in a '.run' file" << std::endl;
-	std::cout << "-h --help\tShow this usage information" << std::endl;
+	std::cout << "Usage: trit-dif [[--run <instruction file> ] | [-v|--viewer] | [-h|--help ]]" << std::endl;
+	std::cout << std::endl << std::left;
+	std::cout << std::setw(4) << "" << std::setw(12) << "--run" << "Provide the program with a set of instructions in a '.run' file" << std::endl;
+	std::cout << std::setw(4) << "-v" << std::setw(12) <<  "--viewer" << "Open the graphical user interface" << std::endl;
+	std::cout << std::setw(4) << "-h" << std::setw(12) <<  "--help" << "Show this usage information" << std::endl;
 	std::cout << "Alternative, older ways of using the program may be found in the documentation or the source." << std::endl;
 	std::cout << std::endl;
 

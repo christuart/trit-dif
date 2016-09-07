@@ -59,6 +59,14 @@ namespace Errors {
 		// and a description of where (in the code) it was being converted
 		explicit ConvertingMissingUnitException(const std::string& what_arg):BadInputDataException(what_arg) {}
 	};
+	class FileHandlerException : public std::runtime_error {
+	public:
+		explicit FileHandlerException(const std::string& what_arg):std::runtime_error("File handling error: " + what_arg) {}
+	};
+	class FileHandlerLineUnavailableException : public FileHandlerException {
+	public:
+		explicit FileHandlerLineUnavailableException(const std::string& what_arg):FileHandlerException(what_arg) {}
+	};
 	class BadRunFileException : public std::runtime_error {
 	public:
 		explicit BadRunFileException(const std::string& what_arg):std::runtime_error("Run file error: " + what_arg) {}

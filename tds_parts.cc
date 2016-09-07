@@ -593,7 +593,6 @@ int tds_section::add_element(tds_element* new_element) {
 }
 
 void tds_section::clean_elements() {
-	for (int i=0; i<elements_.size(); ++i) delete elements_[i];
 	elements_.resize(0);
 }
 
