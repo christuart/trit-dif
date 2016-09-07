@@ -14,7 +14,7 @@
     the plug-in map even while an iterator is in use, and these values will
     be found and loaded.
 */
-enum plugin {
+enum plugin : unsigned int {
 	// Default behaviour is that the first enumerator = 0 and subsequent
 	// enumerators = previous + 1
 	PUndefined,
@@ -43,12 +43,12 @@ public:
 	virtual void interrupt_element_creation(element_identifier& _new_element);
 	virtual void interrupt_element_link_creation(element_link_identifier& _new_element_link);
 	virtual void interrupt_pre_simulation();
-	virtual void interrupt_start_step(int _step, double _time);
-	virtual void interrupt_end_step(int _step, double _time);
+	virtual void interrupt_start_step(const int _step, const double _time);
+	virtual void interrupt_end_step(const int _step, const double _time);
 	virtual void interrupt_post_simulation();
 	
 	inline void set_plugin_file(plugin_file _plugin_file) { plugin_file_ = _plugin_file; }
-	inline plugin_file get_plugin_file() { return plugin_file_; }
+	inline plugin_file get_plugin_file() { if (plugin_file_.file_name != "") { return plugin_file_; } else { throw Errors::PluginFileException("Missing plugin file.",plugin_identifier()); } }
 
 	static void replace_material(material_identifier& _old_material, tds_material* _new_material);
 	static void replace_section(section_identifier& _old_section, tds_section* _new_section);

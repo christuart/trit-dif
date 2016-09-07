@@ -1,0 +1,7 @@
+Tritium decay constant:
+Half life = 12.32 years = 12.32 * 365.24 * 24 * 3600 seconds = 388,778,987.52 seconds
+Decay constant = ln(2) / T_1/2
+
+decay-constant  1.78288231e-9
+
+You should be able to put anything in this file, as long as one of the lines starts with "decay-constant" followed by some whitespace and then the value.

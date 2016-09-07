@@ -14,8 +14,8 @@ void IPlugin::interrupt_node_creation(node_identifier&) {}
 void IPlugin::interrupt_element_creation(element_identifier&) {}
 void IPlugin::interrupt_element_link_creation(element_link_identifier&) {}
 void IPlugin::interrupt_pre_simulation() {}
-void IPlugin::interrupt_start_step(int _step, double _time) {}
-void IPlugin::interrupt_end_step(int _step, double _time) {}
+void IPlugin::interrupt_start_step(const int _step, const double _time) {}
+void IPlugin::interrupt_end_step(const int _step, const double _time) {}
 void IPlugin::interrupt_post_simulation() {}
 
 

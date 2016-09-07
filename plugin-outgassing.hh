@@ -58,7 +58,7 @@ public:
 namespace Errors {
 	class OutgassingException : public PluginRuntimeException {
 	public:
-		explicit OutgassingException(const std::string& what_arg):PluginRuntimeException("(outgassing) " + what_arg) {}
+		explicit OutgassingException(const std::string& what_arg):PluginRuntimeException("(outgassing) " + what_arg, POutgassing) {}
 	};
 }
 #endif

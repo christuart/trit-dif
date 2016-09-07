@@ -5,8 +5,6 @@ void Outgassing::load_plugin() {
 	IPlugin::get_run()->add_section_interrupt(this);
 	IPlugin::get_run()->add_element_link_interrupt(this);
 	IPlugin::get_run()->add_pre_simulation_interrupt(this);
-	IPlugin::get_run()->add_start_step_interrupt(this);
-	IPlugin::get_run()->add_end_step_interrupt(this);
 	IPlugin::get_run()->add_post_simulation_interrupt(this);
 	outgassing_material = new tds_material("outgassing", 1.0, 0.0);
 	IPlugin::get_run()->add_material(outgassing_material);

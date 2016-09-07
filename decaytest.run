@@ -1,0 +1,19 @@
+mode				testing
+version				one
+models-directory		models/
+config-directory 		config/
+output-directory 		output/
+gmsh-bin-directory 		~/gmsh-2.12.0-Linux/bin/
+model-name			outgassing
+config-name			simple
+output-name			outgassing-test
+delta-t				1 seconds
+tracking-interval		2 seconds
+simulation-length		20 seconds
+contamination-mode-time 	constant
+contamination-mode-space	constant
+contamination 			1 au
+tracking-mode			all
+track				5
+activate-plugin			decay
+plugin-file			decay init-only tritium-decay-constant

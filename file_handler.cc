@@ -65,8 +65,11 @@ void file_handler::read_line() {
 				v="";
 			}
 			expand_key_width(k);
+			trim(v);
 			entries.push_back(std::pair<std::string,std::string>(k,v));
+			line_it = entries.begin()+furthest_line;
 			++furthest_line;
+			line_n = furthest_line;
 		} else {
 			file_complete = true;
 		}

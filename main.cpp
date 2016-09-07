@@ -79,10 +79,10 @@ int main(int nArg, char** vArg){
 					return 0;
 				}
 				catch (Errors::BadRunFileException& e) {
-					std::cout << e.what() << std::endl;
+					LOG(exceptions,e.what());
 				}
 				catch (Errors::AnalysisException& e) {
-					std::cout << e.what() << std::endl;
+					LOG(exceptions,e.what());
 				}
 				clear_pointers();
 				return 0;
@@ -293,13 +293,11 @@ void show_preamble() {
 }
 void show_usage() {
 
-	std::cout << std::endl;
 	std::cout << "Usage: trit-dif [[--run <instruction file> ] | [-v|--viewer] | [-h|--help ]]" << std::endl;
 	std::cout << std::endl << std::left;
 	std::cout << std::setw(4) << "" << std::setw(12) << "--run" << "Provide the program with a set of instructions in a '.run' file" << std::endl;
 	std::cout << std::setw(4) << "-v" << std::setw(12) <<  "--viewer" << "Open the graphical user interface" << std::endl;
 	std::cout << std::setw(4) << "-h" << std::setw(12) <<  "--help" << "Show this usage information" << std::endl;
-	std::cout << "Alternative, older ways of using the program may be found in the documentation or the source." << std::endl;
-	std::cout << std::endl;
+	std::cout << "Alternative, older ways of using the program may be found in the documentation or the source.";
 
 }

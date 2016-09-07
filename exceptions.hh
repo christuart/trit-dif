@@ -3,6 +3,9 @@
 
 #include <exception>
 #include <stdexcept>
+
+enum plugin : unsigned int;
+
 namespace Errors {
 	class FutureImplementationException : public std::logic_error {
 	public:
@@ -95,7 +98,12 @@ namespace Errors {
 
 	class PluginRuntimeException : public std::runtime_error {
 	public:
-		explicit PluginRuntimeException(const std::string& what_arg):std::runtime_error("(plugin runtime exception) " + what_arg) {};
+		explicit PluginRuntimeException(const std::string& what_arg, const plugin which_plugin):std::runtime_error("Plugin runtime exception: " + what_arg) {};
+	};
+
+	class PluginFileException : public PluginRuntimeException {
+	public:
+		explicit PluginFileException(const std::string& what_arg, const plugin which_plugin):PluginRuntimeException("Plugin file error: " + what_arg, which_plugin) {};
 	};
 
 	class UIException : public std::runtime_error {
