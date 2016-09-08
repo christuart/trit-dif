@@ -79,6 +79,7 @@ public:
 	void clean_nodes();
 	void clean_elements();
 	void clean_inactive_elements();
+	void empty_model();
 	
 	//setters
 	inline void tds_name(std::string tds_n) { tds_name_=tds_n; }
@@ -356,6 +357,7 @@ private:
 	void revert_run_file();
 	void change_files();
 	void finish_changing_files();
+	void run_loaded_simulation();
 	void close_application();
 	void load_event();
 	void load_section(int chnum);

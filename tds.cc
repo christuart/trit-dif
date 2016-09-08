@@ -25,10 +25,7 @@ tds::tds():sections_() {
 }
 
 tds::~tds(){
-	clean_sections();
-	clean_materials();
-	clean_elements();
-	clean_nodes();
+	empty_model();
 }
 
 int tds::add_section(tds_section* new_section) {
@@ -89,6 +86,12 @@ void tds::clean_inactive_elements() {
 			elements_.erase(elements_.begin()+i,elements_.begin()+j); // start inclusive end exclusive
 		}
 	}
+}
+void tds::empty_model() {
+	clean_sections();
+	clean_materials();
+	clean_elements();
+	clean_nodes();
 }
 
 /// Allocates at least enough memory for the expected number of materials
@@ -227,7 +230,9 @@ tds_run::tds_run():tds(),units_set_(false){
 	units_processing_output.add_listener(&console_out);
 }
 
-tds_run::~tds_run(){}
+tds_run::~tds_run(){
+	IPlugin::empty_plugins();
+}
 
 // void tds_run::tdsfile_close(){
 //	std::cout<<"close tds file"<<std::endl;
@@ -415,7 +420,7 @@ void tds_run::make_analysis() {
 				    << std::setw(13) << format_time(remaining_time)
 				    << "        total (est.): "
 				    << std::setw(13) << format_time(elapsed_time+remaining_time));
-
+				Fl::check();
 				// Add in some smoothed adaptive behaviour - aim for every ~2 seconds
 				double r = (now - last_checkmark)/2000.0;
 				r -= 1;
@@ -1524,6 +1529,23 @@ void tds_display::change_files() {
 void tds_display::finish_changing_files() {
 	GUI_->wndw_new_files->hide();
 }
+void tds_display::run_loaded_simulation() {
+	if (!struct_is_up_to_date()) {
+	}
+	LOG(gui_status,"Started simulating.");
+	process_plugins();
+	// really need to think about how some of these work for when the
+	// tds_run class runs the analysis multiple times without being
+	// hard reset every time
+	initialise();
+	direct_simulation_output_to_cout();
+	make_analysis();
+	LOG(gui_status,"Finished simulating.");
+	empty_model();
+	IPlugin::empty_plugins();
+	LOG(gui_status,"Finished cleaning up after simulation.");
+	
+}
 void tds_display::close_application() {
 	GUI_->wndw_new_files->hide();
 	GUI_->wndw_run_file->hide();
@@ -1661,6 +1683,9 @@ void tds_display::action(Fl_Widget *sender){
 	} else if (sender == GUI_->btn_save_new_files) {
 		LOG(gui_actions, "Accepting new files/directories.");
 		finish_changing_files();
+	} else if (sender == GUI_->btn_run_simulation) {
+		LOG(gui_actions, "Running the loaded simulation.");
+		run_loaded_simulation();
 	} else if (sender == GUI_->main_window) {
 		LOG(gui_actions, "Closing application.");
 		close_application();

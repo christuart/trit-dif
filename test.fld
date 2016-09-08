@@ -44,7 +44,7 @@ class UserInterface {open
   } {
     Fl_Window main_window {
       label {Tritium Diffusion Software - v0.1 - Chris Stuart}
-      callback {userAction(main_window);} selected
+      callback {userAction(main_window);} open
       xywh {663 64 1225 560} type Double align 80 size_range {1225 560 1225 560} visible
     } {
       Fl_Group grp_run_file {
@@ -127,12 +127,17 @@ class UserInterface {open
         xywh {825 129 385 221} box DOWN_BOX textfont 4 textsize 9
         code0 {txedt_run_file_contents->cursor_style(Fl_Text_Display::NORMAL_CURSOR);}
       }
-      Fl_Group grp_simulation {open
+      Fl_Group grp_simulation {open selected
         xywh {25 20 790 485} box DOWN_BOX
       } {
         Fl_Browser brwsr_run_output {
           label {Console Output:}
           xywh {35 45 770 320} align 5
+        }
+        Fl_Button btn_run_simulation {
+          label {Run Simulation}
+          callback {userAction(btn_run_simulation);}
+          xywh {650 460 155 30}
         }
       }
       Fl_Group grp_status_bar {open

@@ -77,6 +77,12 @@ void IPlugin::store_plugin(IPlugin* _plugin) {
 	}
 	IPlugin::plugin_map_.insert(std::pair<plugin,IPlugin*>(plugin_type,_plugin));
 }
+void IPlugin::empty_plugins() {
+	while (!plugin_map_.empty()) {
+		delete plugin_map_.begin()->second;
+		plugin_map_.erase(plugin_map_.begin());
+	}
+}
 IPlugin* IPlugin::get_plugin(plugin _plugin_type) {
 	if (!plugin_loaded(_plugin_type)) {
 		std::cerr << "Requested unloaded plugin type: " << _plugin_type << std::endl;

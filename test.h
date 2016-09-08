@@ -67,6 +67,11 @@ public:
   Fl_Text_Editor *txedt_run_file_contents;
   Fl_Group *grp_simulation;
   Fl_Browser *brwsr_run_output;
+  Fl_Button *btn_run_simulation;
+private:
+  inline void cb_btn_run_simulation_i(Fl_Button*, void*);
+  static void cb_btn_run_simulation(Fl_Button*, void*);
+public:
   Fl_Group *grp_status_bar;
   Fl_Text_Display *txdsp_status_bar;
   Fl_Text_Display *txdsp_data_dirty;

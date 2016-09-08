@@ -148,7 +148,7 @@ bool gui_console_messages::handle_message(std::string msg, IMessageBuffer* sendi
 			throw Errors::MessagingException("Unknown message type for '" + msg + "'.");
 		}
 		last_message_buffer_type = sending_buffer->type();
-		browser().bottomline(browser().size()-1);
+		browser().bottomline(browser().size());
 		return true;
 	} else {
 		return false;

@@ -53,6 +53,7 @@ public:
 	static void replace_element_link(element_link_identifier& _old_element_link, tds_element_link* _new_element_link);
 
 	static void store_plugin(IPlugin* _plugin);
+	static void empty_plugins();
 	static IPlugin* get_plugin(plugin _plugin_type);
 	static std::map<plugin,IPlugin*>::iterator get_plugin_iterator();
 	static std::map<plugin,IPlugin*>::iterator get_plugin_iterator_end();

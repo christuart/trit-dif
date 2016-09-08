@@ -48,6 +48,13 @@ void UserInterface::cb_btn_new_files(Fl_Button* o, void* v) {
   ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_new_files_i(o,v);
 }
 
+void UserInterface::cb_btn_run_simulation_i(Fl_Button*, void*) {
+  userAction(btn_run_simulation);
+}
+void UserInterface::cb_btn_run_simulation(Fl_Button* o, void* v) {
+  ((UserInterface*)(o->parent()->parent()->user_data()))->cb_btn_run_simulation_i(o,v);
+}
+
 void UserInterface::cb_btn_change_model_dir_i(Fl_Button*, void*) {
   userAction(btn_change_model_dir);
 }
@@ -188,8 +195,14 @@ Fl_Double_Window* UserInterface::make_window() {
     { grp_simulation = new Fl_Group(25, 20, 790, 485);
       grp_simulation->box(FL_DOWN_BOX);
       { brwsr_run_output = new Fl_Browser(35, 45, 770, 320, "Console Output:");
+        brwsr_run_output->textfont(4);
+        brwsr_run_output->textsize(11);
         brwsr_run_output->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+        txdsp_model_dir->scrollbar_align(FL_ALIGN_CLIP);
       } // Fl_Browser* brwsr_run_output
+      { btn_run_simulation = new Fl_Button(650, 460, 155, 30, "Run Simulation");
+        btn_run_simulation->callback((Fl_Callback*)cb_btn_run_simulation);
+      } // Fl_Button* btn_run_simulation
       grp_simulation->end();
     } // Fl_Group* grp_simulation
     { grp_status_bar = new Fl_Group(-5, 532, 1235, 36);
