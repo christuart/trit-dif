@@ -311,7 +311,7 @@ void tds_run::make_analysis() {
 	std::string contaminations_file_address_;
 	bool usedTrackingFile = false;
 	try {
-		trackingfile_.exceptions(ofstream::failbit | ofstream::badbit);
+		trackingfile_.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 		tracking_file_address_ = std::string(tracking_file_address());
 		trackingfile_.open(tracking_file_address_.c_str());
 		usedTrackingFile = true;
@@ -444,7 +444,7 @@ void tds_run::make_analysis() {
 
 		// Contaminations: final values at all elements
 		contaminations_file_address_ = contaminations_file_address();
-		contaminationsfile_.exceptions(ofstream::failbit | ofstream::badbit);
+		contaminationsfile_.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 		contaminationsfile_.open(contaminations_file_address_.c_str());
 		contaminationsfile_ << "model: " << basename_ << "; config: " << configname_ << "; delta_t: "
 		                    << delta_t() << "; time steps: " << steps() << "; final time: " << time
@@ -456,7 +456,7 @@ void tds_run::make_analysis() {
 			                    << ", " << element(i).origin(2) << ", " << element(i).contamination()
 			                    << std::endl;
 		contaminationsfile_.close();
-	} catch (ofstream::failure& e) {
+	} catch (std::ofstream::failure& e) {
 		// These files can only be open if the exception was thrown while they were being built up
 		// so if they are open, we might as well get rid of the incomplete file after we close them.
 		LOGMULTI(warnings, "File exception whilst running simulation:" << std::endl

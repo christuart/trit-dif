@@ -120,19 +120,19 @@ int main(int nArg, char** vArg){
 				bool basename_set = false, configname_set = false, outputname_set = false;
 				for (unsigned i=0; i < cl.size(); ++i) {
 					if (i < cl.size()-1) {
-						if (cl[i].arg == 'm' && !basename_set) { // model
+						if (cl[i].arg == "m" && !basename_set) { // model
 							basename = cl[++i].arg; basename_set = true;
-						} else if (cl[i].arg == 'c' && !configname_set) { // config
+						} else if (cl[i].arg == "c" && !configname_set) { // config
 							configname = cl[++i].arg; configname_set = true;
-						} else if (cl[i].arg == 'o' && !outputname_set) { // output
+						} else if (cl[i].arg == "o" && !outputname_set) { // output
 							outputname = cl[++i].arg; outputname_set = true;
-						} else if (cl[i].arg == 'd') { // delta_t
+						} else if (cl[i].arg == "d") { // delta_t
 							std::istringstream iss(cl[++i].arg);
 							iss >> delta_t;
-						} else if (cl[i].arg == 's') { // steps
+						} else if (cl[i].arg == "s") { // steps
 							std::istringstream iss(cl[++i].arg);
 							iss >> steps;
-						} else if (cl[i].arg == 'e') { // elements (to track)
+						} else if (cl[i].arg == "e") { // elements (to track)
 							element_ids.resize(0);
 							int this_id;
 							std::istringstream iss(cl[++i].arg);
@@ -141,10 +141,10 @@ int main(int nArg, char** vArg){
 								std::cout << "Tracking " << this_id << std::endl;
 								element_ids.push_back(this_id);
 							}
-						} else if (cl[i].arg == 'r') { // recording interval
+						} else if (cl[i].arg == "r") { // recording interval
 							std::istringstream iss(cl[++i].arg);
 							iss >> recording_interval;
-						} else if (cl[i].arg == 'f') { // finish time
+						} else if (cl[i].arg == "f") { // finish time
 							std::istringstream iss(cl[++i].arg);
 							iss >> finish_time;
 							steps = ceil(finish_time/delta_t);
@@ -168,6 +168,7 @@ int main(int nArg, char** vArg){
 				clear_pointers();
 				return 0;
 			} else if (b >= 0) {
+				/*
 				//std::string textfile(vArg[2]);
 				//std::string testoutput = "test.txt";
 				//TFile *f = new TFile("out.root","RECREATE","tds batch file output");
@@ -251,7 +252,7 @@ int main(int nArg, char** vArg){
 				std::cout<<"total root files reduced = "<<filechain-1<<", last file was "<<exroot<<std::endl;
 				std::cout<<"number of pulses found = "<<tot_pulses<<std::endl;
 				//std::cout<<"start at file "<<start_from<<" up to "<<end_at<<std::endl;
-				return 0;
+				return 0;*/
 			} else {
 				show_usage();
 			}
