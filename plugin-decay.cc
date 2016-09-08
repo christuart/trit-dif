@@ -32,11 +32,19 @@ void Decay::interrupt_end_step(const int _step, const double _time) {
 	// get a look at this step's value, we must use !flagAB() instead of
 	// simply flagAB().
 
-	/*
-	int N = IPlugin::get_tds_run()->n_elements();
-	double timestep = IPlugin::get_tds_run()
-	
-	for (int i=0; i < N; ++i) {
-	*/	
-	
+	int S = IPlugin::get_run()->n_sections();
+	int N;
+	double timestep = IPlugin::get_run()->delta_t();
+	tds_element* this_element;
+	double decay_factor = exp(-timestep*contaminant_decay_constant);
+	for (int i=0; i < S; ++i) {
+		// Note simple model with constant source so no need to update them
+		if (!IPlugin::get_run()->section(i).material().is_source()) {
+			N = IPlugin::get_run()->section(i).n_elements();
+			for (int j=0; j < N; ++j) {
+				this_element = &(IPlugin::get_run()->section(i).element(j));
+				this_element->contamination(decay_factor*this_element->contamination(!this_element->flagAB()));
+			}
+		}
+	}
 }

@@ -165,17 +165,12 @@ void tds_element::add_element_link(tds_element_link* new_element_link) {
 }
 
 void tds_element::transfer_contaminant(double _quantity) {
-	// std::cout << "Received quantity of " << _quantity << " and have size() of "
-	//            << size() << std::endl;
 	contamination(contamination()+_quantity/size());
-	flagAB(!flagAB());
 }
 void tds_element::set_origin_from_nodes() {
-	//std::cout << "Setting origin from nodes." << std::endl;
 	origin_.reserve(3);
 	int n_nodes = nodes_.size();
 	double x,y,z;
-	// std::cout << "There are " << n_nodes << " nodes." << std::endl;
 	
 	switch (n_nodes) {
 	case 2:

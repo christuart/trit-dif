@@ -322,6 +322,8 @@ void tds_run::make_analysis() {
 		double step_times[trail_length]; // values stored will be ms per step per element.
 		uint64 start_checkmark = GetTimeMs64();
 		uint64 last_checkmark = start_checkmark;
+
+		bool AB = false;
 	
 		int reporting_interval = ceil(steps()/100.0f);
 		reporting_interval = std::min(reporting_interval,1+(25000000/n_elements()));
@@ -362,6 +364,17 @@ void tds_run::make_analysis() {
 			}
 			// 1.5) Plug-in end-step
 			interrupt_end_step(step,time);
+
+			// Switch the flags in every element that is doing something interesting (i.e. non-source)
+			AB = !AB;
+			for (int i=0; i < n_sections(); ++i) {
+				
+				if (!section(i).material().is_source()) {
+					for (int j=0; j < section(i).n_elements(); ++j) {
+						section(i).element(j).flagAB(AB);
+					}
+				}
+			}
 		
 			time += delta_t();
 		
